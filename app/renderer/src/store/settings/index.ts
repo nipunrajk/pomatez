@@ -140,6 +140,20 @@ const settingsSlice = createSlice({
       state.autoStartWorkTime = action.payload;
     },
 
+    setShowTimerInTrayBar(
+      state,
+      action: SettingsPayload<"showTimerInTrayBar">
+    ) {
+      state.showTimerInTrayBar = action.payload;
+    },
+
+    setEnableUsageTracking(
+      state,
+      action: SettingsPayload<"enableUsageTracking">
+    ) {
+      state.enableUsageTracking = action.payload;
+    },
+
     setOpenAtLogin(state, action: SettingsPayload<"openAtLogin">) {
       state.openAtLogin = action.payload;
     },
@@ -176,6 +190,8 @@ export const {
   setOpenAtLogin,
   setEnableRPC,
   setLanguage,
+  setShowTimerInTrayBar,
+  setEnableUsageTracking,
   setUseNativeTitlebar,
   toggleNotificationSound,
 } = settingsSlice.actions;

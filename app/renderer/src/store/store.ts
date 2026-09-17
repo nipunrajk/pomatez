@@ -7,6 +7,7 @@ import settingReducer from "./settings";
 import timerReducer from "./timer";
 import undoableTasksReducer from "./tasks";
 import updateReducer from "./update";
+import historyReducer from "./history";
 
 export type AppStateTypes = ReturnType<typeof store.getState>;
 export type AppDispatchTypes = typeof store.dispatch;
@@ -18,6 +19,7 @@ const store = configureStore({
     timer: timerReducer,
     tasks: undoableTasksReducer,
     update: updateReducer,
+    history: historyReducer,
   },
 });
 
@@ -26,6 +28,7 @@ if (!getFromStorage("state")) {
     config: store.getState().config,
     settings: store.getState().settings,
     tasks: store.getState().tasks.present,
+    history: store.getState().history,
   });
 }
 
@@ -35,6 +38,7 @@ store.subscribe(
       config: store.getState().config,
       settings: store.getState().settings,
       tasks: store.getState().tasks.present,
+      history: store.getState().history,
     });
   }, 1000)
 );

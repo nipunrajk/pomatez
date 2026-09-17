@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import useStayAwake from "use-stay-awake";
-import { setPlay, setRound, setTimerType } from "store";
+import {
+  setPlay,
+  setRound,
+  setTimerType,
+  recordFocusSession,
+} from "store";
 import { useNotification } from "hooks";
 import { isEqualToOne, padNum } from "utils";
 
@@ -297,6 +302,13 @@ const CounterProvider: React.FC = ({ children }) => {
       setHasNotifiedBreak(true);
       switch (timer.timerType) {
         case TimerStatus.STAY_FOCUS:
+          dispatch(
+            recordFocusSession({
+              completedAt: Date.now(),
+              durationMinutes: config.stayFocus,
+            })
+          );
+
           if (timer.round < config.sessionRounds) {
             setTimeout(() => {
               notification(

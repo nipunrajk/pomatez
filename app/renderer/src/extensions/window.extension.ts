@@ -4,7 +4,7 @@ declare global {
   interface Window {
     electron: {
       send: (channel: string, ...args: any[]) => void;
-      recieve: (channel: string, response: Function) => void;
+      receive: (channel: string, response: Function) => void;
       openExternal: (
         url: string,
         options?: Electron.OpenExternalOptions

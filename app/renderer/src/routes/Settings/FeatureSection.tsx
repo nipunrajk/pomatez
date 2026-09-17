@@ -11,6 +11,8 @@ import {
   setAutoStartWorkTime,
   setMinimizeToTray,
   setCloseToTray,
+  setShowTimerInTrayBar,
+  setEnableUsageTracking,
   setEnableVoiceAssistance,
   setEnableCompactMode,
   setOpenAtLogin,
@@ -127,6 +129,32 @@ const FeatureSection: React.FC = () => {
       onChange: useCallback(() => {
         dispatch(setCloseToTray(!settings.closeToTray));
       }, [dispatch, settings.closeToTray]),
+    },
+    {
+      id: "show-timer-in-tray-bar",
+      label: t("settings.showTimerInTrayBar"),
+      checked: settings.showTimerInTrayBar,
+      onChange: useCallback(() => {
+        dispatch(setShowTimerInTrayBar(!settings.showTimerInTrayBar));
+      }, [dispatch, settings.showTimerInTrayBar]),
+      style: {
+        ...(detectOS() !== "MacOS" && {
+          display: "none",
+        }),
+      },
+    },
+    {
+      id: "enable-usage-tracking",
+      label: t("settings.enableUsageTracking"),
+      checked: settings.enableUsageTracking,
+      onChange: useCallback(() => {
+        dispatch(setEnableUsageTracking(!settings.enableUsageTracking));
+      }, [dispatch, settings.enableUsageTracking]),
+      style: {
+        ...(detectOS() !== "MacOS" && {
+          display: "none",
+        }),
+      },
     },
     {
       id: "voice-assistance",

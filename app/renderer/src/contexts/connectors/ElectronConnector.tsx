@@ -5,7 +5,7 @@ import React, {
   useRef,
 } from "react";
 import { ConnnectorContext } from "../ConnnectorContext";
-import { useAppSelector } from "hooks/storeHooks";
+import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { CounterContext } from "../CounterContext";
 import {
   SET_ALWAYS_ON_TOP,
@@ -17,13 +17,21 @@ import {
   SHOW_WINDOW,
   SET_UI_THEME,
   TRAY_ICON_UPDATE,
+  TRAY_TITLE_UPDATE,
   SET_OPEN_AT_LOGIN,
   SET_RPC_ACTIVITY,
   SET_ENABLE_RPC,
+  SET_ENABLE_ACTIVITY_TRACKING,
+  ACTIVITY_SAMPLE,
 } from "@pomatez/shareables";
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { TimerStatus } from "store/timer/types";
+import { padNum } from "utils";
+import {
+  recordActivitySample,
+  RecordActivitySamplePayload,
+} from "store";
 
 export const ElectronInvokeConnector: InvokeConnector = {
   send: (event: string, ...payload: any) => {
@@ -35,6 +43,7 @@ export const ElectronInvokeConnector: InvokeConnector = {
 
 export const ElectronConnectorProvider: React.FC = ({ children }) => {
   const { electron } = window;
+  const dispatch = useAppDispatch();
 
   const { timer, config, settings } = useAppSelector((state) => ({
     timer: state.timer,
@@ -175,6 +184,39 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
   useTrayIconUpdates((dataUrl) => {
     electron.send(TRAY_ICON_UPDATE, dataUrl);
   });
+
+  useEffect(() => {
+    if (settings.showTimerInTrayBar && timer.playing) {
+      const minutes = Math.floor(count / 60);
+      const seconds = count % 60;
+      electron.send(TRAY_TITLE_UPDATE, `${minutes}:${padNum(seconds)}`);
+    } else {
+      electron.send(TRAY_TITLE_UPDATE, "");
+    }
+  }, [electron, settings.showTimerInTrayBar, timer.playing, count]);
+
+  useEffect(() => {
+    const enable =
+      settings.enableUsageTracking &&
+      timer.playing &&
+      timer.timerType === TimerStatus.STAY_FOCUS;
+
+    electron.send(SET_ENABLE_ACTIVITY_TRACKING, { enable });
+  }, [
+    electron,
+    settings.enableUsageTracking,
+    timer.playing,
+    timer.timerType,
+  ]);
+
+  useEffect(() => {
+    electron.receive(
+      ACTIVITY_SAMPLE,
+      (sample: RecordActivitySamplePayload) => {
+        dispatch(recordActivitySample(sample));
+      }
+    );
+  }, [electron, dispatch]);
 
   return (
     <ConnnectorContext.Provider

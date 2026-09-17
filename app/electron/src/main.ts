@@ -22,9 +22,11 @@ import {
   SHOW_WINDOW,
   RELEASE_NOTES_LINK,
   TRAY_ICON_UPDATE,
+  TRAY_TITLE_UPDATE,
   SET_COMPACT_MODE,
   SET_OPEN_AT_LOGIN,
   SET_ENABLE_RPC,
+  SET_ENABLE_ACTIVITY_TRACKING,
 } from "@pomatez/shareables";
 import {
   activateGlobalShortcuts,
@@ -38,6 +40,8 @@ import {
   initializeRPC,
   uninitializeRPC,
   isUserHaveSession,
+  initializeActivityTracking,
+  uninitializeActivityTracking,
 } from "./helpers";
 import isDev from "electron-is-dev";
 import store from "./store";
@@ -495,6 +499,18 @@ ipcMain.on(SET_NATIVE_TITLEBAR, (e, { useNativeTitlebar }) => {
 ipcMain.on(TRAY_ICON_UPDATE, (e, dataUrl) => {
   const image = nativeImage.createFromDataURL(dataUrl);
   tray?.setImage(image);
+});
+
+ipcMain.on(TRAY_TITLE_UPDATE, (e, title) => {
+  tray?.setTitle(title || "");
+});
+
+ipcMain.on(SET_ENABLE_ACTIVITY_TRACKING, (e, { enable }) => {
+  if (enable) {
+    if (win) initializeActivityTracking(win);
+  } else {
+    uninitializeActivityTracking();
+  }
 });
 
 ipcMain.on(SET_OPEN_AT_LOGIN, (e, { openAtLogin }) => {

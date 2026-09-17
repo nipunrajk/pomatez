@@ -15,6 +15,8 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   notificationType: NotificationTypes.NONE,
   closeToTray: true,
   minimizeToTray: false,
+  showTimerInTrayBar: false,
+  enableUsageTracking: false,
   autoStartWorkTime: false,
   useNativeTitlebar: detectOS() === "Windows" ? false : true,
   openAtLogin: false,

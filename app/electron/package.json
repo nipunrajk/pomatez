@@ -47,10 +47,16 @@
     "files": [
       "build"
     ],
+    "asarUnpack": [
+      "node_modules/active-win/**/*"
+    ],
     "mac": {
       "artifactName": "Pomatez-v${version}-mac-${arch}.${ext}",
       "category": "public.app-category.productivity",
-      "icon": "./build/assets/logo-dark@2x.png"
+      "icon": "./build/assets/logo-dark@2x.png",
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "Pomatez uses Apple Events to detect which website you're viewing in your browser during focus sessions, for the App Split/Browser Activity feature."
+      }
     },
     "win": {
       "target": [
@@ -86,6 +92,7 @@
   "dependencies": {
     "@pomatez/shareables": "^1.0.0",
     "@types/discord-rpc": "^4.0.9",
+    "active-win": "^8.2.1",
     "discord-rpc": "^4.0.1",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^4.2.4",

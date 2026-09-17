@@ -9,3 +9,4 @@ export * from "./getFromStorage";
 export * from "./contextMenu";
 export * from "./discordRPC";
 export * from "./isUserHaveSession";
+export * from "./activityTracking";

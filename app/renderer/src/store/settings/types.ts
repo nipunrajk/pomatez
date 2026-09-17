@@ -14,6 +14,8 @@ export type SettingTypes = {
   notificationSoundOn: boolean;
   closeToTray: boolean;
   minimizeToTray: boolean;
+  showTimerInTrayBar: boolean;
+  enableUsageTracking: boolean;
   autoStartWorkTime: boolean;
   notificationType: NotificationTypes;
   openAtLogin: boolean;

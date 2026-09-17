@@ -6,6 +6,7 @@ export const SET_NATIVE_TITLEBAR = "SET_NATIVE_TITLEBAR";
 export const SET_OPEN_AT_LOGIN = "SET_OPEN_AT_LOGIN";
 export const SET_ENABLE_RPC = "SET_ENABLE_RPC";
 export const TRAY_ICON_UPDATE = "TRAY_ICON_UPDATE";
+export const TRAY_TITLE_UPDATE = "TRAY_TITLE_UPDATE";
 export const SET_UI_THEME = "SET_UI_THEME";
 export const SET_RPC_ACTIVITY = "SET_RPC_ACTIVITY";
 export const MINIMIZE_WINDOW = "MINIMIZE_WINDOW";
@@ -13,6 +14,9 @@ export const CLOSE_WINDOW = "CLOSE_WINDOW";
 export const SHOW_WINDOW = "SHOW_WINDOW";
 export const UPDATE_AVAILABLE = "UPDATE_AVAILABLE";
 export const INSTALL_UPDATE = "INSTALL_UPDATE";
+export const SET_ENABLE_ACTIVITY_TRACKING =
+  "SET_ENABLE_ACTIVITY_TRACKING";
+export const ACTIVITY_SAMPLE = "ACTIVITY_SAMPLE";
 
 export const TO_MAIN: string[] = [
   SET_ALWAYS_ON_TOP,
@@ -21,15 +25,17 @@ export const TO_MAIN: string[] = [
   SET_NATIVE_TITLEBAR,
   SET_ENABLE_RPC,
   TRAY_ICON_UPDATE,
+  TRAY_TITLE_UPDATE,
   SET_UI_THEME,
   SET_RPC_ACTIVITY,
   MINIMIZE_WINDOW,
   CLOSE_WINDOW,
   SHOW_WINDOW,
   INSTALL_UPDATE,
+  SET_ENABLE_ACTIVITY_TRACKING,
 ];
 
-export const FROM_MAIN: string[] = [UPDATE_AVAILABLE];
+export const FROM_MAIN: string[] = [UPDATE_AVAILABLE, ACTIVITY_SAMPLE];
 
 export const RELEASE_NOTES_LINK =
   "https://github.com/zidoro/pomatez/releases/latest";
