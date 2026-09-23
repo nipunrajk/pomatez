@@ -152,6 +152,17 @@ export const StyledResetButton = styled.button`
 
 export const StyledMainButton = styled.button`
   ${ControlButton};
+
+  width: var(--layout-compact-controls-primary-size);
+  height: var(--layout-compact-controls-primary-size);
+  border: var(--border-width-hairline) solid
+    var(--layout-compact-controls-border);
+  border-radius: var(--radius-circle);
+
+  &.compact {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
 `;
 
 export const StyledCompactButton = styled.button<{ compact?: boolean }>`

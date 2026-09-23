@@ -1,35 +1,36 @@
 import React, { SVGProps } from "react";
 import {
-  ConfigSVG,
-  PauseSVG,
-  PlaySVG,
-  ProgressSVG,
-  ResetSVG,
-  SettingsSVG,
-  TaskSVG,
-  SkipSVG,
-  TimerSVG,
-  VolumeMuteSVG,
-  VolumeOnSVG,
-  ExternalSVG,
-  OptionXSVG,
-  AddSVG,
-  PencilSVG,
-  SaveSVG,
-  TrashSVG,
-  CloseSVG,
-  FastFoodSVG,
-  RefreshSVG,
-  ChevronDownSVG,
-  OptionYSVG,
-  AlertSVG,
-  ExpandSVG,
-  LaptopSVG,
-  NapSVG,
-  MugSVG,
-  StatsSVG,
-  CalendarSVG,
-} from "assets/icons";
+  Bed,
+  CalendarDays,
+  ChartNoAxesColumn,
+  ChevronDown,
+  CircleAlert,
+  Clock,
+  Coffee,
+  Ellipsis,
+  EllipsisVertical,
+  ExternalLink,
+  Laptop,
+  LucideIcon,
+  Maximize2,
+  Pause,
+  Pencil,
+  Play,
+  Plus,
+  RefreshCw,
+  RotateCw,
+  Save,
+  Settings,
+  SkipForward,
+  SquarePen,
+  Timer,
+  Trash2,
+  UtensilsCrossed,
+  Volume2,
+  VolumeX,
+  X,
+} from "lucide-react";
+import { ProgressSVG } from "assets/icons";
 
 export type SVGTypes = {
   size?: number;
@@ -66,69 +67,59 @@ export type SVGTypes = {
     | "calendar";
 };
 
-const SVG: React.FC<SVGTypes> = ({ name, size, style }) => {
-  switch (name) {
-    case "laptop":
-      return <LaptopSVG />;
-    case "mug":
-      return <MugSVG />;
-    case "nap":
-      return <NapSVG />;
-    case "config":
-      return <ConfigSVG />;
-    case "option-x":
-      return <OptionXSVG />;
-    case "option-y":
-      return <OptionYSVG />;
-    case "pause":
-      return <PauseSVG height={size} width={size} />;
-    case "play":
-      return <PlaySVG height={size} width={size} />;
-    case "progress":
-      return <ProgressSVG />;
-    case "reset":
-      return <ResetSVG />;
-    case "settings":
-      return <SettingsSVG />;
-    case "skip":
-      return <SkipSVG />;
-    case "task":
-      return <TaskSVG />;
-    case "timer":
-      return <TimerSVG />;
-    case "volume-mute":
-      return <VolumeMuteSVG />;
-    case "volume-on":
-      return <VolumeOnSVG />;
-    case "external":
-      return <ExternalSVG />;
-    case "add":
-      return <AddSVG />;
-    case "pencil":
-      return <PencilSVG />;
-    case "save":
-      return <SaveSVG />;
-    case "trash":
-      return <TrashSVG />;
-    case "close":
-      return <CloseSVG />;
-    case "fast-food":
-      return <FastFoodSVG />;
-    case "refresh":
-      return <RefreshSVG />;
-    case "alert":
-      return <AlertSVG />;
-    case "chevron-down":
-      return <ChevronDownSVG />;
-    case "expand":
-      return <ExpandSVG style={style} />;
-    case "stats":
-      return <StatsSVG />;
-    case "calendar":
-      return <CalendarSVG />;
-    default:
-      return <TimerSVG />;
-  }
+const ICONS: Record<
+  Exclude<SVGTypes["name"], "progress">,
+  LucideIcon
+> = {
+  laptop: Laptop,
+  mug: Coffee,
+  nap: Bed,
+  config: Clock,
+  "option-x": Ellipsis,
+  "option-y": EllipsisVertical,
+  pause: Pause,
+  play: Play,
+  reset: RotateCw,
+  settings: Settings,
+  skip: SkipForward,
+  task: SquarePen,
+  timer: Timer,
+  "volume-mute": VolumeX,
+  "volume-on": Volume2,
+  external: ExternalLink,
+  add: Plus,
+  pencil: Pencil,
+  save: Save,
+  trash: Trash2,
+  close: X,
+  "fast-food": UtensilsCrossed,
+  refresh: RefreshCw,
+  alert: CircleAlert,
+  "chevron-down": ChevronDown,
+  expand: Maximize2,
+  stats: ChartNoAxesColumn,
+  calendar: CalendarDays,
+};
+
+/**
+ * Outline icons from Lucide at the Modula 1.5px stroke. The stroke stays
+ * 1.5px at any rendered size (absoluteStrokeWidth). Containers size icons
+ * with CSS width/height; `size` only sets the default.
+ */
+const SVG: React.FC<SVGTypes> = ({ name, size = 20, style }) => {
+  // The timer ring's shape, not an icon; styled in counter.ts.
+  if (name === "progress") return <ProgressSVG />;
+
+  const Icon = ICONS[name];
+  return (
+    <Icon
+      size={size}
+      strokeWidth={1.5}
+      absoluteStrokeWidth
+      style={style}
+      aria-hidden="true"
+    />
+  );
 };
 
 export default React.memo(SVG);

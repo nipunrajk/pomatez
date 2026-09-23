@@ -70,6 +70,15 @@ export const GlobalStyles = createGlobalStyle<GlobalTypes>`
     box-sizing: border-box;
   }
 
+  /*
+   * Lucide icons are outline-only. Older styles set svg { fill: currentColor }
+   * for the previous filled icon set; don't let that fill Lucide shapes.
+   */
+  svg.lucide,
+  svg.lucide * {
+    fill: none !important;
+  }
+
   a {
     text-decoration: none;
     color: currentColor;

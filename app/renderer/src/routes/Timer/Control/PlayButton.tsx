@@ -28,11 +28,14 @@ const PlayButton: React.FC<Props> = ({
     [buttonClickAction, onClick]
   );
 
-  const size = compact ? 36 : 56;
+  // The circle is the button's border now; the icon sits inside it.
+  const size = compact ? 16 : 24;
 
   return (
     <StyledMainButton
-      className={className}
+      className={[className, compact && "compact"]
+        .filter(Boolean)
+        .join(" ")}
       ref={buttonRef}
       onClick={onPlayAction}
     >
