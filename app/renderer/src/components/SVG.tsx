@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Laptop,
   LucideIcon,
-  Maximize2,
   Pause,
   Pencil,
   Play,
@@ -62,7 +61,6 @@ export type SVGTypes = {
     | "refresh"
     | "alert"
     | "chevron-down"
-    | "expand"
     | "stats"
     | "calendar";
 };
@@ -96,7 +94,6 @@ const ICONS: Record<
   refresh: RefreshCw,
   alert: CircleAlert,
   "chevron-down": ChevronDown,
-  expand: Maximize2,
   stats: ChartNoAxesColumn,
   calendar: CalendarDays,
 };

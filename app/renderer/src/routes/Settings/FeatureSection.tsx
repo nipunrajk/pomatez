@@ -14,7 +14,6 @@ import {
   setShowTimerInTrayBar,
   setEnableUsageTracking,
   setEnableVoiceAssistance,
-  setEnableCompactMode,
   setOpenAtLogin,
   setEnableRPC,
   setFollowSystemTheme,
@@ -24,7 +23,7 @@ import { ThemeContext } from "contexts";
 
 import SettingSection from "./SettingSection";
 import { detectOS } from "utils";
-import { AppLayout, NotificationTypes } from "store/settings/types";
+import { NotificationTypes } from "store/settings/types";
 
 const FeatureSection: React.FC = () => {
   const { t } = useTranslation();
@@ -42,19 +41,6 @@ const FeatureSection: React.FC = () => {
       onChange: useCallback(() => {
         dispatch(setAlwaysOnTop(!settings.alwaysOnTop));
       }, [dispatch, settings.alwaysOnTop]),
-    },
-    {
-      id: "compact-mode",
-      label: t("settings.compactMode"),
-      checked: settings.compactMode,
-      onChange: useCallback(() => {
-        dispatch(setEnableCompactMode(!settings.compactMode));
-      }, [dispatch, settings.compactMode]),
-      style: {
-        ...(settings.layout === AppLayout.DASHBOARD && {
-          display: "none",
-        }),
-      },
     },
     {
       id: "fullscreen-break",

@@ -51,6 +51,7 @@ export const zh = {
     longBreak: "长休息",
     specialBreak: "特殊休息",
     sessions: "轮次",
+    openDashboard: "打开仪表盘",
   },
   tasks: {
     addAnotherList: "添加另一个列表",
@@ -110,7 +111,6 @@ export const zh = {
     alertHeading: "你好 👋,",
     alertBody: "如果你喜欢这个应用，请考虑在 GitHub 上点星以示支持。",
     alwaysOnTop: "始终置顶",
-    compactMode: "紧凑模式",
     fullscreenBreak: "全屏休息",
     strictMode: "严格模式",
     darkTheme: "深色主题",

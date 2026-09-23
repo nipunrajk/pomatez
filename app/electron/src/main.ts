@@ -23,7 +23,6 @@ import {
   RELEASE_NOTES_LINK,
   TRAY_ICON_UPDATE,
   TRAY_TITLE_UPDATE,
-  SET_COMPACT_MODE,
   SET_LAYOUT,
   SET_OPEN_AT_LOGIN,
   SET_ENABLE_RPC,
@@ -71,14 +70,15 @@ const applicationMenu = isMacOS()
   : null;
 Menu.setApplicationMenu(applicationMenu);
 
+// The classic window is a fixed-size single-purpose timer popup.
 const getFrameHeight = () => {
   if (isWindow()) {
-    return 502;
+    return 640;
   } else {
     if (store.safeGet("useNativeTitlebar")) {
-      return 488;
+      return 626;
     }
-    return 502;
+    return 640;
   }
 };
 
@@ -89,13 +89,11 @@ let win: BrowserWindow | null;
 let isRecreatingWindow = false;
 
 type WindowStateProps = {
-  isOnCompactMode: boolean;
   layout: AppLayoutName;
 } & FullscreenState;
 
 const windowState: WindowStateProps = {
   isFullscreen: false,
-  isOnCompactMode: false,
   layout:
     store.safeGet("layout") === "dashboard" ? "dashboard" : "classic",
 };
@@ -259,15 +257,7 @@ function createMainWindow() {
   win.on("leave-full-screen", () => {
     // The dashboard is freely resizable; macOS restores its previous size.
     if (isDashboardLayout()) return;
-    if (windowState.isOnCompactMode) {
-      setSizeIfDiff(340, 100);
-      // Windows doesn't like trying to set it as not resizeable it along with everything else that's going on
-      setTimeout(() => {
-        win?.setResizable(false);
-      });
-    } else {
-      setSizeIfDiff(340, getFrameHeight());
-    }
+    setSizeIfDiff(340, getFrameHeight());
   });
 
   win.on(
@@ -515,25 +505,6 @@ ipcMain.on(SET_LAYOUT, (e, { layout }: { layout: AppLayoutName }) => {
   windowState.layout = layout;
   store.safeSet("layout", layout);
   if (win && !win.isFullScreen()) applyLayoutSize(win);
-});
-
-ipcMain.on(SET_COMPACT_MODE, (e, args) => {
-  // Compact mode doesn't exist in the dashboard; don't shrink it to 340px.
-  if (isDashboardLayout()) {
-    windowState.isOnCompactMode = false;
-    return;
-  }
-  if (args.compactMode) {
-    win?.setMinimumSize(340, 100);
-    win?.setSize(340, 100);
-    win?.setResizable(false);
-    windowState.isOnCompactMode = true;
-  } else {
-    win?.setResizable(true);
-    windowState.isOnCompactMode = false;
-    win?.setMinimumSize(340, getFrameHeight());
-    win?.setSize(340, getFrameHeight());
-  }
 });
 
 ipcMain.on(SET_UI_THEME, (e, { isDarkMode }) => {

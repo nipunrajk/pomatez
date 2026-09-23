@@ -91,15 +91,6 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
     border: var(--layout-compact-timer-ring-stroke) solid
       var(--color-timer-ring-track);
   }
-
-  &.compact {
-    padding: 16px;
-    display: flex;
-    flex: 0;
-    &::before {
-      display: ${(p) => (p.fullscreen ? "auto" : "none")};
-    }
-  }
 `;
 
 export const StyledCounterType = styled.div`
@@ -116,7 +107,7 @@ export const StyledCounterType = styled.div`
 type TimerProps = {
   type?: TimerStatus;
   hours: string;
-} & CounterContainerProps;
+};
 
 export const StyledCounterTimer = styled.h3<TimerProps>`
   ${typeStyle("timer-display")};
@@ -148,13 +139,6 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
 
   & > span:first-of-type {
     justify-self: end;
-  }
-
-  &.compact {
-    font-size: ${(p) => (p.fullscreen ? "4.8rem" : "2.4rem")};
-    width: unset;
-    display: flex;
-    gap: 0.25rem;
   }
 `;
 

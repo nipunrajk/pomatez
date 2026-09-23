@@ -52,6 +52,7 @@ export const ja = {
     longBreak: "長い休憩",
     specialBreak: "特別休憩",
     sessions: "セッション",
+    openDashboard: "ダッシュボードを開く",
   },
   tasks: {
     addAnotherList: "別のリストを追加",
@@ -112,7 +113,6 @@ export const ja = {
     alertBody:
       "このアプリが気に入ったら、GitHub でスターを付けて応援してください。",
     alwaysOnTop: "常に最前面",
-    compactMode: "コンパクトモード",
     fullscreenBreak: "フルスクリーン休憩",
     strictMode: "厳格モード",
     darkTheme: "ダークテーマ",

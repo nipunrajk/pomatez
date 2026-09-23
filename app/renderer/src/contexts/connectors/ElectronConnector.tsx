@@ -10,7 +10,6 @@ import { CounterContext } from "../CounterContext";
 import {
   SET_ALWAYS_ON_TOP,
   CLOSE_WINDOW,
-  SET_COMPACT_MODE,
   SET_LAYOUT,
   SET_FULLSCREEN_BREAK,
   MINIMIZE_WINDOW,
@@ -106,12 +105,6 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
   useEffect(() => {
     electron.send(SET_LAYOUT, { layout: settings.layout });
   }, [electron, settings.layout]);
-
-  useEffect(() => {
-    electron.send(SET_COMPACT_MODE, {
-      compactMode: settings.compactMode,
-    });
-  }, [electron, settings.compactMode]);
 
   useEffect(() => {
     electron.send(SET_UI_THEME, {

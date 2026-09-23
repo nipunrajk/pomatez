@@ -52,6 +52,7 @@ export const es = {
     longBreak: "Pausa larga",
     specialBreak: "Pausa especial",
     sessions: "Sesiones",
+    openDashboard: "Abrir panel",
   },
   tasks: {
     addAnotherList: "Agregar otra lista",
@@ -113,7 +114,6 @@ export const es = {
     alertBody:
       "Si te gustó esta app, considera marcar este proyecto con una estrella en GitHub para mostrar tu apoyo.",
     alwaysOnTop: "Siempre arriba",
-    compactMode: "Modo compacto",
     fullscreenBreak: "Pausa en pantalla completa",
     strictMode: "Modo estricto",
     darkTheme: "Tema oscuro",

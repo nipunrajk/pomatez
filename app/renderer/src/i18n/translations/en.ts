@@ -51,6 +51,7 @@ export const en = {
     longBreak: "Long Break",
     specialBreak: "Special Break",
     sessions: "Sessions",
+    openDashboard: "Open Dashboard",
   },
   tasks: {
     addAnotherList: "Add another list",
@@ -112,7 +113,6 @@ export const en = {
     alertBody:
       "If you liked this app, please consider starring this project on GitHub to show your ❤️ and support.",
     alwaysOnTop: "Always On Top",
-    compactMode: "Compact Mode",
     fullscreenBreak: "Fullscreen Break",
     strictMode: "Strict Mode",
     darkTheme: "Dark Theme",

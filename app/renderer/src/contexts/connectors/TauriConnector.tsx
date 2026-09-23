@@ -7,7 +7,6 @@ import {
   SET_ALWAYS_ON_TOP,
   CLOSE_WINDOW,
   SET_CLOSE_TO_TRAY,
-  SET_COMPACT_MODE,
   SET_LAYOUT,
   SET_FULLSCREEN_BREAK,
   MINIMIZE_WINDOW,
@@ -171,12 +170,6 @@ export const TauriConnectorProvider: React.FC = ({ children }) => {
   useEffect(() => {
     send(SET_LAYOUT, { layout: settings.layout });
   }, [send, settings.layout]);
-
-  useEffect(() => {
-    send(SET_COMPACT_MODE, {
-      compactMode: settings.compactMode,
-    });
-  }, [send, settings.compactMode]);
 
   useEffect(() => {
     send(SET_UI_THEME, {

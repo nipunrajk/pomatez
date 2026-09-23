@@ -6,7 +6,7 @@ import {
   ConnectorProvider,
 } from "contexts";
 import { Layout, Preloader } from "components";
-import { compactRoutes, dashboardRoutes, routes } from "config";
+import { compactRoutes, dashboardRoutes } from "config";
 import { useEntryPomodoroSync, useLanguageSync } from "hooks";
 import { useAppSelector } from "hooks/storeHooks";
 import { AppLayout } from "store/settings/types";
@@ -16,11 +16,12 @@ export default function App() {
   useLanguageSync();
   useEntryPomodoroSync();
 
-  const activeRoutes = settings.compactMode
-    ? compactRoutes
-    : settings.layout === AppLayout.DASHBOARD
-    ? dashboardRoutes()
-    : routes();
+  // Classic is a single-purpose timer popup with no tabs; only the
+  // dashboard exposes the rest of the app.
+  const activeRoutes =
+    settings.layout === AppLayout.DASHBOARD
+      ? dashboardRoutes()
+      : compactRoutes;
 
   useEffect(() => {
     const contextEvent = (event: MouseEvent) => {

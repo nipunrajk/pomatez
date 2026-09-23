@@ -14,13 +14,10 @@ use crate::updater;
 
 impl WindowSize {
     // Not sure why, if its due to UI scaling or what though these values seem to size smaller than the same values on electron
+    // The classic window is a fixed-size single-purpose timer popup.
     pub const MIN: LogicalSize<u32> = LogicalSize {
         width: 340,
-        height: 540,
-    };
-    pub const COMPACT: LogicalSize<u32> = LogicalSize {
-        width: 340,
-        height: 60,
+        height: 690,
     };
     pub const DASHBOARD: LogicalSize<u32> = LogicalSize {
         width: 1200,
@@ -65,12 +62,7 @@ fn set_layout<R: Runtime>(layout: String, window: tauri::WebviewWindow<R>) {
     }
 }
 
-static ORIGINAL_SIZE: Mutex<LogicalSize<u32>> = Mutex::new(WindowSize::MIN);
-
-static UNDECORATED_TITLE_SIZE: u32 = 40;
-
 static HAS_DECORATIONS: Mutex<bool> = Mutex::new(true);
-static IS_COMPACT: Mutex<bool> = Mutex::new(false);
 
 // Mirrors the renderer's `closeToTray` setting (default matches
 // `defaultSettings.ts`). Kept in sync via `set_close_to_tray` so the
@@ -176,65 +168,6 @@ fn try_set_resizeable<R: Runtime>(resizeable: bool, window: &tauri::WebviewWindo
     }
 }
 
-fn set_window_fixed_size<R: Runtime>(size: LogicalSize<u32>, window: &tauri::WebviewWindow<R>) {
-    let decorations = HAS_DECORATIONS.lock().unwrap();
-
-    let new_height = size.height
-        + (if *decorations {
-            0
-        } else {
-            UNDECORATED_TITLE_SIZE
-        });
-
-    let new_size = LogicalSize {
-        width: size.width,
-        height: new_height,
-    };
-
-    try_set_size(new_size, window);
-    try_set_resizeable(false, window);
-}
-
-fn set_window_resizeable<R: Runtime>(
-    min_size: LogicalSize<u32>,
-    size: LogicalSize<u32>,
-    window: &tauri::WebviewWindow<R>,
-) {
-    try_set_resizeable(true, window);
-    try_set_size(size, window);
-    try_set_min_size(Some(min_size), window);
-}
-
-#[tauri::command]
-fn set_compact_mode<R: Runtime>(compact_mode: bool, window: tauri::WebviewWindow<R>) {
-    // Compact mode doesn't exist in the dashboard; don't shrink it to 340px.
-    if *IS_DASHBOARD.lock().unwrap() {
-        *IS_COMPACT.lock().unwrap() = false;
-        return;
-    }
-    {
-        let mut compact = IS_COMPACT.lock().unwrap();
-        *compact = compact_mode;
-        drop(compact);
-    }
-    if compact_mode {
-        {
-            let mut size = ORIGINAL_SIZE.lock().unwrap();
-            *size = window
-                .outer_size()
-                .unwrap()
-                .to_logical(window.scale_factor().unwrap());
-        }
-        set_window_fixed_size(WindowSize::COMPACT, &window);
-    } else {
-        set_window_resizeable(
-            WindowSize::MIN,
-            ORIGINAL_SIZE.lock().unwrap().clone(),
-            &window,
-        );
-    }
-}
-
 // TODO - This is doing nothing - Remove or fix
 #[tauri::command]
 fn set_ui_theme<R: Runtime>(is_dark_mode: bool, _window: tauri::WebviewWindow<R>) {
@@ -264,17 +197,6 @@ pub fn try_set_native_titlebar<R: Runtime>(use_native_titlebar: bool, window: &t
         ),
     }
     println!("set_native_titlebar! {}", use_native_titlebar);
-
-    // Check DECORATIONS and IS_COMPACT
-    let decorated = HAS_DECORATIONS.lock().unwrap();
-    let compact = IS_COMPACT.lock().unwrap();
-    if !*decorated && *compact {
-        let size = LogicalSize {
-            width: WindowSize::COMPACT.width,
-            height: WindowSize::COMPACT.height + UNDECORATED_TITLE_SIZE,
-        };
-        try_set_size(size, window);
-    }
 }
 
 /**
@@ -295,7 +217,6 @@ impl PomatezCommands for Builder<Wry> {
             show_window,
             set_always_on_top,
             set_fullscreen_break,
-            set_compact_mode,
             set_ui_theme,
             set_native_titlebar,
             system_tray::tray_icon_update,
@@ -315,7 +236,6 @@ impl PomatezCommands for Builder<Wry> {
             show_window,
             set_always_on_top,
             set_fullscreen_break,
-            set_compact_mode,
             set_ui_theme,
             set_native_titlebar,
             system_tray::tray_icon_update,

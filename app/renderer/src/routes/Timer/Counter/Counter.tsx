@@ -21,47 +21,6 @@ const Counter: React.FC = () => {
 
   const { hours, minutes, seconds } = useTime(count);
 
-  if (settings.compactMode) {
-    return (
-      <StyledCounterContainer
-        className="compact"
-        fullscreen={shouldFullscreen}
-      >
-        {shouldFullscreen ? (
-          <>
-            <StyledCounterProgress
-              offset={dashOffset}
-              type={timerType}
-              animate={
-                settings.enableProgressAnimation ? "true" : "false"
-              }
-            />
-            <StyledCounterWrapper>
-              <CounterType timerType={timerType} />
-              <CounterTimer
-                compact
-                fullscreen={shouldFullscreen}
-                timerType={timerType}
-                hours={hours}
-                minutes={minutes}
-                seconds={seconds}
-              />
-              <CounterLabel timerType={timerType} />
-            </StyledCounterWrapper>
-          </>
-        ) : (
-          <CounterTimer
-            compact
-            timerType={timerType}
-            hours={hours}
-            minutes={minutes}
-            seconds={seconds}
-          />
-        )}
-      </StyledCounterContainer>
-    );
-  }
-
   return (
     <StyledCounterContainer fullscreen={shouldFullscreen}>
       <StyledCounterProgress

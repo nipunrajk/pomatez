@@ -8,7 +8,6 @@ import { detectOS } from "utils";
 
 export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   alwaysOnTop: false,
-  compactMode: false,
   ignoreUpdate: "",
   enableFullscreenBreak: false,
   enableStrictMode: false,

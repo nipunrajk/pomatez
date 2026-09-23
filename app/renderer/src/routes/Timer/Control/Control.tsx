@@ -3,9 +3,7 @@ import { SVG } from "components";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { TimerStatus } from "store/timer/types";
-import { AppLayout } from "store/settings/types";
 import {
-  setEnableCompactMode,
   setPlay,
   setRound,
   setTimerType,
@@ -19,7 +17,6 @@ import {
   StyledStrictSnackbar,
   StyledControlSpacer,
 } from "styles";
-import CompactModeButton from "./CompactModeButton";
 import PlayButton from "./PlayButton";
 import ResetButton from "./ResetButton";
 import Sessions from "./Sessions";
@@ -81,10 +78,6 @@ const Control: React.FC<Props> = ({ resetTimerAction }) => {
     dispatch(toggleNotificationSound());
   }, [dispatch]);
 
-  const onToggleCompactCallback = useCallback(() => {
-    dispatch(setEnableCompactMode(!settings.compactMode));
-  }, [dispatch, settings.compactMode]);
-
   const onSkipAction = useCallback(() => {
     if (timer.playing && settings.enableStrictMode) {
       activateWarning();
@@ -145,31 +138,6 @@ const Control: React.FC<Props> = ({ resetTimerAction }) => {
     return () => clearTimeout(timeout);
   }, [warn]);
 
-  if (settings.compactMode) {
-    return (
-      <StyledControl className="compact" type={timer.timerType}>
-        <Sessions
-          timerType={timer.timerType}
-          round={timer.round}
-          sessionRounds={config.sessionRounds}
-          onClick={onResetSessionCallback}
-        />
-        <StyledControlSpacer className="test" />
-        <StyledControlMain compact={settings.compactMode}>
-          <ResetButton className="compact" onClick={onResetCallback} />
-          <PlayButton
-            compact
-            playing={timer.playing}
-            onClick={onPlayCallback}
-          />
-          <SkipButton className="compact" onClick={onSkipAction} />
-        </StyledControlMain>
-        <StyledControlSpacer className="test" />
-        <CompactModeButton onClick={onToggleCompactCallback} />
-      </StyledControl>
-    );
-  }
-
   return (
     <StyledControl type={timer.timerType}>
       <Sessions
@@ -199,9 +167,7 @@ const Control: React.FC<Props> = ({ resetTimerAction }) => {
             You are currently on <span>Strict Mode!</span>
           </StyledStrictSnackbar>
         </StyledStrictIndicator>
-      ) : settings.layout === AppLayout.DASHBOARD ? null : (
-        <CompactModeButton flipped onClick={onToggleCompactCallback} />
-      )}
+      ) : null}
     </StyledControl>
   );
 };

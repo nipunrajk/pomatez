@@ -1,25 +1,34 @@
 import { CounterContext } from "contexts";
 import React, { useCallback, useContext } from "react";
 import { useAppSelector } from "hooks/storeHooks";
-import { StyledTimer } from "styles";
+import { StyledTimer, StyledTimerHeaderPad } from "styles";
+import { AppLayout } from "store/settings/types";
 import Control from "./Control";
 import Counter from "./Counter";
-import PriorityCard from "./PriorityCard";
+import TimerHeader from "./TimerHeader";
+import TimerStats from "./TimerStats";
 
 export default function Timer() {
-  const compactMode = useAppSelector(
-    (state) => state.settings.compactMode
-  );
+  const settings = useAppSelector((state) => state.settings);
+  const timer = useAppSelector((state) => state.timer);
   const { resetTimerAction } = useContext(CounterContext);
 
   const onResetCallback = useCallback(() => {
     if (resetTimerAction) resetTimerAction();
   }, [resetTimerAction]);
 
+  const isDashboard = settings.layout === AppLayout.DASHBOARD;
+
   return (
-    <StyledTimer className={compactMode ? "compact" : ""}>
+    <StyledTimer>
+      {/* Classic has no tab bar; this is its only way back to the rest of the app. */}
+      {!isDashboard && (
+        <StyledTimerHeaderPad>
+          <TimerHeader timerType={timer.timerType} />
+        </StyledTimerHeaderPad>
+      )}
       <Counter />
-      {compactMode ? null : <PriorityCard />}
+      <TimerStats />
       <Control resetTimerAction={onResetCallback} />
     </StyledTimer>
   );

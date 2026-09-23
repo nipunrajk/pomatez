@@ -25,11 +25,6 @@ const ControlButton = css`
   }
 
   ${focusRing};
-
-  &.compact {
-    min-width: 1.6rem;
-    min-height: 1.6rem;
-  }
 `;
 
 /** Playback controls: outlined circles per layout.compact.controls. */
@@ -44,16 +39,6 @@ const OutlinedControl = css`
   & > svg {
     width: var(--icon-size-md);
     height: var(--icon-size-md);
-  }
-
-  &.compact {
-    width: 3.2rem;
-    height: 3.2rem;
-
-    & > svg {
-      width: var(--icon-size-sm);
-      height: var(--icon-size-sm);
-    }
   }
 `;
 
@@ -86,11 +71,6 @@ export const StyledControl = styled.div<ControlProps>`
       (p.type === TimerStatus.SPECIAL_BREAK &&
         "var(--color-bg-ripple-yellow)") ||
       "var(--color-bg-ripple-primary)"};
-  }
-
-  &.compact {
-    height: 100%;
-    padding: 0;
   }
 `;
 
@@ -161,7 +141,7 @@ export const StyledSessions = styled.p`
   }
 `;
 
-export const StyledControlMain = styled.div<{ compact?: boolean }>`
+export const StyledControlMain = styled.div`
   display: grid;
   align-items: center;
   align-content: center;
@@ -181,20 +161,6 @@ export const StyledMainButton = styled.button`
   border: var(--border-width-hairline) solid
     var(--layout-compact-controls-border);
   border-radius: var(--radius-circle);
-
-  &.compact {
-    width: 3.6rem;
-    height: 3.6rem;
-  }
-`;
-
-export const StyledCompactButton = styled.button<{ compact?: boolean }>`
-  ${ControlButton}
-  padding-right: ${(p) => (p.compact ? "1.6rem" : 0)};
-
-  & > svg {
-    width: ${(p) => (p.compact ? "1.6rem" : "inherit")};
-  }
 `;
 
 export const StyledSkipButton = styled.button`

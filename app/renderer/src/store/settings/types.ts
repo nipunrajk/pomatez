@@ -3,7 +3,6 @@ import { PayloadAction } from "@reduxjs/toolkit";
 export type SettingTypes = {
   ignoreUpdate: string;
   alwaysOnTop: boolean;
-  compactMode: boolean;
   enableFullscreenBreak: boolean;
   enableDarkTheme: boolean;
   followSystemTheme: boolean;

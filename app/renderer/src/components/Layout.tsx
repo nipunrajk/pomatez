@@ -14,7 +14,6 @@ import {
 } from "styles";
 
 import Titlebar from "./Titlebar";
-import Navigation from "./Navigation";
 import Sidebar from "./Sidebar";
 import { ThemeContext } from "contexts";
 import { TimerStatus } from "store/timer/types";
@@ -50,14 +49,15 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
   }, [registerKey]);
 
   // On launch and whenever the layout changes, land on a page that exists
-  // in that layout: the dashboard opens on Day, classic has no Day page.
+  // in that layout: the dashboard opens on Day, classic only has "/" (it's
+  // a single-purpose timer popup with no tabs).
   const appliedLayout = useRef<AppLayout | null>(null);
   useEffect(() => {
     if (appliedLayout.current === settings.layout) return;
     appliedLayout.current = settings.layout;
     if (isDashboard && location.pathname === "/") {
       history.replace(dayRoute.path);
-    } else if (!isDashboard && location.pathname === dayRoute.path) {
+    } else if (!isDashboard && location.pathname !== "/") {
       history.replace("/");
     }
   }, [settings.layout, isDashboard, location.pathname, history]);
@@ -108,12 +108,7 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
           </StyledDashboardContent>
         </StyledDashboard>
       ) : (
-        <>
-          {settings["compactMode"] ? null : (
-            <Navigation timerType={timer.timerType} />
-          )}
-          {children}
-        </>
+        children
       )}
     </StyledLayout>
   );

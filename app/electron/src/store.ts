@@ -8,7 +8,6 @@ type StoreProps = {
   userId?: string;
   isDarkMode?: boolean;
   useNativeTitlebar?: boolean;
-  compactMode?: boolean;
   openAtLogin?: boolean;
   /** Mirrors the renderer's layout so the window opens at the right size. */
   layout?: AppLayoutName;
@@ -59,7 +58,6 @@ const store = new SafeStore<StoreProps>({
   defaults: {
     isDarkMode: false,
     useNativeTitlebar: !isWindow(),
-    compactMode: false,
     openAtLogin: false,
     layout: "classic",
   },
