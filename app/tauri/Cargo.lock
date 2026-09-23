@@ -2886,6 +2886,7 @@ version = "1.10.0"
 dependencies = [
  "base64 0.22.1",
  "lazy_static",
+ "objc2-app-kit",
  "reqwest 0.12.28",
  "serde",
  "serde_json",

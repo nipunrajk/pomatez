@@ -1,4 +1,4 @@
-use tauri::{Manager, RunEvent};
+use tauri::{Manager, RunEvent, WindowEvent};
 use tauri_plugin_autostart::MacosLauncher;
 
 #[macro_use]
@@ -43,11 +43,25 @@ pub fn run() {
 
     let app = builder
         .register_pomatez_commands()
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main"
+                    && *commands::CLOSE_TO_TRAY.lock().unwrap()
+                {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
         .setup(|app| {
             #[cfg(desktop)]
             {
                 app.setup_global_shortcuts();
                 app.set_pomatez_system_tray();
+            }
+            #[cfg(target_os = "macos")]
+            if let Some(window) = app.get_webview_window("main") {
+                system_tray::move_to_active_space_when_shown(&window);
             }
             Ok(())
         })

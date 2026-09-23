@@ -37,3 +37,5 @@ export { ReactComponent as ChevronDownSVG } from "./chevron-down.svg";
 export { ReactComponent as ExpandSVG } from "./expand.svg";
 
 export { ReactComponent as StatsSVG } from "./stats.svg";
+
+export { ReactComponent as CalendarSVG } from "./calendar.svg";

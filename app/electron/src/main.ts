@@ -24,6 +24,7 @@ import {
   TRAY_ICON_UPDATE,
   TRAY_TITLE_UPDATE,
   SET_COMPACT_MODE,
+  SET_LAYOUT,
   SET_OPEN_AT_LOGIN,
   SET_ENABLE_RPC,
   SET_ENABLE_ACTIVITY_TRACKING,
@@ -33,6 +34,7 @@ import {
   activateAutoUpdate,
   blockShortcutKeys,
   getIcon,
+  getTrayIcon,
   isWindow,
   isMacOS,
   getFromStorage,
@@ -44,7 +46,7 @@ import {
   uninitializeActivityTracking,
 } from "./helpers";
 import isDev from "electron-is-dev";
-import store from "./store";
+import store, { AppLayoutName } from "./store";
 
 import {
   FullscreenState,
@@ -60,7 +62,7 @@ const notificationIcon = path.join(
   "assets/notification-dark.png"
 );
 
-const trayIcon = path.join(__dirname, "assets/tray-dark.png");
+const trayIcon = getTrayIcon();
 
 const onlySingleInstance = app.requestSingleInstanceLock();
 
@@ -88,19 +90,94 @@ let isRecreatingWindow = false;
 
 type WindowStateProps = {
   isOnCompactMode: boolean;
+  layout: AppLayoutName;
 } & FullscreenState;
 
 const windowState: WindowStateProps = {
   isFullscreen: false,
   isOnCompactMode: false,
+  layout:
+    store.safeGet("layout") === "dashboard" ? "dashboard" : "classic",
 };
 
+const DASHBOARD_SIZE = { width: 1200, height: 760 };
+const DASHBOARD_MIN_SIZE = { width: 960, height: 620 };
+
+const isDashboardLayout = () => windowState.layout === "dashboard";
+
+function applyLayoutSize(window: BrowserWindow) {
+  if (isDashboardLayout()) {
+    window.setResizable(true);
+    window.setMaximizable(true);
+    window.setMinimumSize(
+      DASHBOARD_MIN_SIZE.width,
+      DASHBOARD_MIN_SIZE.height
+    );
+    window.setSize(DASHBOARD_SIZE.width, DASHBOARD_SIZE.height);
+    window.center();
+  } else {
+    if (window.isMaximized()) window.unmaximize();
+    window.setMaximizable(false);
+    window.setMinimumSize(340, getFrameHeight());
+    window.setSize(340, getFrameHeight());
+  }
+}
+
+const workspaceOptions = { skipTransformProcessType: true };
+let pendingWorkspaceReset: NodeJS.Timeout | null = null;
+
+/**
+ * Shows and focuses the window on the macOS Space the user is currently on,
+ * instead of jumping them to the Space the window was last on.
+ *
+ * The window joins all Spaces, is shown, then leaves them again. It must
+ * leave in a *later* turn: toggling within the same turn is a no-op for the
+ * window server, so the window stays on its old Space and the app activation
+ * from `show()` switches the user there. Measured on macOS 26, resets under
+ * ~100ms are unreliable, hence 300ms (which also outlasts the async
+ * activation). `skipTransformProcessType` stops Electron from hiding and
+ * re-showing the Dock icon, which would re-activate the app later.
+ */
+function showOnCurrentWorkspace(window: BrowserWindow | null) {
+  if (!window) return;
+
+  // Already on all Spaces (fullscreen break, or a reset still pending).
+  if (window.isVisibleOnAllWorkspaces()) {
+    window.show();
+    window.focus();
+    return;
+  }
+
+  window.setVisibleOnAllWorkspaces(true, workspaceOptions);
+  window.show();
+  window.focus();
+
+  pendingWorkspaceReset = setTimeout(() => {
+    pendingWorkspaceReset = null;
+    if (!window.isDestroyed()) {
+      window.setVisibleOnAllWorkspaces(false, workspaceOptions);
+    }
+  }, 300);
+}
+
+function cancelPendingWorkspaceReset() {
+  if (pendingWorkspaceReset) {
+    clearTimeout(pendingWorkspaceReset);
+    pendingWorkspaceReset = null;
+  }
+}
+
 function createMainWindow() {
+  const dashboard = isDashboardLayout();
   win = new BrowserWindow({
-    width: 340,
-    height: getFrameHeight(),
+    width: dashboard ? DASHBOARD_SIZE.width : 340,
+    height: dashboard ? DASHBOARD_SIZE.height : getFrameHeight(),
+    ...(dashboard && {
+      minWidth: DASHBOARD_MIN_SIZE.width,
+      minHeight: DASHBOARD_MIN_SIZE.height,
+    }),
     resizable: true,
-    maximizable: false,
+    maximizable: dashboard,
     show: false,
     frame: store.safeGet("useNativeTitlebar"),
     icon: getIcon(),
@@ -176,6 +253,8 @@ function createMainWindow() {
   }
 
   win.on("leave-full-screen", () => {
+    // The dashboard is freely resizable; macOS restores its previous size.
+    if (isDashboardLayout()) return;
     if (windowState.isOnCompactMode) {
       setSizeIfDiff(340, 100);
       // Windows doesn't like trying to set it as not resizeable it along with everything else that's going on
@@ -224,7 +303,7 @@ const contextMenu = Menu.buildFromTemplate([
   {
     label: "Restore the app",
     click: () => {
-      win?.show();
+      showOnCurrentWorkspace(win);
     },
   },
   {
@@ -267,12 +346,14 @@ function createSystemTray() {
   tray.setContextMenu(contextMenu);
 
   tray?.on("click", () => {
-    if (!win?.isVisible()) {
-      win?.show();
-    } else {
-      if (!win?.isFullScreen()) {
-        win?.hide();
+    // Visible-but-unfocused usually means it's on another Space or behind
+    // other apps, so bring it here rather than hiding it.
+    if (win?.isVisible() && win.isFocused()) {
+      if (!win.isFullScreen()) {
+        win.hide();
       }
+    } else {
+      showOnCurrentWorkspace(win);
     }
   });
 }
@@ -310,10 +391,8 @@ if (!onlySingleInstance) {
     if (win) {
       if (win.isMinimized()) {
         win.restore();
-      } else if (!win.isVisible()) {
-        win.show();
       } else {
-        win.focus();
+        showOnCurrentWorkspace(win);
       }
     }
   });
@@ -369,7 +448,7 @@ if (!onlySingleInstance) {
       {
         key: "Alt+Shift+S",
         callback: () => {
-          win?.show();
+          showOnCurrentWorkspace(win);
         },
       },
     ]);
@@ -413,6 +492,8 @@ ipcMain.on(SET_ALWAYS_ON_TOP, (e, { alwaysOnTop }) => {
 });
 
 ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
+  // The break sets its own all-Spaces state; don't let a pending reset undo it.
+  cancelPendingWorkspaceReset();
   setFullscreenBreakHandler(args, {
     win,
     tray,
@@ -422,7 +503,22 @@ ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
   });
 });
 
+ipcMain.on(SET_LAYOUT, (e, { layout }: { layout: AppLayoutName }) => {
+  if (layout !== "classic" && layout !== "dashboard") return;
+  // Also sent on every launch; only resize on an actual change so a
+  // user-resized dashboard window keeps its size.
+  if (layout === windowState.layout) return;
+  windowState.layout = layout;
+  store.safeSet("layout", layout);
+  if (win && !win.isFullScreen()) applyLayoutSize(win);
+});
+
 ipcMain.on(SET_COMPACT_MODE, (e, args) => {
+  // Compact mode doesn't exist in the dashboard; don't shrink it to 340px.
+  if (isDashboardLayout()) {
+    windowState.isOnCompactMode = false;
+    return;
+  }
   if (args.compactMode) {
     win?.setMinimumSize(340, 100);
     win?.setSize(340, 100);
@@ -441,11 +537,7 @@ ipcMain.on(SET_UI_THEME, (e, { isDarkMode }) => {
 });
 
 ipcMain.on(SHOW_WINDOW, () => {
-  if (!win?.isVisible()) {
-    win?.show();
-  } else {
-    win?.focus();
-  }
+  showOnCurrentWorkspace(win);
 });
 
 ipcMain.on(MINIMIZE_WINDOW, (e, { minimizeToTray }) => {
@@ -496,10 +588,32 @@ ipcMain.on(SET_NATIVE_TITLEBAR, (e, { useNativeTitlebar }) => {
   }
 });
 
-ipcMain.on(TRAY_ICON_UPDATE, (e, dataUrl) => {
-  const image = nativeImage.createFromDataURL(dataUrl);
-  tray?.setImage(image);
-});
+ipcMain.on(
+  TRAY_ICON_UPDATE,
+  (
+    e,
+    {
+      dataUrl,
+      isTemplate,
+    }: { dataUrl: string | null; isTemplate: boolean }
+  ) => {
+    if (!dataUrl) {
+      // Text-only style: macOS can go fully icon-less and rely on the
+      // title text; other platforms can't show a title, so the renderer
+      // falls back to a non-null icon there (see useTrayIconUpdates).
+      if (process.platform === "darwin") {
+        tray?.setImage(nativeImage.createEmpty());
+      }
+      return;
+    }
+
+    const image = nativeImage.createFromDataURL(dataUrl);
+    if (process.platform === "darwin" && isTemplate) {
+      image.setTemplateImage(true);
+    }
+    tray?.setImage(image);
+  }
+);
 
 ipcMain.on(TRAY_TITLE_UPDATE, (e, title) => {
   tray?.setTitle(title || "");

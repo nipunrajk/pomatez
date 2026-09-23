@@ -1,12 +1,12 @@
 import { SVGTypes } from "components";
-import { TaskList, Config, Timer, Settings, Stats } from "routes";
+import { TaskList, Config, Timer, Settings, Stats, Day } from "routes";
 import { ConfigSliderProps } from "routes";
 import { AppStateTypes } from "./store";
 import { DefaultRootState } from "react-redux";
 
 export const APP_NAME = "Pomatez";
 
-type NavItemTypes = {
+export type NavItemTypes = {
   name: string;
   icon: SVGTypes["name"];
   exact: boolean;
@@ -59,6 +59,20 @@ export const routes: (state?: AppStateTypes) => NavItemTypes[] = (
     notify: !!state?.update?.updateBody,
   },
 ];
+
+/** Home of the dashboard layout; not part of the classic 340px layout. */
+export const dayRoute: NavItemTypes = {
+  icon: "calendar",
+  name: "nav.day",
+  exact: true,
+  path: "/day",
+  component: Day,
+  notify: false,
+};
+
+export const dashboardRoutes = (
+  state?: AppStateTypes
+): NavItemTypes[] => [dayRoute, ...routes(state)];
 
 export const compactRoutes: NavItemTypes[] = [
   {

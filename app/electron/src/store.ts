@@ -3,12 +3,16 @@ import { nativeTheme } from "electron";
 import { isWindow } from "./helpers";
 import ElectronStore from "electron-store";
 
+export type AppLayoutName = "classic" | "dashboard";
+
 type StoreProps = {
   userId?: string;
   isDarkMode?: boolean;
   useNativeTitlebar?: boolean;
   compactMode?: boolean;
   openAtLogin?: boolean;
+  /** Mirrors the renderer's layout so the window opens at the right size. */
+  layout?: AppLayoutName;
 };
 
 /**
@@ -58,6 +62,7 @@ const store = new SafeStore<StoreProps>({
     useNativeTitlebar: !isWindow(),
     compactMode: false,
     openAtLogin: false,
+    layout: "classic",
   },
 });
 

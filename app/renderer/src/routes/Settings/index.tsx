@@ -5,6 +5,8 @@ import { StyledSettings } from "styles";
 import { Alert } from "components";
 
 import FeatureSection from "./FeatureSection";
+import LayoutSection from "./LayoutSection";
+import TrayIconSection from "./TrayIconSection";
 import LanguageSection from "./LanguageSection";
 import HelpSection from "./HelpSection";
 import ShortcutSection from "./ShortcutSection";
@@ -36,8 +38,10 @@ export default function Settings() {
           }}
         />
       )}
+      <LayoutSection />
       <LanguageSection />
       <FeatureSection />
+      <TrayIconSection />
       <ShortcutSection />
       <HelpSection />
       <StickySection />

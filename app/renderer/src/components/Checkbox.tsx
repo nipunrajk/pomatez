@@ -6,10 +6,10 @@ import {
 } from "styles";
 
 export type CheckboxProps = {
-  label?: string;
+  label?: React.ReactNode;
   asPrimary?: boolean;
   hidden?: boolean;
-} & React.HTMLProps<HTMLInputElement>;
+} & Omit<React.HTMLProps<HTMLInputElement>, "label">;
 
 export const Checkbox = React.forwardRef<
   HTMLInputElement,

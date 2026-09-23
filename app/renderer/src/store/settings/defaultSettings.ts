@@ -1,4 +1,9 @@
-import { NotificationTypes, SettingTypes } from "./types";
+import {
+  AppLayout,
+  NotificationTypes,
+  SettingTypes,
+  TrayIconStyle,
+} from "./types";
 import { detectOS, isPreferredDark } from "utils";
 
 export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
@@ -22,4 +27,6 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   openAtLogin: false,
   enableRPC: true,
   language: "auto",
+  trayIconStyle: TrayIconStyle.CLASSIC,
+  layout: AppLayout.CLASSIC,
 });

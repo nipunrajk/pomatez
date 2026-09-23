@@ -3,6 +3,7 @@ import { SVG } from "components";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { TimerStatus } from "store/timer/types";
+import { AppLayout } from "store/settings/types";
 import {
   setEnableCompactMode,
   setPlay,
@@ -198,7 +199,7 @@ const Control: React.FC<Props> = ({ resetTimerAction }) => {
             You are currently on <span>Strict Mode!</span>
           </StyledStrictSnackbar>
         </StyledStrictIndicator>
-      ) : (
+      ) : settings.layout === AppLayout.DASHBOARD ? null : (
         <CompactModeButton flipped onClick={onToggleCompactCallback} />
       )}
     </StyledControl>

@@ -1,12 +1,11 @@
 import React from "react";
 import { TimerStatus } from "store/timer/types";
+import { TrayIconProps } from "./TrayIconProps";
 
-type Props = {
-  dashOffset?: number;
-  timerType?: TimerStatus;
-};
-
-export const TraySVG: React.FC<Props> = ({ timerType, dashOffset }) => {
+export const ClassicTrayIcon: React.FC<TrayIconProps> = ({
+  timerType,
+  dashOffset,
+}) => {
   const getProgressColor = (opacity = 1) => {
     switch (timerType) {
       case TimerStatus.STAY_FOCUS:
@@ -72,7 +71,7 @@ export const TraySVG: React.FC<Props> = ({ timerType, dashOffset }) => {
 };
 
 //TODO: Remove this
-TraySVG.defaultProps = {
+ClassicTrayIcon.defaultProps = {
   dashOffset: 0,
   timerType: TimerStatus.STAY_FOCUS,
 };

@@ -7,10 +7,11 @@ import {
 import { SVG } from "components";
 
 type Props = {
+  heading: string;
   children?: React.ReactNode;
 };
 
-const Collapse: React.FC<Props> = ({ children }) => {
+const Collapse: React.FC<Props> = ({ heading, children }) => {
   const [open, setOpen] = useState(false);
 
   const toggleCollapse = () => {
@@ -24,7 +25,7 @@ const Collapse: React.FC<Props> = ({ children }) => {
         open={open}
         onClick={toggleCollapse}
       >
-        Notification Types
+        {heading}
         <SVG name="chevron-down" />
       </StyledCollapseHeading>
       {open && (

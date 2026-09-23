@@ -8,6 +8,7 @@ import timerReducer from "./timer";
 import undoableTasksReducer from "./tasks";
 import updateReducer from "./update";
 import historyReducer from "./history";
+import entriesReducer from "./entries";
 
 export type AppStateTypes = ReturnType<typeof store.getState>;
 export type AppDispatchTypes = typeof store.dispatch;
@@ -20,26 +21,25 @@ const store = configureStore({
     tasks: undoableTasksReducer,
     update: updateReducer,
     history: historyReducer,
+    entries: entriesReducer,
   },
 });
 
+const getPersistedState = () => ({
+  config: store.getState().config,
+  settings: store.getState().settings,
+  tasks: store.getState().tasks.present,
+  history: store.getState().history,
+  entries: store.getState().entries,
+});
+
 if (!getFromStorage("state")) {
-  saveToStorage("state", {
-    config: store.getState().config,
-    settings: store.getState().settings,
-    tasks: store.getState().tasks.present,
-    history: store.getState().history,
-  });
+  saveToStorage("state", getPersistedState());
 }
 
 store.subscribe(
   debounce(() => {
-    saveToStorage("state", {
-      config: store.getState().config,
-      settings: store.getState().settings,
-      tasks: store.getState().tasks.present,
-      history: store.getState().history,
-    });
+    saveToStorage("state", getPersistedState());
   }, 1000)
 );
 

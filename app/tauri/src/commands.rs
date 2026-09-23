@@ -22,6 +22,46 @@ impl WindowSize {
         width: 340,
         height: 60,
     };
+    pub const DASHBOARD: LogicalSize<u32> = LogicalSize {
+        width: 1200,
+        height: 760,
+    };
+    pub const DASHBOARD_MIN: LogicalSize<u32> = LogicalSize {
+        width: 960,
+        height: 620,
+    };
+}
+
+// The window always starts at the classic size from tauri.conf.json.
+static IS_DASHBOARD: Mutex<bool> = Mutex::new(false);
+
+#[tauri::command]
+fn set_layout<R: Runtime>(layout: String, window: tauri::WebviewWindow<R>) {
+    let dashboard = layout == "dashboard";
+    {
+        let mut current = IS_DASHBOARD.lock().unwrap();
+        // Also sent on every launch; only resize on an actual change.
+        if *current == dashboard {
+            return;
+        }
+        *current = dashboard;
+    }
+
+    try_set_resizeable(true, &window);
+    if dashboard {
+        let _ = window.set_maximizable(true);
+        try_set_min_size(Some(WindowSize::DASHBOARD_MIN), &window);
+        try_set_size(WindowSize::DASHBOARD, &window);
+        let _ = window.center();
+    } else {
+        if window.is_maximized().unwrap_or(false) {
+            let _ = window.unmaximize();
+        }
+        let _ = window.set_maximizable(false);
+        // Lower the minimum first, or the OS clamps the shrink to it.
+        try_set_min_size(Some(WindowSize::MIN), &window);
+        try_set_size(WindowSize::MIN, &window);
+    }
 }
 
 static ORIGINAL_SIZE: Mutex<LogicalSize<u32>> = Mutex::new(WindowSize::MIN);
@@ -30,6 +70,17 @@ static UNDECORATED_TITLE_SIZE: u32 = 40;
 
 static HAS_DECORATIONS: Mutex<bool> = Mutex::new(true);
 static IS_COMPACT: Mutex<bool> = Mutex::new(false);
+
+// Mirrors the renderer's `closeToTray` setting (default matches
+// `defaultSettings.ts`). Kept in sync via `set_close_to_tray` so the
+// native window-close button, which never goes through the `close_window`
+// command, can still decide whether to hide to tray instead of closing.
+pub static CLOSE_TO_TRAY: Mutex<bool> = Mutex::new(true);
+
+#[tauri::command]
+fn set_close_to_tray(close_to_tray: bool) {
+    *CLOSE_TO_TRAY.lock().unwrap() = close_to_tray;
+}
 
 #[tauri::command]
 fn minimize_window<R: Runtime>(minimize_to_tray: bool, window: tauri::Window<R>) {
@@ -155,6 +206,11 @@ fn set_window_resizeable<R: Runtime>(
 
 #[tauri::command]
 fn set_compact_mode<R: Runtime>(compact_mode: bool, window: tauri::WebviewWindow<R>) {
+    // Compact mode doesn't exist in the dashboard; don't shrink it to 340px.
+    if *IS_DASHBOARD.lock().unwrap() {
+        *IS_COMPACT.lock().unwrap() = false;
+        return;
+    }
     {
         let mut compact = IS_COMPACT.lock().unwrap();
         *compact = compact_mode;
@@ -242,7 +298,10 @@ impl PomatezCommands for Builder<Wry> {
             set_ui_theme,
             set_native_titlebar,
             system_tray::tray_icon_update,
+            system_tray::tray_title_update,
             close_window,
+            set_close_to_tray,
+            set_layout,
             minimize_window,
             updater::check_for_updates,
             updater::install_update
@@ -259,7 +318,10 @@ impl PomatezCommands for Builder<Wry> {
             set_ui_theme,
             set_native_titlebar,
             system_tray::tray_icon_update,
+            system_tray::tray_title_update,
             close_window,
+            set_close_to_tray,
+            set_layout,
             minimize_window
         ])
     }

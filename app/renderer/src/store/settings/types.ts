@@ -21,7 +21,14 @@ export type SettingTypes = {
   openAtLogin: boolean;
   enableRPC: boolean;
   language: LanguageOption;
+  trayIconStyle: TrayIconStyle;
+  layout: AppLayout;
 };
+
+export const enum AppLayout {
+  CLASSIC = "classic",
+  DASHBOARD = "dashboard",
+}
 
 export type LanguageCode = "en" | "es" | "zh" | "ja";
 
@@ -31,6 +38,13 @@ export const enum NotificationTypes {
   NONE = "none",
   NORMAL = "normal",
   EXTRA = "extra",
+}
+
+export const enum TrayIconStyle {
+  CLASSIC = "classic",
+  MINIMAL = "minimal",
+  TEXT_ONLY = "text_only",
+  ICON_TEXT = "icon_text",
 }
 
 export type SettingsPayload<T extends keyof SettingTypes> =

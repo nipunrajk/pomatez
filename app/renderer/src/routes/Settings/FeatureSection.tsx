@@ -24,7 +24,7 @@ import { ThemeContext } from "contexts";
 
 import SettingSection from "./SettingSection";
 import { detectOS } from "utils";
-import { NotificationTypes } from "store/settings/types";
+import { AppLayout, NotificationTypes } from "store/settings/types";
 
 const FeatureSection: React.FC = () => {
   const { t } = useTranslation();
@@ -50,6 +50,11 @@ const FeatureSection: React.FC = () => {
       onChange: useCallback(() => {
         dispatch(setEnableCompactMode(!settings.compactMode));
       }, [dispatch, settings.compactMode]),
+      style: {
+        ...(settings.layout === AppLayout.DASHBOARD && {
+          display: "none",
+        }),
+      },
     },
     {
       id: "fullscreen-break",
@@ -216,7 +221,7 @@ const FeatureSection: React.FC = () => {
           />
         )
       )}
-      <Collapse>
+      <Collapse heading={t("settings.notificationTypes")}>
         <Radio
           id="none"
           label={t("settings.notificationNone")}

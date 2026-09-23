@@ -5,4 +5,6 @@ export * from "./useNotification";
 export * from "./useTime";
 export * from "./storeHooks";
 export * from "./useStats";
+export * from "./useEntryPomodoroSync";
+export * from "./useNow";
 export { default as useLanguageSync } from "./useLanguageSync";

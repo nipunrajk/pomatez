@@ -11,6 +11,7 @@ import {
   SET_ALWAYS_ON_TOP,
   CLOSE_WINDOW,
   SET_COMPACT_MODE,
+  SET_LAYOUT,
   SET_FULLSCREEN_BREAK,
   MINIMIZE_WINDOW,
   SET_NATIVE_TITLEBAR,
@@ -27,6 +28,7 @@ import {
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { TimerStatus } from "store/timer/types";
+import { TrayIconStyle } from "store/settings/types";
 import { padNum } from "utils";
 import {
   recordActivitySample,
@@ -98,6 +100,12 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
       alwaysOnTop: settings.alwaysOnTop,
     });
   }, [electron, settings.alwaysOnTop, shouldFullscreen]);
+
+  // Sent before compact mode so the main process knows the layout when it
+  // decides how to size the window.
+  useEffect(() => {
+    electron.send(SET_LAYOUT, { layout: settings.layout });
+  }, [electron, settings.layout]);
 
   useEffect(() => {
     electron.send(SET_COMPACT_MODE, {
@@ -181,19 +189,32 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
     });
   }, [electron, settings.enableRPC]);
 
-  useTrayIconUpdates((dataUrl) => {
-    electron.send(TRAY_ICON_UPDATE, dataUrl);
+  useTrayIconUpdates(({ dataUrl, isTemplate }) => {
+    electron.send(TRAY_ICON_UPDATE, { dataUrl, isTemplate });
   });
 
+  const isTextTrayStyle =
+    settings.trayIconStyle === TrayIconStyle.TEXT_ONLY ||
+    settings.trayIconStyle === TrayIconStyle.ICON_TEXT;
+
   useEffect(() => {
-    if (settings.showTimerInTrayBar && timer.playing) {
+    if (
+      (settings.showTimerInTrayBar || isTextTrayStyle) &&
+      timer.playing
+    ) {
       const minutes = Math.floor(count / 60);
       const seconds = count % 60;
       electron.send(TRAY_TITLE_UPDATE, `${minutes}:${padNum(seconds)}`);
     } else {
       electron.send(TRAY_TITLE_UPDATE, "");
     }
-  }, [electron, settings.showTimerInTrayBar, timer.playing, count]);
+  }, [
+    electron,
+    settings.showTimerInTrayBar,
+    isTextTrayStyle,
+    timer.playing,
+    count,
+  ]);
 
   useEffect(() => {
     const enable =

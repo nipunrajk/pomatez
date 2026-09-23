@@ -13,30 +13,76 @@ use base64::Engine;
 const TRAY_ID: &str = "main";
 
 #[tauri::command]
-pub fn tray_icon_update<R: Runtime>(data_url: String, window: tauri::Window<R>) {
-    let base64_str = data_url.trim_start_matches("data:image/png;base64,");
+pub fn tray_icon_update<R: Runtime>(
+    data_url: Option<String>,
+    is_template: bool,
+    window: tauri::Window<R>,
+) {
+    let icon = match data_url {
+        // Text-only style: no icon graphic at all.
+        None => None,
+        Some(data_url) => {
+            let base64_str = data_url.trim_start_matches("data:image/png;base64,");
 
-    let decoded_vec = match general_purpose::STANDARD.decode(base64_str) {
-        Ok(vec) => vec,
-        Err(e) => {
-            eprintln!("Error decoding Base64 string: {}", e);
-            return;
-        }
-    };
+            let decoded_vec = match general_purpose::STANDARD.decode(base64_str) {
+                Ok(vec) => vec,
+                Err(e) => {
+                    eprintln!("Error decoding Base64 string: {}", e);
+                    return;
+                }
+            };
 
-    let icon = match Image::from_bytes(&decoded_vec) {
-        Ok(img) => img,
-        Err(e) => {
-            eprintln!("Error parsing tray icon image: {}", e);
-            return;
+            match Image::from_bytes(&decoded_vec) {
+                Ok(img) => Some(img),
+                Err(e) => {
+                    eprintln!("Error parsing tray icon image: {}", e);
+                    return;
+                }
+            }
         }
     };
 
     if let Some(tray) = window.app_handle().tray_by_id(TRAY_ID) {
-        if let Err(e) = tray.set_icon(Some(icon)) {
+        if let Err(e) = tray.set_icon_with_as_template(icon, is_template) {
             eprintln!("Error setting tray icon: {}", e);
         }
     }
+}
+
+#[tauri::command]
+pub fn tray_title_update<R: Runtime>(title: String, window: tauri::Window<R>) {
+    if let Some(tray) = window.app_handle().tray_by_id(TRAY_ID) {
+        let title_opt = if title.is_empty() { None } else { Some(title.as_str()) };
+        if let Err(e) = tray.set_title(title_opt) {
+            eprintln!("Error setting tray title: {}", e);
+        }
+    }
+}
+
+/// On macOS, relies on `move_to_active_space_when_shown` having been
+/// applied at startup: showing then moves the window to the current Space,
+/// so the activation in `set_focus` has no reason to switch Spaces.
+pub fn show_on_current_workspace<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    let _ = window.show();
+    let _ = window.set_focus();
+}
+
+/// Sets AppKit's `MoveToActiveSpace` so showing or activating the window
+/// brings it to the user's current Space instead of switching Spaces to
+/// wherever it was last shown.
+#[cfg(target_os = "macos")]
+pub fn move_to_active_space_when_shown<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    use objc2_app_kit::{NSWindow, NSWindowCollectionBehavior};
+
+    let Ok(ptr) = window.ns_window() else { return };
+    // SAFETY: Tauri hands back a live NSWindow, and this is called from app
+    // setup, which runs on the main thread as AppKit requires.
+    let ns_window = unsafe { &*(ptr as *const NSWindow) };
+    // CanJoinAllSpaces and MoveToActiveSpace are mutually exclusive.
+    let behavior = (ns_window.collectionBehavior()
+        - NSWindowCollectionBehavior::CanJoinAllSpaces)
+        | NSWindowCollectionBehavior::MoveToActiveSpace;
+    ns_window.setCollectionBehavior(behavior);
 }
 
 pub trait PomatezTray {
@@ -76,8 +122,7 @@ impl PomatezTray for App {
             .on_menu_event(|app, event| match event.id().as_ref() {
                 "show" => {
                     if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.show();
-                        let _ = window.set_focus();
+                        show_on_current_workspace(&window);
                     }
                 }
                 "quit" => {
@@ -94,8 +139,18 @@ impl PomatezTray for App {
                 {
                     let app = tray.app_handle();
                     if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.show();
-                        let _ = window.set_focus();
+                        // Visible-but-unfocused usually means it's on another
+                        // Space or behind other apps, so bring it here.
+                        let visible = window.is_visible().unwrap_or(false);
+                        let focused = window.is_focused().unwrap_or(false);
+                        let fullscreen = window.is_fullscreen().unwrap_or(false);
+                        if visible && focused {
+                            if !fullscreen {
+                                let _ = window.hide();
+                            }
+                        } else {
+                            show_on_current_workspace(&window);
+                        }
                     }
                 }
             })

@@ -6,13 +6,16 @@ import {
   CHECK_FOR_UPDATES,
   SET_ALWAYS_ON_TOP,
   CLOSE_WINDOW,
+  SET_CLOSE_TO_TRAY,
   SET_COMPACT_MODE,
+  SET_LAYOUT,
   SET_FULLSCREEN_BREAK,
   MINIMIZE_WINDOW,
   SET_NATIVE_TITLEBAR,
   SHOW_WINDOW,
   SET_UI_THEME,
   TRAY_ICON_UPDATE,
+  TRAY_TITLE_UPDATE,
   UPDATE_AVAILABLE,
 } from "@pomatez/shareables";
 import {
@@ -25,6 +28,8 @@ import { listen } from "@tauri-apps/api/event";
 import { open } from "@tauri-apps/plugin-shell";
 import { setUpdateBody, setUpdateVersion } from "../../store/update";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
+import { TrayIconStyle } from "store/settings/types";
+import { padNum } from "utils";
 
 export const TauriInvokeConnector = {
   send: (event: string, ...payload: any) => {
@@ -113,7 +118,7 @@ export const TauriConnectorProvider: React.FC = ({ children }) => {
 
   const timer = useAppSelector((state) => state.timer);
 
-  const { shouldFullscreen } = useContext(CounterContext);
+  const { count, shouldFullscreen } = useContext(CounterContext);
 
   const onMinimizeCallback = useCallback(() => {
     send(MINIMIZE_WINDOW, {
@@ -145,12 +150,27 @@ export const TauriConnectorProvider: React.FC = ({ children }) => {
     });
   }, [send, settings.alwaysOnTop]);
 
+  // Keeps the Rust side aware of closeToTray so the native window-close
+  // button (which never goes through onExitCallback/CLOSE_WINDOW) can
+  // decide whether to hide to tray instead of closing.
+  useEffect(() => {
+    send(SET_CLOSE_TO_TRAY, {
+      closeToTray: settings.closeToTray,
+    });
+  }, [send, settings.closeToTray]);
+
   useEffect(() => {
     send(SET_FULLSCREEN_BREAK, {
       shouldFullscreen,
       alwaysOnTop: settings.alwaysOnTop,
     });
   }, [send, settings.alwaysOnTop, shouldFullscreen]);
+
+  // Sent before compact mode so Rust knows the layout when it decides how
+  // to size the window.
+  useEffect(() => {
+    send(SET_LAYOUT, { layout: settings.layout });
+  }, [send, settings.layout]);
 
   useEffect(() => {
     send(SET_COMPACT_MODE, {
@@ -170,9 +190,34 @@ export const TauriConnectorProvider: React.FC = ({ children }) => {
     });
   }, [send, settings.useNativeTitlebar]);
 
-  useTrayIconUpdates((dataUrl) => {
-    send(TRAY_ICON_UPDATE, { dataUrl });
+  useTrayIconUpdates(({ dataUrl, isTemplate }) => {
+    send(TRAY_ICON_UPDATE, { dataUrl, isTemplate });
   });
+
+  const isTextTrayStyle =
+    settings.trayIconStyle === TrayIconStyle.TEXT_ONLY ||
+    settings.trayIconStyle === TrayIconStyle.ICON_TEXT;
+
+  useEffect(() => {
+    if (
+      (settings.showTimerInTrayBar || isTextTrayStyle) &&
+      timer.playing
+    ) {
+      const minutes = Math.floor(count / 60);
+      const seconds = count % 60;
+      send(TRAY_TITLE_UPDATE, {
+        title: `${minutes}:${padNum(seconds)}`,
+      });
+    } else {
+      send(TRAY_TITLE_UPDATE, { title: "" });
+    }
+  }, [
+    send,
+    settings.showTimerInTrayBar,
+    isTextTrayStyle,
+    timer.playing,
+    count,
+  ]);
 
   // Workaround to make sure it only calls once on mount
   const checkUpdate = useCallback(() => {

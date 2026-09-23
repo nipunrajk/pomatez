@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getFromStorage } from "utils";
-import { SettingTypes, SettingsPayload } from "./types";
+import { AppLayout, SettingTypes, SettingsPayload } from "./types";
 import { defaultSettings } from "./defaultSettings";
 
 export type { SettingTypes };
@@ -77,7 +77,9 @@ const settingsSlice = createSlice({
       state,
       action: SettingsPayload<"compactMode">
     ) {
-      state.compactMode = action.payload;
+      // The mini timer strip only exists in the classic layout.
+      state.compactMode =
+        state.layout === AppLayout.DASHBOARD ? false : action.payload;
     },
 
     setEnableFullscreenBreak(
@@ -166,6 +168,17 @@ const settingsSlice = createSlice({
       state.language = action.payload;
     },
 
+    setTrayIconStyle(state, action: SettingsPayload<"trayIconStyle">) {
+      state.trayIconStyle = action.payload;
+    },
+
+    setLayout(state, action: SettingsPayload<"layout">) {
+      state.layout = action.payload;
+      if (action.payload === AppLayout.DASHBOARD) {
+        state.compactMode = false;
+      }
+    },
+
     restoreDefaultSettings() {
       return defaultSettings;
     },
@@ -193,6 +206,8 @@ export const {
   setShowTimerInTrayBar,
   setEnableUsageTracking,
   setUseNativeTitlebar,
+  setTrayIconStyle,
+  setLayout,
   toggleNotificationSound,
 } = settingsSlice.actions;
 

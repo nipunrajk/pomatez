@@ -31,12 +31,7 @@ impl PomatezGlobalShortcutsSetup for App {
                 println!("Shortcut pressed: {:?}", shortcut);
                 match shortcut.id() {
                     key if SHOW_SHORTCUT.id() == key => {
-                        if let Err(e) = window.show() {
-                            println!("Failed to show window: {:?}", e);
-                        }
-                        if let Err(e) = window.set_focus() {
-                            println!("Failed to focus window: {:?}", e);
-                        }
+                        crate::system_tray::show_on_current_workspace(&window);
                     }
                     key if HIDE_SHORTCUT.id() == key => {
                         if let Err(e) = window.hide() {

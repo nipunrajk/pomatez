@@ -6,13 +6,21 @@ import {
   ConnectorProvider,
 } from "contexts";
 import { Layout, Preloader } from "components";
-import { compactRoutes, routes } from "config";
-import { useLanguageSync } from "hooks";
+import { compactRoutes, dashboardRoutes, routes } from "config";
+import { useEntryPomodoroSync, useLanguageSync } from "hooks";
 import { useAppSelector } from "hooks/storeHooks";
+import { AppLayout } from "store/settings/types";
 
 export default function App() {
   const settings = useAppSelector((state) => state.settings);
   useLanguageSync();
+  useEntryPomodoroSync();
+
+  const activeRoutes = settings.compactMode
+    ? compactRoutes
+    : settings.layout === AppLayout.DASHBOARD
+    ? dashboardRoutes()
+    : routes();
 
   useEffect(() => {
     const contextEvent = (event: MouseEvent) => {
@@ -52,27 +60,16 @@ export default function App() {
             <Layout>
               <Suspense fallback={<Preloader />}>
                 <Switch>
-                  {settings["compactMode"]
-                    ? compactRoutes.map(
-                        ({ exact, path, component }, index) => (
-                          <Route
-                            exact={exact}
-                            path={path}
-                            component={component}
-                            key={index}
-                          />
-                        )
-                      )
-                    : routes().map(
-                        ({ exact, path, component }, index) => (
-                          <Route
-                            exact={exact}
-                            path={path}
-                            component={component}
-                            key={index}
-                          />
-                        )
-                      )}
+                  {activeRoutes.map(
+                    ({ exact, path, component }, index) => (
+                      <Route
+                        exact={exact}
+                        path={path}
+                        component={component}
+                        key={index}
+                      />
+                    )
+                  )}
                 </Switch>
               </Suspense>
             </Layout>

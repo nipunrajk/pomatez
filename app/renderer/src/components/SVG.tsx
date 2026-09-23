@@ -28,6 +28,7 @@ import {
   NapSVG,
   MugSVG,
   StatsSVG,
+  CalendarSVG,
 } from "assets/icons";
 
 export type SVGTypes = {
@@ -61,7 +62,8 @@ export type SVGTypes = {
     | "alert"
     | "chevron-down"
     | "expand"
-    | "stats";
+    | "stats"
+    | "calendar";
 };
 
 const SVG: React.FC<SVGTypes> = ({ name, size, style }) => {
@@ -122,6 +124,8 @@ const SVG: React.FC<SVGTypes> = ({ name, size, style }) => {
       return <ExpandSVG style={style} />;
     case "stats":
       return <StatsSVG />;
+    case "calendar":
+      return <CalendarSVG />;
     default:
       return <TimerSVG />;
   }

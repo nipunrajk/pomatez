@@ -28,4 +28,4 @@ export { default as NavNotify } from "./NavNotify";
 
 export * from "./Popper";
 export * from "./Preloader";
-export * from "./TraySVG";
+export * from "./TrayIcons";

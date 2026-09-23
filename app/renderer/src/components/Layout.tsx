@@ -6,13 +6,21 @@ import React, {
   useRef,
 } from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { StyledLayout } from "styles";
+import {
+  StyledClassicPageFrame,
+  StyledDashboard,
+  StyledDashboardContent,
+  StyledLayout,
+} from "styles";
 
 import Titlebar from "./Titlebar";
 import Navigation from "./Navigation";
+import Sidebar from "./Sidebar";
 import { ThemeContext } from "contexts";
 import { TimerStatus } from "store/timer/types";
+import { AppLayout } from "store/settings/types";
 import { useAppSelector } from "hooks/storeHooks";
+import { dayRoute } from "config";
 
 type Props = {} & RouteComponentProps;
 
@@ -25,7 +33,7 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
 
   const [noTransition, setNoTransition] = useState(false);
 
-  const useNativeTitlebar = useRef(settings.useNativeTitlebar);
+  const isDashboard = settings.layout === AppLayout.DASHBOARD;
 
   const registerKey = useCallback(
     (e: KeyboardEvent) => {
@@ -40,6 +48,19 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
     document.addEventListener("keydown", registerKey);
     return () => document.removeEventListener("keydown", registerKey);
   }, [registerKey]);
+
+  // On launch and whenever the layout changes, land on a page that exists
+  // in that layout: the dashboard opens on Day, classic has no Day page.
+  const appliedLayout = useRef<AppLayout | null>(null);
+  useEffect(() => {
+    if (appliedLayout.current === settings.layout) return;
+    appliedLayout.current = settings.layout;
+    if (isDashboard && location.pathname === "/") {
+      history.replace(dayRoute.path);
+    } else if (!isDashboard && location.pathname === dayRoute.path) {
+      history.replace("/");
+    }
+  }, [settings.layout, isDashboard, location.pathname, history]);
 
   useEffect(() => {
     if (settings.enableFullscreenBreak) {
@@ -63,6 +84,8 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
     settings.enableFullscreenBreak,
   ]);
 
+  const isWidePage = location.pathname === dayRoute.path;
+
   return (
     <StyledLayout noTransition={noTransition}>
       {!settings.useNativeTitlebar && (
@@ -71,10 +94,27 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
           timerType={timer.timerType}
         />
       )}
-      {settings["compactMode"] ? null : (
-        <Navigation timerType={timer.timerType} />
+      {isDashboard ? (
+        <StyledDashboard>
+          <Sidebar />
+          <StyledDashboardContent wide={isWidePage}>
+            {isWidePage ? (
+              children
+            ) : (
+              <StyledClassicPageFrame>
+                {children}
+              </StyledClassicPageFrame>
+            )}
+          </StyledDashboardContent>
+        </StyledDashboard>
+      ) : (
+        <>
+          {settings["compactMode"] ? null : (
+            <Navigation timerType={timer.timerType} />
+          )}
+          {children}
+        </>
       )}
-      {children}
     </StyledLayout>
   );
 };
