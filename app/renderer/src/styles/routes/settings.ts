@@ -26,15 +26,19 @@ export const StyledSettingSection = styled.section`
   display: grid;
   align-items: center;
 
-  margin-top: 0.8rem;
+  row-gap: var(--space-2);
+  margin-top: var(--space-2);
 
+  /* Sections are split by a hairline rule, not boxed. */
   &:not(:first-of-type) {
-    margin-top: 2rem;
-    margin-bottom: 1.6rem;
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: var(--component-section-header-divider-width) solid
+      var(--component-section-header-divider);
   }
 
   &:last-of-type {
-    margin-bottom: 0.2rem;
+    margin-bottom: var(--space-1);
   }
 `;
 
@@ -63,7 +67,9 @@ export const StyledSectionSticky = styled.div`
 
   gap: 1rem;
 
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-background-window);
+  border-top: var(--border-width-hairline) solid
+    var(--color-border-strong);
 
   display: flex;
   flex-wrap: wrap;

@@ -2,12 +2,16 @@ import styled from "styled-components/macro";
 import { TimerStatus } from "store/timer/types";
 import { NavLink } from "react-router-dom";
 import { themes } from "../themes";
+import { focusRing, timerColor, typeStyle } from "styles/mixins";
 
 export const StyledNav = styled.nav<{ useNativeTitlebar: boolean }>`
   width: 100%;
   height: ${({ useNativeTitlebar }) =>
-    useNativeTitlebar ? "5.6rem" : "4.8rem"};
+    useNativeTitlebar
+      ? "var(--layout-compact-tab-bar-height)"
+      : "4.8rem"};
   position: relative;
+  background-color: var(--layout-compact-tab-bar-bg);
 
   &::before {
     content: "";
@@ -19,7 +23,7 @@ export const StyledNav = styled.nav<{ useNativeTitlebar: boolean }>`
     width: 100%;
     height: 1px;
 
-    background-color: var(--color-border-primary);
+    background-color: var(--layout-compact-tab-bar-border);
   }
 `;
 
@@ -28,9 +32,8 @@ export const StyledNavList = styled.ul`
   height: 100%;
 
   list-style: none;
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  font-weight: 400;
+  ${typeStyle("meta")};
+  font-weight: var(--font-weight-medium);
 
   display: flex;
   align-items: center;
@@ -71,27 +74,29 @@ export const StyledNavLink = styled(NavLink)<NavLinkProps>`
   position: relative;
   cursor: pointer;
 
+  /* tabBar.inactiveText (#8C8C80) is 3.1:1 at 12px; use the readable variant. */
+  color: var(--color-text-secondary-readable);
+
   transition: ${themes.transition};
 
   &:hover {
-    color: var(--color-primary);
+    color: var(--color-text-primary);
   }
 
+  ${focusRing};
+
+  /* The Timer tab keeps following the timer state, as before. */
   &.active {
     color: ${(p) =>
-      (p.type === TimerStatus.SHORT_BREAK &&
-        p.to === "/" &&
-        "var(--color-green)") ||
-      (p.type === TimerStatus.LONG_BREAK &&
-        p.to === "/" &&
-        "var(--color-yellow)") ||
-      (p.type === TimerStatus.SPECIAL_BREAK &&
-        p.to === "/" &&
-        "var(--color-yellow)") ||
-      "var(--color-primary)"};
+      p.to === "/"
+        ? timerColor(p.type, true)
+        : "var(--color-brand-primary-readable)"};
 
     &::after {
-      background-color: currentColor;
+      background-color: ${(p) =>
+        p.to === "/"
+          ? timerColor(p.type)
+          : "var(--layout-compact-tab-bar-indicator-color)"};
     }
   }
 
@@ -102,7 +107,7 @@ export const StyledNavLink = styled(NavLink)<NavLinkProps>`
     bottom: 0;
 
     width: 100%;
-    height: 1px;
+    height: var(--layout-compact-tab-bar-indicator-height);
 
     background-color: transparent;
   }

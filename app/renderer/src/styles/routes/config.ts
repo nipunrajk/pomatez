@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components/macro";
 import { StyledHeaderHeading } from "styles";
 import { themes } from "styles/themes";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledConfig = styled.main`
   padding: 0 2rem;
@@ -33,7 +34,7 @@ export const StyledSpecialBreakHeading = styled(StyledHeaderHeading)<{
   grid-row: 1 / 2;
   grid-column: 1 / -1;
 
-  color: ${(p) => p.disabled && "var(--color-disabled-text)"};
+  color: ${(p) => p.disabled && "var(--color-text-tertiary)"};
 `;
 
 export const StyledSpecialClearButton = styled.button<{
@@ -53,12 +54,13 @@ export const StyledSpecialClearButton = styled.button<{
   align-items: center;
   justify-content: center;
 
-  color: var(--color-body-text);
+  color: var(--color-icon-default);
 
   border: none;
-  border-radius: 50%;
-  background-color: var(--color-bg-popper);
-  box-shadow: 0 2px 8px -1px var(--color-shadow-primary);
+  border-radius: var(--radius-circle);
+  background-color: var(--color-background-surface);
+  box-shadow: var(--shadow-floating);
+  cursor: pointer;
 
   opacity: 0;
   visibility: hidden;
@@ -66,14 +68,14 @@ export const StyledSpecialClearButton = styled.button<{
   transition: all 320ms ease;
 
   &:hover {
-    color: ${themes.color.close};
+    color: var(--color-status-danger-readable);
   }
 
-  & > svg {
-    width: 1rem;
-    height: 1rem;
+  ${focusRing};
 
-    fill: currentColor;
+  & > svg {
+    width: 1.2rem;
+    height: 1.2rem;
   }
 
   ${(p) =>
@@ -92,28 +94,28 @@ type SpecialBreakProps = {
 
 export const StyledSpecialField = styled.div<SpecialBreakProps>`
   width: 100%;
-  height: 3.2rem;
+  height: var(--component-button-height-md);
 
   display: grid;
   grid-template-columns: 1fr 1px 4.6rem;
 
-  border-radius: 1px;
-  border: 1px solid var(--color-border-secondary);
-  background-color: var(--color-bg-secondary);
-  box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.16);
+  color: var(--component-input-text);
+  border-radius: var(--component-input-radius);
+  border: var(--border-width-hairline) solid
+    var(--component-input-border);
+  background-color: var(--component-input-bg);
 
   position: relative;
 
   &:focus-within {
     border-color: ${(p) =>
       p.disabled
-        ? "var(--color-border-secondary)"
-        : "var(--color-primary)"};
-    box-shadow: 0 0 0 2px
-      ${(p) =>
-        p.disabled
-          ? "rgba(var(--color-pink-rgb), 0)"
-          : "rgba(var(--color-primary-rgb), 0.16)"};
+        ? "var(--component-input-border)"
+        : "var(--color-border-focus)"};
+    box-shadow: ${(p) =>
+      p.disabled
+        ? "none"
+        : "0 0 0 var(--border-width-hairline) var(--color-border-focus)"};
   }
 
   &:hover
@@ -158,7 +160,9 @@ export const StyledSpecialField = styled.div<SpecialBreakProps>`
 
     &::placeholder {
       color: ${(p) =>
-        p.disabled ? "transparent" : "var(--color-disabled-text)"};
+        p.disabled
+          ? "transparent"
+          : "var(--color-text-placeholder-readable)"};
     }
   }
 
@@ -166,9 +170,7 @@ export const StyledSpecialField = styled.div<SpecialBreakProps>`
     width: 1px;
     height: 100%;
 
-    background-color: ${(p) =>
-      (p.disabled && "var(--color-bg-tertiary)") ||
-      "var(--color-border-primary)"};
+    background-color: var(--color-border-input);
   }
 
   ${(p) =>
@@ -179,16 +181,13 @@ export const StyledSpecialField = styled.div<SpecialBreakProps>`
 
   @keyframes success {
     0% {
-      border-color: var(--color-green);
-      box-shadow: 0 0 0 2px rgba(var(--color-green-rgb), 0.24);
+      border-color: var(--color-status-completed);
     }
     50% {
-      border-color: var(--color-green);
-      box-shadow: 0 0 0 6px rgba(var(--color-green-rgb), 0);
+      border-color: var(--color-status-completed);
     }
     100% {
-      border-color: var(--color-border-primary);
-      box-shadow: 0 0 0 2px rgba(var(--color-green-rgb), 0);
+      border-color: var(--component-input-border);
     }
   }
 `;
@@ -205,7 +204,7 @@ export const StyledSpecialBreakSetter = styled.form`
   transform: translate(-50%, -50%);
   z-index: 10;
 
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-background-window);
 
   display: grid;
   row-gap: 2rem;
@@ -219,13 +218,13 @@ export const StyledSpecialBreakSetter = styled.form`
     row-gap: 0.4rem;
 
     & > h3 {
-      font-size: 1.5rem;
-      font-weight: 500;
-      text-transform: uppercase;
+      ${typeStyle("card-title")};
+      color: var(--color-text-heading);
     }
 
     & > p {
       width: 80%;
+      color: var(--color-text-secondary-readable);
     }
   }
 
@@ -255,9 +254,11 @@ export const StyledSpecialBreakDuration = styled.div`
 export const StyledSpecialBreakDurationSpan = styled.span<{
   error?: boolean;
 }>`
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: ${(p) =>
-    p.error ? "var(--color-pink)" : "var(--color-primary)"};
+    p.error
+      ? "var(--color-status-danger-readable)"
+      : "var(--color-brand-primary-readable)"};
 `;
 
 export const StyledSpecialBreakAction = styled.div`

@@ -46,7 +46,7 @@ export const StyledMarkLogo = styled.img`
   width: 1.6rem;
   height: 1.6rem;
 
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   background-color: var(--color-bg-tertiary);
 `;
 
@@ -88,8 +88,8 @@ export const StyledMinimizeButton = styled.button`
     width: 12px;
     height: 2px;
 
-    border-radius: 10px;
-    background-color: var(--color-body-text);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-icon-default);
     transform: translate(-50%, -50%);
   }
 `;
@@ -117,8 +117,8 @@ export const StyledCloseButton = styled.button`
     width: 14px;
     height: 2px;
 
-    border-radius: 10px;
-    background-color: var(--color-body-text);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-icon-default);
   }
 
   &::before {

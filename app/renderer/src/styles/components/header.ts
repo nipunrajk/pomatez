@@ -1,5 +1,5 @@
 import styled from "styled-components/macro";
-import { typeStyle } from "styles/mixins";
+import { focusRing, typeStyle } from "styles/mixins";
 import { themes } from "styles/themes";
 
 export const StyledHeader = styled.header`
@@ -21,22 +21,30 @@ export const StyledHeaderHeading = styled.h3`
 
 type HeaderButtonTypes = { success?: boolean };
 
+/** Ghost action (components.button.ghost), e.g. "Restore Default". */
 export const StyledHeaderButton = styled.button<HeaderButtonTypes>`
-  height: 3.2rem;
+  height: var(--component-button-height-sm);
+  padding: 0 var(--space-2);
 
-  font-weight: 500;
+  ${typeStyle("button")};
+  color: var(--color-text-secondary-readable);
   border: none;
+  border-radius: var(--radius-md);
   background-color: transparent;
+  cursor: pointer;
 
   transition: ${themes.transition};
 
-  &,
-  &:hover {
-    color: ${(p) => p.success && "var(--color-green)"} !important;
+  &:hover,
+  &:focus-visible {
+    color: var(--component-button-ghost-hover-text);
   }
 
-  &:hover,
-  &:focus {
-    color: var(--color-primary);
+  ${focusRing};
+
+  &,
+  &:hover {
+    color: ${(p) =>
+      p.success && "var(--color-status-completed-readable)"} !important;
   }
 `;

@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components/macro";
 import { StyledButton, StyledButtonPrimary } from "styles";
+import { focusRing } from "styles/mixins";
 
 export const StyledCardText = styled.p<{ done?: boolean }>`
   min-height: 2.4rem;
@@ -14,7 +15,7 @@ export const StyledCardText = styled.p<{ done?: boolean }>`
   ${(p) =>
     p.done &&
     css`
-      color: var(--color-green);
+      color: var(--color-status-completed-readable);
       text-decoration: line-through;
     `}
 `;
@@ -42,7 +43,7 @@ const ButtonCardStyles = css`
   justify-content: center;
 
   border: none;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 
   & > svg {
     margin: 0;
@@ -65,13 +66,12 @@ export const StyledCardDeleteButton = styled(StyledButton)`
   ${ButtonCardStyles};
 
   &:hover {
-    color: var(--color-pink) !important;
+    color: var(--color-status-danger-readable) !important;
   }
 `;
 
 export const StyledCardSaveButton = styled(StyledButtonPrimary)`
   ${ButtonCardStyles};
-  box-shadow: 0 2px 4px -2px var(--color-shadow-primary);
 `;
 
 type CardProps = {
@@ -84,45 +84,61 @@ export const StyledCard = styled.div<CardProps>`
   height: 3.6rem;
   height: max-content;
 
-  padding: 0.5rem;
-  padding-left: 1rem;
-  margin-bottom: 0.8rem;
+  padding: var(--space-2);
+  padding-left: var(--space-3);
+  margin-bottom: var(--layout-dashboard-content-board-card-gap);
 
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
-  border-radius: 3px;
-  border: 1px solid var(--color-border-input-primary);
-  border-bottom-color: var(--color-border-input-secondary);
-  background-color: var(--color-bg-task-card);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: var(--component-card-radius);
+  background-color: var(--component-card-bg);
+  box-shadow: var(--component-card-shadow);
 
-  transition: box-shadow 320ms ease-out, background-color 320ms ease-out,
-    border-color 320ms ease-out;
-
-  ${(p) =>
-    (p.isDragging &&
-      css`
-        border-color: var(--color-bg-task-card-focus) !important;
-        background-color: var(--color-bg-task-card-focus) !important;
-        box-shadow: 0 2px 8px -2px var(--color-shadow-primary);
-      `) ||
-    (p.focused &&
-      css`
-        border-color: var(--color-bg-task-card-focus) !important;
-        background-color: var(--color-bg-task-card-focus) !important;
-        box-shadow: 0 2px 4px -2px var(--color-shadow-primary);
-      `)}
+  transition: box-shadow var(--motion-duration-base)
+      var(--motion-easing-standard),
+    background-color var(--motion-duration-base)
+      var(--motion-easing-standard),
+    rotate var(--motion-duration-base) var(--motion-easing-emphasized);
 
   &:hover,
-  &:focus,
   &:active {
-    background-color: var(--color-bg-task-card-hover);
+    box-shadow: var(--shadow-card-hover);
 
     ${StyledCardEditButton}, ${StyledCardDeleteButton} {
-      color: var(--color-body-text);
+      color: var(--color-icon-default);
     }
   }
+
+  ${focusRing};
+
+  ${(p) =>
+    p.focused &&
+    css`
+      box-shadow: 0 0 0 var(--border-width-hairline)
+        var(--color-border-focus);
+    `}
+
+  /* components.card.highlighted: the card being dragged. */
+  ${(p) =>
+    p.isDragging &&
+    css`
+      &,
+      &:hover {
+        color: var(--component-card-highlighted-text);
+        background-color: var(--component-card-highlighted-bg);
+        box-shadow: var(--component-card-highlighted-shadow);
+        /* rotate (not transform) so it composes with the drag translate. */
+        rotate: -4deg;
+
+        ${StyledCardEditButton}, ${StyledCardDeleteButton} {
+          color: var(--component-card-highlighted-text);
+        }
+      }
+    `}
 `;
 
 export const StyledCardWrapper = styled.div``;

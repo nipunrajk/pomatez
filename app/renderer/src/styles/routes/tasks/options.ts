@@ -20,7 +20,6 @@ export const StyledOptionList = styled.ul`
     & > svg {
       width: 0.8em;
       height: 0.8em;
-      fill: currentColor;
 
       margin-right: 8px;
     }
@@ -46,7 +45,6 @@ export const StyledOptionList = styled.ul`
     & > svg {
       width: 0.8em;
       height: 0.8em;
-      fill: currentColor;
 
       margin-right: 8px;
     }
@@ -55,18 +53,18 @@ export const StyledOptionList = styled.ul`
 
 export const StyledOptionPriority = styled.li`
   &:hover {
-    color: var(--color-yellow);
+    color: var(--color-timer-long-break-readable);
   }
 `;
 
 export const StyledOptionDone = styled.li`
   &:hover {
-    color: var(--color-green);
+    color: var(--color-status-completed-readable);
   }
 `;
 
 export const StyledOptionDelete = styled.li`
   &:hover {
-    color: var(--color-pink);
+    color: var(--color-status-danger-readable);
   }
 `;

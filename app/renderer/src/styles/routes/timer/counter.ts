@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components/macro";
 import { TimerStatus } from "store/timer/types";
 import { ProgressSVG } from "assets/icons";
+import { timerColor, typeStyle } from "styles/mixins";
 
 export type ProgressProps = {
   offset: number;
@@ -10,12 +11,9 @@ export type ProgressProps = {
 
 export const StyledCounterProgress = styled(ProgressSVG)<ProgressProps>`
   #progress {
-    stroke: ${(p) =>
-      (p.type === TimerStatus.SHORT_BREAK && "var(--color-green)") ||
-      (p.type === TimerStatus.LONG_BREAK && "var(--color-yellow)") ||
-      (p.type === TimerStatus.SPECIAL_BREAK && "var(--color-yellow)") ||
-      "var(--color-primary)"};
-    stroke-width: 0.6rem;
+    stroke: ${(p) => timerColor(p.type)};
+    /* In the ring's 220-unit viewBox; renders as the 6px ringStroke at 240px. */
+    stroke-width: 5.5;
     stroke-linecap: round;
     stroke-dasharray: 674px;
     stroke-dashoffset: ${(p) => `${p.offset}px`};
@@ -82,15 +80,16 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
     left: 50%;
     transform: translate(-50%, -50%) rotateY(-180deg) rotateZ(-90deg);
 
-    width: 22rem;
-    height: 22rem;
+    width: var(--layout-compact-timer-ring-size);
+    height: var(--layout-compact-timer-ring-size);
   }
 
   &::before {
     content: "";
 
-    border-radius: 50%;
-    border: 6px solid var(--color-border-primary);
+    border-radius: var(--radius-circle);
+    border: var(--layout-compact-timer-ring-stroke) solid
+      var(--color-timer-ring-track);
   }
 
   &.compact {
@@ -109,9 +108,8 @@ export const StyledCounterType = styled.div`
   padding-bottom: 0.4rem;
 
   & > svg {
-    width: 4rem;
-    height: 4rem;
-    fill: currentColor;
+    width: 3.2rem;
+    height: 3.2rem;
   }
 `;
 
@@ -121,15 +119,15 @@ type TimerProps = {
 } & CounterContainerProps;
 
 export const StyledCounterTimer = styled.h3<TimerProps>`
-  font-size: 4rem;
-  font-weight: 400;
-  color: ${(p) =>
-    (p.type === TimerStatus.SHORT_BREAK && "var(--color-green)") ||
-    (p.type === TimerStatus.LONG_BREAK && "var(--color-yellow)") ||
-    (p.type === TimerStatus.SPECIAL_BREAK && "var(--color-yellow)") ||
-    "var(--color-primary)"};
-
-  line-height: 1.2;
+  ${typeStyle("timer-display")};
+  /*
+   * timerDisplay is 80px, but "24:56" at 80px is wider than the 240px
+   * ring's inner space. Same role, scaled to fit with the icon and label.
+   */
+  font-size: 4.8rem;
+  /* Playfair defaults to old-style figures; keep digits even and steady. */
+  font-variant-numeric: lining-nums tabular-nums;
+  color: ${(p) => timerColor(p.type, true)};
 
   width: 20rem;
 
@@ -153,7 +151,7 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
   }
 
   &.compact {
-    font-size: ${(p) => (p.fullscreen ? "4rem" : "2.3rem")};
+    font-size: ${(p) => (p.fullscreen ? "4.8rem" : "2.4rem")};
     width: unset;
     display: flex;
     gap: 0.25rem;
@@ -161,6 +159,7 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
 `;
 
 export const StyledCounterLabel = styled.p`
-  font-size: 1.8rem;
-  text-transform: capitalize;
+  ${typeStyle("eyebrow")};
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary-readable);
 `;

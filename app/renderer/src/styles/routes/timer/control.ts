@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components/macro";
 import { TimerStatus } from "store/timer/types";
 import { themes } from "../../themes";
+import { focusRing, timerColor, typeStyle } from "styles/mixins";
 
 const ControlButton = css`
   min-width: 3.2rem;
@@ -9,10 +10,10 @@ const ControlButton = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-body-text);
+  color: var(--color-icon-default);
 
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background-color: transparent;
 
   cursor: pointer;
@@ -20,12 +21,39 @@ const ControlButton = css`
   transition: ${themes.transition};
 
   &:hover {
-    color: currentColor;
+    background-color: var(--color-background-surface-sunken);
   }
+
+  ${focusRing};
 
   &.compact {
     min-width: 1.6rem;
     min-height: 1.6rem;
+  }
+`;
+
+/** Playback controls: outlined circles per layout.compact.controls. */
+const OutlinedControl = css`
+  ${ControlButton};
+
+  width: var(--layout-compact-controls-secondary-size);
+  height: var(--layout-compact-controls-secondary-size);
+  border: var(--border-width-hairline) solid
+    var(--layout-compact-controls-border);
+
+  & > svg {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+  }
+
+  &.compact {
+    width: 3.2rem;
+    height: 3.2rem;
+
+    & > svg {
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+    }
   }
 `;
 
@@ -39,7 +67,7 @@ export const StyledControl = styled.div<ControlProps>`
   width: 100%;
   height: 9.2rem;
 
-  padding: 0.8rem 1.6rem;
+  padding: 0.8rem 1.2rem;
 
   display: flex;
   align-items: center;
@@ -47,11 +75,7 @@ export const StyledControl = styled.div<ControlProps>`
   grid-template-columns: 72px max-content 1fr;
   column-gap: 1rem;
 
-  color: ${(p) =>
-    (p.type === TimerStatus.SHORT_BREAK && "var(--color-green)") ||
-    (p.type === TimerStatus.LONG_BREAK && "var(--color-yellow)") ||
-    (p.type === TimerStatus.SPECIAL_BREAK && "var(--color-yellow)") ||
-    "var(--color-primary)"};
+  color: ${(p) => timerColor(p.type)};
 
   .ripple-hook {
     background-color: ${(p) =>
@@ -88,8 +112,8 @@ export const StyledSessionReset = styled.button<SessionProps>`
   justify-content: center;
 
   border: none;
-  border-radius: 50%;
-  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-circle);
+  background-color: var(--color-background-surface-sunken);
 
   opacity: 0;
   visibility: hidden;
@@ -97,21 +121,14 @@ export const StyledSessionReset = styled.button<SessionProps>`
   transition: all 320ms ease;
 
   &:hover {
-    color: ${(p) =>
-      (p.timerType === TimerStatus.SHORT_BREAK &&
-        "var(--color-green)") ||
-      (p.timerType === TimerStatus.LONG_BREAK &&
-        "var(--color-yellow)") ||
-      (p.timerType === TimerStatus.SPECIAL_BREAK &&
-        "var(--color-yellow)") ||
-      "var(--color-primary)"};
+    color: ${(p) => timerColor(p.timerType, true)};
   }
 
-  & > svg {
-    width: 1.6rem;
-    height: 1.6rem;
+  ${focusRing};
 
-    fill: currentColor;
+  & > svg {
+    width: 1.4rem;
+    height: 1.4rem;
   }
 `;
 
@@ -119,14 +136,21 @@ export const StyledSessions = styled.p`
   width: max-content;
   height: max-content;
 
-  font-size: 1.4rem;
-  font-weight: 500;
+  ${typeStyle("body")};
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  color: var(--color-body-text);
+  color: var(--color-text-primary);
+
+  /* meta rather than eyebrow: the uppercase label overflows 340px. */
+  & > span:nth-of-type(2) {
+    ${typeStyle("meta")};
+    color: var(--color-text-secondary-readable);
+  }
 
   position: relative;
 
@@ -142,12 +166,11 @@ export const StyledControlMain = styled.div<{ compact?: boolean }>`
   align-items: center;
   align-content: center;
   grid-auto-flow: column;
-  column-gap: 1rem;
-  margin-right: ${(p) => (p.compact ? 0 : "-1rem")};
+  column-gap: var(--space-2);
 `;
 
 export const StyledResetButton = styled.button`
-  ${ControlButton};
+  ${OutlinedControl};
 `;
 
 export const StyledMainButton = styled.button`
@@ -175,16 +198,11 @@ export const StyledCompactButton = styled.button<{ compact?: boolean }>`
 `;
 
 export const StyledSkipButton = styled.button`
-  ${ControlButton};
-
-  & > svg {
-    width: 1.8rem;
-    height: 1.8rem;
-  }
+  ${OutlinedControl};
 `;
 
 export const StyledVolumeButton = styled.button`
-  ${ControlButton};
+  ${OutlinedControl};
 `;
 
 export const StyledStrictIndicator = styled.div<{ warn?: boolean }>`
@@ -195,11 +213,11 @@ export const StyledStrictIndicator = styled.div<{ warn?: boolean }>`
   align-items: center;
   justify-content: center;
 
-  color: var(--color-body-text);
-  background-color: var(--color-bg-secondary);
+  color: var(--color-icon-default);
+  background-color: transparent;
 
-  border-radius: 50%;
-  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-circle);
+  border: var(--border-width-hairline) solid var(--color-border-strong);
   box-shadow: 0 0 0 0 rgba(var(--color-yellow-rgb), 0.16);
 
   position: relative;
@@ -227,8 +245,8 @@ export const StyledStrictIndicator = styled.div<{ warn?: boolean }>`
       box-shadow: 0 0 0 12px rgba(var(--color-yellow-rgb), 0);
     }
     100% {
-      color: var(--color-body-text);
-      border-color: var(--color-border-primary);
+      color: var(--color-icon-default);
+      border-color: var(--color-border-strong);
       box-shadow: 0 0 0 0 rgba(var(--color-yellow-rgb), 0);
     }
   }
@@ -249,11 +267,13 @@ export const StyledStrictSnackbar = styled.div<{ warn?: boolean }>`
 
   text-align: center;
 
-  color: var(--color-body-text);
+  ${typeStyle("meta")};
+  color: var(--color-text-primary);
 
-  border-radius: 10rem;
-  border: 1px solid var(--color-border-primary);
-  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-pill);
+  border: none;
+  background-color: var(--color-background-surface);
+  box-shadow: var(--shadow-floating);
   transition: ${themes.transition};
 
   opacity: 0;

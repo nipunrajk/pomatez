@@ -5,7 +5,7 @@ import {
   StyledTextArea,
 } from "styles";
 import { themes } from "styles/themes";
-import { StyledScrollbar } from "styles/mixins";
+import { StyledScrollbar, focusRing, typeStyle } from "styles/mixins";
 
 export const StyledTaskMain = styled.main`
   position: relative;
@@ -55,23 +55,28 @@ export const StyledTaskSectionItem = styled.div<SectionTypes>`
   height: max-content;
   min-height: 7.8rem;
 
-  padding: 1rem;
+  padding: var(--space-3);
 
-  border-radius: 1px;
-  border-bottom: 2px solid
+  /* The priority list keeps its accent, now as the list's top rule. */
+  border-radius: var(--radius-lg);
+  border-top: var(--border-width-thick) solid
     ${(p) =>
-      (p.priority && "var(--color-yellow)") || "var(--color-primary)"};
+      p.priority
+        ? "var(--color-timer-long-break)"
+        : "var(--color-brand-primary)"};
 
-  background-color: var(--color-bg-task-list);
-  box-shadow: 0 0px 0px var(--color-shadow-primary);
+  background-color: var(--color-background-surface-sunken);
 
-  transition: all 320ms ease-out;
+  transition: box-shadow var(--motion-duration-slow)
+      var(--motion-easing-standard),
+    rotate var(--motion-duration-base) var(--motion-easing-emphasized);
 
   ${(p) =>
     p.isDragging &&
     css`
-      border-bottom-color: var(--color-bg-task-list);
       box-shadow: var(--shadow-dragging);
+      /* rotate (not transform) so it composes with the drag translate. */
+      rotate: -4deg;
     `};
 `;
 
@@ -88,31 +93,27 @@ export const StyledTaskHeader = styled.header`
   &:hover > button,
   &:focus > button,
   &:active > button {
-    color: var(--color-body-text);
+    color: var(--color-icon-default);
   }
 `;
 
 export const StyledTaskHeading = styled.h3`
-  padding: 0.6rem;
+  padding: var(--space-1) var(--space-2);
 
-  font-size: 1.4rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: var(--color-heading-text);
+  ${typeStyle("list-title")};
+  color: var(--color-text-heading);
 
   overflow: hidden;
   overflow-wrap: break-word;
 `;
 
 export const StyledTaskHeadeInput = styled(StyledInput)`
-  padding: 0.5rem;
+  padding: var(--space-1) var(--space-2);
 
   height: max-content;
 
-  font-size: 1.4rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: var(--color-heading-text);
+  ${typeStyle("list-title")};
+  color: var(--color-text-heading);
 `;
 
 export const StyledTaskHeaderOption = styled.button`
@@ -125,22 +126,24 @@ export const StyledTaskHeaderOption = styled.button`
   align-items: center;
   justify-content: center;
 
+  color: var(--color-icon-muted);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background-color: transparent;
+  cursor: pointer;
 
   transition: ${themes.transition};
 
   &:hover {
-    color: var(--color-primary) !important;
-    background-color: var(--color-border-primary);
+    color: var(--color-icon-default) !important;
+    background-color: var(--color-background-surface-sunken);
   }
 
-  & > svg {
-    width: 1.4rem;
-    height: 1.4rem;
+  ${focusRing};
 
-    fill: currentColor;
+  & > svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
   }
 `;
 
@@ -157,7 +160,9 @@ export const StyledTaskStickySection = styled.div`
   padding-bottom: 2rem;
 
   backdrop-filter: blur(12px);
-  background-color: rgba(var(--color-bg-primary-rgb), 0.8);
+  background-color: rgba(var(--color-background-window-rgb), 0.85);
+  border-top: var(--border-width-hairline) solid
+    var(--color-border-strong);
 `;
 
 export const StyledTaskForm = styled.form`
@@ -172,20 +177,13 @@ export const StyledTaskForm = styled.form`
 
 export const StyledTaskInput = styled(StyledInput)`
   grid-column: 1 / -1;
-  padding: 0.6rem 1.2rem;
-  background-color: transparent;
 `;
 
 export const StyledTaskTextArea = styled(StyledTextArea)`
   grid-column: 1 / -1;
-
-  border-color: var(--color-border-input-primary);
-  border-bottom-color: var(--color-border-input-secondary);
 `;
 
-export const StyledTaskCardCancel = styled(StyledButtonNormal)`
-  border-color: var(--color-border-input-primary);
-`;
+export const StyledTaskCardCancel = styled(StyledButtonNormal)``;
 
 export const StyledTaskDimmer = styled.div`
   position: absolute;

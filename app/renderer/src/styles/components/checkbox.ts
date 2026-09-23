@@ -2,8 +2,8 @@ import styled, { css } from "styled-components/macro";
 import { themes } from "styles/themes";
 
 export const StyledCheckboxBox = styled.span<{ hidden?: boolean }>`
-  width: 1.1em;
-  height: 1.1em;
+  width: 1.8rem;
+  height: 1.8rem;
 
   display: ${({ hidden }) => (hidden ? "none" : "flex")};
   align-items: center;
@@ -11,13 +11,11 @@ export const StyledCheckboxBox = styled.span<{ hidden?: boolean }>`
 
   flex-shrink: 0;
 
-  margin-right: 5px;
+  margin-right: var(--space-2);
 
-  border-radius: 2px;
-  border: 2px solid var(--color-border-secondary);
-  background-color: var(--color-bg-tertiary);
-
-  box-shadow: 0 0 0 0 rgba(var(--color-green-rgb), 0.16);
+  border-radius: var(--radius-sm);
+  border: var(--border-width-hairline) solid var(--color-border-strong);
+  background-color: transparent;
 
   transition: ${themes.transition};
 
@@ -25,12 +23,12 @@ export const StyledCheckboxBox = styled.span<{ hidden?: boolean }>`
     content: "";
 
     height: 4px;
-    width: 10px;
+    width: 9px;
 
     margin-top: -2px;
 
-    border-left: 2px solid;
-    border-bottom: 2px solid;
+    border-left: 1.5px solid;
+    border-bottom: 1.5px solid;
 
     border-color: transparent;
 
@@ -40,8 +38,15 @@ export const StyledCheckboxBox = styled.span<{ hidden?: boolean }>`
 `;
 
 export const StyledCheckboxLabel = styled.span`
+  color: var(--color-text-primary);
   transition: ${themes.transition};
 `;
+
+/** Primary (settings choices) fills brand blue; tasks fill "completed". */
+const accent = (asPrimary?: boolean) =>
+  asPrimary
+    ? "var(--color-brand-primary)"
+    : "var(--color-status-completed)";
 
 export const StyledCheckbox = styled.label<{
   asPrimary?: boolean;
@@ -61,52 +66,35 @@ export const StyledCheckbox = styled.label<{
     -moz-appearance: none;
   }
 
-  & > input + ${StyledCheckboxBox} {
-    ${(p) =>
-      p.asPrimary &&
-      css`
-        box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.16);
-      `}
-  }
-
   & > input:checked + ${StyledCheckboxBox} {
-    border-color: ${(p) =>
-      p.asPrimary ? "var(--color-primary)" : "var(--color-green)"};
-    background-color: ${(p) =>
-      p.asPrimary ? "var(--color-primary)" : "var(--color-green)"};
+    border-color: ${(p) => accent(p.asPrimary)};
+    background-color: ${(p) => accent(p.asPrimary)};
   }
 
   & > input:checked + ${StyledCheckboxBox}::after {
-    border-color: var(--color-bg-primary);
+    border-color: var(--color-text-on-primary);
     transform: rotate(-45deg) scale(1);
   }
 
-  & > input:checked ~ ${StyledCheckboxLabel} {
-    color: ${(p) =>
-      p.asPrimary ? "var(--color-primary)" : "var(--color-green)"};
+  & > input:focus-visible + ${StyledCheckboxBox} {
+    outline: var(--border-width-thick) solid var(--color-border-focus);
+    outline-offset: 2px;
   }
 
-  &:hover ${StyledCheckboxBox} {
-    box-shadow: ${(p) =>
-      `0 0 0 0.2rem rgba(var(--${
-        p.asPrimary ? "color-primary" : "color-green"
-      }-rgb), 0.16)`};
+  & > input:disabled + ${StyledCheckboxBox} {
+    opacity: 0.4;
   }
 
-  &:active ${StyledCheckboxBox} {
-    box-shadow: ${(p) =>
-      `0 0 0 0.4rem rgba(var(--${
-        p.asPrimary ? "color-primary" : "color-green"
-      }-rgb), 0.16)`};
-  }
-
-  &:hover ${StyledCheckboxLabel}, &:focus ${StyledCheckboxLabel} {
-    color: ${(p) =>
-      `var(--${p.asPrimary ? "color-primary" : "color-green"})`};
-  }
+  ${(p) =>
+    css`
+      &:hover > input:not(:disabled) + ${StyledCheckboxBox} {
+        border-color: ${accent(p.asPrimary)};
+      }
+    `}
 
   display: inline-flex;
   align-items: center;
+  min-height: 3.2rem;
 
   text-transform: capitalize;
   cursor: pointer;

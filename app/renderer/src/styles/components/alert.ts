@@ -1,37 +1,37 @@
 import styled from "styled-components/macro";
-import { themes } from "styles";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledAlert = styled.div`
   width: 100%;
   min-height: 4rem;
 
-  margin-bottom: 1rem;
-  padding: 0.8rem;
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  padding-right: var(--space-10);
 
-  border-radius: 2px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  background-color: rgba(var(--color-primary-rgb), 0.1);
+  border-radius: var(--component-card-radius);
+  border: none;
+  background-color: var(--component-card-bg);
+  box-shadow: var(--component-card-shadow);
 
   position: relative;
 
   header {
     h3 {
-      color: rgba(var(--color-primary-rgb), 1);
-      font-size: 1.4rem;
-      margin-bottom: 0.2rem;
+      ${typeStyle("card-title")};
+      color: var(--color-text-heading);
+      margin-bottom: var(--space-1);
     }
 
     p {
-      color: rgba(var(--color-primary-rgb), 0.8);
+      color: var(--color-text-primary);
     }
 
     a {
-      font-weight: 500;
-      color: rgba(var(--color-primary-rgb), 1);
-
-      &:hover {
-        text-decoration: underline;
-      }
+      font-weight: var(--font-weight-medium);
+      color: var(--color-brand-primary-readable);
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
   }
 `;
@@ -44,23 +44,26 @@ export const StyledAlertCloseButton = styled.button`
   width: 2.4rem;
   height: 2.4rem;
 
-  color: rgba(var(--color-primary-rgb), 1);
+  color: var(--color-icon-muted);
 
   border: none;
-  border-radius: 10rem;
+  border-radius: var(--radius-circle);
   background: transparent;
+  cursor: pointer;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    color: ${themes.color.close};
+    color: var(--color-icon-default);
+    background-color: var(--color-background-surface-sunken);
   }
 
+  ${focusRing};
+
   & > svg {
-    width: 1.8rem;
-    height: 1.8rem;
-    fill: currentColor;
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
   }
 `;

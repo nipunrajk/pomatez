@@ -58,7 +58,7 @@ const FocusedTimeChart: React.FC<Props> = ({ buckets }) => {
               y={y + 3}
               textAnchor="end"
               fontSize={8}
-              fill="var(--color-disabled-text)"
+              fill="var(--color-text-secondary-readable)"
             >
               {formatMinutes(tick)}
             </text>
@@ -93,7 +93,7 @@ const FocusedTimeChart: React.FC<Props> = ({ buckets }) => {
                 y={VIEW_HEIGHT - 4}
                 textAnchor="middle"
                 fontSize={8}
-                fill="var(--color-disabled-text)"
+                fill="var(--color-text-secondary-readable)"
               >
                 {bucket.label}
               </text>

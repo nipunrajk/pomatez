@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledHelpWrapper = styled.a`
   width: 100%;
@@ -9,11 +10,14 @@ export const StyledHelpWrapper = styled.a`
   grid-template-columns: 1fr max-content;
 
   position: relative;
+  color: var(--color-text-primary);
 
   &:hover,
   &:focus {
-    color: var(--color-primary);
+    color: var(--color-brand-primary-readable);
   }
+
+  ${focusRing};
 
   &::after {
     content: "";
@@ -22,9 +26,9 @@ export const StyledHelpWrapper = styled.a`
     left: 0;
 
     width: 100%;
-    height: 0.1rem;
+    height: var(--border-width-hairline);
 
-    background-color: var(--color-border-secondary);
+    background-color: var(--color-border-soft);
   }
 `;
 
@@ -38,8 +42,12 @@ export const StyledHelpLabel = styled.span`
 `;
 
 export const StyledHelpExternal = styled.span`
-  border-radius: 0.3rem;
-  background-color: var(--color-bg-secondary);
+  ${typeStyle("tag")};
+  display: inline-flex;
+  align-items: center;
+  height: var(--component-tag-height);
+  padding: 0 var(--component-tag-padding-x);
 
-  padding: 0.4rem 0.8rem;
+  border-radius: var(--component-tag-radius);
+  border: var(--border-width-hairline) solid var(--component-tag-border);
 `;

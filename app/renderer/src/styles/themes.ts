@@ -16,6 +16,7 @@ const modulaReadable = css`
   --color-timer-short-break-readable: #377d4f;
   --color-timer-long-break-readable: #a25e47;
   --color-status-danger-readable: #a25e47;
+  --color-status-completed-readable: #377d4f;
 `;
 
 /**
@@ -207,6 +208,7 @@ export const darkTheme = css`
   --color-timer-short-break-readable: var(--color-green);
   --color-timer-long-break-readable: var(--color-yellow);
   --color-status-danger-readable: var(--color-pink);
+  --color-status-completed-readable: var(--color-green);
 `;
 
 const enterFromLeft = keyframes`

@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledCollapse = styled.div`
   width: 100%;
@@ -16,23 +17,23 @@ export const StyledCollapseHeading = styled.h4<{ open?: boolean }>`
   align-items: center;
   justify-content: space-between;
 
-  color: var(--color-body-text);
-  font-weight: 400;
+  ${typeStyle("body")};
+  color: var(--color-text-primary);
   border: none;
   background-color: transparent;
+  cursor: pointer;
 
-  &:focus {
-    color: var(--color-primary);
-  }
+  ${focusRing};
 
   & > svg {
-    width: 1.4rem;
-    height: 1.4rem;
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
 
     margin-right: 0.8rem;
 
     transform: ${(p) => p.open && "rotate(180deg)"};
-    transition: transform 180ms ease;
+    transition: transform var(--motion-duration-base)
+      var(--motion-easing-standard);
   }
 
   position: relative;
@@ -44,9 +45,9 @@ export const StyledCollapseHeading = styled.h4<{ open?: boolean }>`
     left: 0;
 
     width: 100%;
-    height: 1px;
+    height: var(--border-width-hairline);
 
-    background-color: var(--color-border-secondary);
+    background-color: var(--color-border-soft);
   }
 `;
 
@@ -72,9 +73,9 @@ export const StyledCollapseContent = styled.div`
     left: 0;
 
     width: 100%;
-    height: 1px;
+    height: var(--border-width-hairline);
 
-    background-color: var(--color-border-secondary);
+    background-color: var(--color-border-soft);
   }
 
   @keyframes enter {

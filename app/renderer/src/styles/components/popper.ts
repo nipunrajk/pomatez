@@ -1,6 +1,5 @@
 import styled from "styled-components/macro";
-import { typeStyle } from "styles/mixins";
-import { themes } from "styles";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledPopper = styled.div``;
 
@@ -10,11 +9,11 @@ export const StyledPopperContent = styled.div`
 
   position: absolute;
 
-  padding-bottom: 0.4rem;
+  padding-bottom: var(--space-1);
 
-  border-radius: 2px;
-  background-color: var(--color-bg-popper);
-  box-shadow: 0 2px 12px -2px var(--color-shadow-primary);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background-surface);
+  box-shadow: var(--shadow-floating);
 
   cursor: auto;
   z-index: 10;
@@ -37,9 +36,9 @@ export const StyledPopperHeader = styled.header`
     left: 0;
 
     width: 100%;
-    height: 1px;
+    height: var(--border-width-hairline);
 
-    background-color: var(--color-border-secondary);
+    background-color: var(--color-border-soft);
   }
 
   & > h4 {
@@ -55,22 +54,26 @@ export const StyledPopperHeader = styled.header`
     width: 2.4rem;
     height: 2.4rem;
 
+    color: var(--color-icon-muted);
     border: none;
-    border-radius: 10rem;
+    border-radius: var(--radius-circle);
     background: transparent;
+    cursor: pointer;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     &:hover {
-      color: ${themes.color.close};
+      color: var(--color-icon-default);
+      background-color: var(--color-background-surface-sunken);
     }
 
+    ${focusRing};
+
     & > svg {
-      width: 1.8rem;
-      height: 1.8rem;
-      fill: currentColor;
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
     }
   }
 `;

@@ -7,6 +7,6 @@ export const StyledDimmer = styled.div`
   bottom: 0;
   right: 0;
 
-  border-radius: 1px;
+  border-radius: var(--radius-none);
   background-color: var(--color-background-overlay);
 `;

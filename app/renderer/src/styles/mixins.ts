@@ -1,4 +1,5 @@
 import { css } from "styled-components/macro";
+import { TimerStatus } from "store/timer/types";
 
 export const StyledScrollbar = css`
   &:hover::-webkit-scrollbar {
@@ -50,4 +51,30 @@ export const typeStyle = (role: TypeRole) => css`
   line-height: var(--type-${role}-line-height);
   letter-spacing: var(--type-${role}-letter-spacing);
   text-transform: var(--type-${role}-transform);
+`;
+
+/**
+ * Timer-state color from `color.timer`: focus is blue, short break green,
+ * long (and special) break terracotta. `readable` picks the darker variant
+ * that clears 4.5:1 for text; strokes and fills use the spec color.
+ */
+export const timerColor = (type?: TimerStatus, readable = false) => {
+  const suffix = readable ? "-readable" : "";
+  switch (type) {
+    case TimerStatus.SHORT_BREAK:
+      return `var(--color-timer-short-break${suffix})`;
+    case TimerStatus.LONG_BREAK:
+    case TimerStatus.SPECIAL_BREAK:
+      return `var(--color-timer-long-break${suffix})`;
+    default:
+      return `var(--color-timer-focus${suffix})`;
+  }
+};
+
+/** Keyboard focus ring shared by interactive controls. */
+export const focusRing = css`
+  &:focus-visible {
+    outline: var(--border-width-thick) solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
 `;

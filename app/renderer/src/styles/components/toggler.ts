@@ -1,13 +1,15 @@
 import styled from "styled-components/macro";
 import { themes } from "styles/themes";
+import { typeStyle } from "styles/mixins";
 
 export const StyledTogglerWrapper = styled.div`
   width: 100%;
-  height: 4rem;
+  min-height: 5.2rem;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-3);
 
   position: relative;
 
@@ -18,9 +20,9 @@ export const StyledTogglerWrapper = styled.div`
     left: 0;
 
     width: 100%;
-    height: 0.1rem;
+    height: var(--border-width-hairline);
 
-    background-color: var(--color-border-secondary);
+    background-color: var(--color-border-soft);
   }
 `;
 
@@ -28,17 +30,27 @@ export const StyledTogglerLabel = styled.label`
   width: 100%;
   height: 100%;
 
+  ${typeStyle("body")};
+  color: var(--color-text-primary);
+
   display: flex;
   align-items: center;
 `;
 
+const KNOB_INSET = "4px";
+const KNOB_SIZE = `calc(var(--component-toggle-height) - 2 * ${KNOB_INSET})`;
+
+/** components.toggle: 60x34 pill, brand track when on, white knob. */
 export const StyledTogglerSwitch = styled.input`
-  width: 2.6rem;
-  height: 3.2rem;
+  flex-shrink: 0;
+  width: var(--component-toggle-width);
+  height: var(--component-toggle-height);
 
   appearance: none;
+  cursor: pointer;
 
   position: relative;
+  border-radius: var(--component-toggle-radius);
 
   transition: opacity 0.15s;
 
@@ -49,56 +61,44 @@ export const StyledTogglerSwitch = styled.input`
   }
 
   &::before {
-    top: 50%;
-    left: 50%;
+    inset: 0;
 
-    width: 2.4rem;
-    height: 1.2rem;
-
-    border-radius: 10rem;
-    background-color: var(--color-border-primary);
-
-    transform: translate(-50%, -50%);
-
-    transition: ${themes.transition} 40ms;
-  }
-
-  &::after {
-    top: 50%;
-    left: 0;
-
-    width: 1.4rem;
-    height: 1.4rem;
-
-    border-radius: 10rem;
-    border: 0.1rem solid var(--color-primary);
-    background-color: var(--color-bg-slider-thumb);
-    box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.16);
-
-    transform: translateY(-50%);
-    cursor: pointer;
+    border-radius: var(--component-toggle-radius);
+    background-color: var(--component-toggle-off-bg);
 
     transition: ${themes.transition};
   }
 
-  &:hover::after,
-  &:focus::after {
-    box-shadow: 0 0 0 0.4rem rgba(var(--color-primary-rgb), 0.16);
+  &::after {
+    top: ${KNOB_INSET};
+    left: ${KNOB_INSET};
+
+    width: ${KNOB_SIZE};
+    height: ${KNOB_SIZE};
+
+    border-radius: var(--radius-circle);
+    background-color: var(--component-toggle-knob);
+    box-shadow: var(--shadow-button);
+
+    transition: left var(--motion-duration-base)
+      var(--motion-easing-standard);
   }
 
-  &:active::after {
-    box-shadow: 0 0 0 0.6rem rgba(var(--color-primary-rgb), 0.24);
+  &:focus-visible {
+    outline: var(--border-width-thick) solid var(--color-border-focus);
+    outline-offset: 2px;
   }
 
   &:disabled {
-    opacity: 0.2;
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   &:checked::before {
-    background-color: var(--color-primary);
+    background-color: var(--component-toggle-on-bg);
   }
 
   &:checked::after {
-    left: calc(100% - 1.4rem);
+    left: calc(100% - ${KNOB_SIZE} - ${KNOB_INSET});
   }
 `;

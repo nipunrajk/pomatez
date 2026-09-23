@@ -42,14 +42,13 @@ export const StyledDetailContainer = styled.div`
 
 export const StyledDetailHeader = styled.textarea`
   width: calc(100% - 3.2rem);
-  height: 2.3rem;
+  height: 2.8rem;
 
   resize: none;
 
-  font-size: 1.5rem;
-  font-weight: 500;
+  ${typeStyle("card-title")};
 
-  color: var(--color-heading-text);
+  color: var(--color-text-heading);
 
   border: none;
   background-color: transparent;
@@ -64,8 +63,9 @@ export const StyledDetailCloseButton = styled.button`
   height: 2.4rem;
 
   border: none;
-  border-radius: 10rem;
-  background: var(--color-bg-secondary);
+  border-radius: var(--radius-circle);
+  background: var(--color-background-surface-sunken);
+  cursor: pointer;
 
   display: flex;
   align-items: center;
@@ -73,13 +73,12 @@ export const StyledDetailCloseButton = styled.button`
 
   &:hover {
     color: ${themes.color.close};
-    background: var(--color-bg-tertiary);
+    background: var(--color-background-surface-sunken);
   }
 
   & > svg {
     width: 1.8rem;
-    height: 1.8rem;
-    fill: currentColor;
+    height: var(--icon-size-sm);
   }
 `;
 
@@ -117,23 +116,21 @@ export const StyledDescriptionArea = styled(StyledTextArea)`
 
   min-height: 7.2rem;
   max-height: 15.4rem;
-  background-color: var(--color-bg-secondary);
 `;
 
 export const StyledDescriptionFormatHelp = styled.a`
   grid-column: 3 / -1;
   justify-self: end;
 
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: var(--color-body-text);
+  ${typeStyle("meta")};
+  color: var(--color-text-secondary-readable);
 
   height: max-content;
 
   padding: 0 0.4rem;
 
   &:hover {
-    color: var(--color-primary);
+    color: var(--color-brand-primary-readable);
   }
 `;
 
@@ -150,16 +147,18 @@ export const StyledDescriptionPreviewer = styled.div<{
   display: grid;
   row-gap: 0.8rem;
 
-  border-radius: 3px;
-  border: 1px solid var(--color-border-primary);
-  background-color: var(--color-bg-secondary);
+  border-radius: var(--component-card-radius);
+  border: none;
+  background-color: var(--component-card-bg);
+  box-shadow: var(--component-card-shadow);
 
   overflow: hidden auto;
 
   ${StyledScrollbar};
 
   p {
-    color: ${(p) => !p.hasValue && "var(--color-disabled-text)"};
+    color: ${(p) =>
+      !p.hasValue && "var(--color-text-placeholder-readable)"};
     // fixes an issue where the bullet points show not on the same line
     display: inline-block;
   }
@@ -215,17 +214,17 @@ export const StyledDescriptionPreviewer = styled.div<{
       height: 0.4em;
       margin-right: 8px;
       margin-bottom: 0.15em;
-      border-radius: 50%;
+      border-radius: var(--radius-circle);
       background-color: var(--color-body-text);
     }
   }
 
   del {
-    color: var(--color-green);
+    color: var(--color-status-completed-readable);
   }
 
   a {
-    color: var(--color-primary);
+    color: var(--color-brand-primary-readable);
     &:hover {
       text-decoration: underline;
     }
@@ -237,18 +236,18 @@ export const StyledDescriptionPreviewer = styled.div<{
     line-height: 1.7;
     white-space: pre-wrap;
 
-    border-radius: 3px;
-    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    border: var(--border-width-hairline) solid var(--color-border-soft);
     background-color: var(--color-bg-code);
   }
 
   pre {
     padding: 0.1em 0.4em;
 
-    color: var(--color-green);
+    color: var(--color-status-completed-readable);
 
-    border-radius: 3px;
-    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    border: var(--border-width-hairline) solid var(--color-border-soft);
     background-color: var(--color-bg-code);
 
     code {
@@ -271,7 +270,8 @@ export const StyledDescriptionPreviewer = styled.div<{
     thead {
       tr {
         background-color: var(--color-bg-primary);
-        border-top: 1px solid var(--color-border-primary);
+        border-top: var(--border-width-hairline) solid
+          var(--color-border-soft);
 
         th {
           padding: 0.5rem 1rem;
@@ -284,7 +284,8 @@ export const StyledDescriptionPreviewer = styled.div<{
     tbody {
       tr {
         background-color: var(--color-bg-primary);
-        border-top: 1px solid var(--color-border-primary);
+        border-top: var(--border-width-hairline) solid
+          var(--color-border-soft);
 
         &:nth-child(odd) {
           background-color: var(--color-bg-tertiary);
@@ -299,14 +300,15 @@ export const StyledDescriptionPreviewer = styled.div<{
 
     th,
     td {
-      border: 1px solid var(--color-border-primary);
+      border: var(--border-width-hairline) solid
+        var(--color-border-soft);
     }
   }
 
   blockquote {
     padding: 0 1em;
-    color: rgba(var(--color-primary-rgb), 0.8);
-    border-left: 0.25em solid rgba(var(--color-primary-rgb), 0.2);
+    color: var(--color-text-heading);
+    border-left: 0.25em solid var(--color-brand-primary);
   }
 
   dt {
@@ -327,7 +329,8 @@ export const StyledDescriptionPreviewer = styled.div<{
     width: 100%;
     height: 1px;
 
-    border: 1px solid rgba(var(--color-primary-rgb), 0.16);
+    border: var(--border-width-hairline) solid
+      var(--color-border-strong);
   }
 `;
 

@@ -1,5 +1,6 @@
 import styled from "styled-components/macro";
 import { themes } from "../themes";
+import { typeStyle } from "styles/mixins";
 
 export const StyledRangeContainer = styled.div`
   width: 100%;
@@ -13,7 +14,7 @@ export const StyledRangeContainer = styled.div`
 
 export const StyledRangeWrapper = styled.div`
   width: 100%;
-  height: 0.6rem;
+  height: var(--component-progress-bar-height);
 
   position: relative;
 `;
@@ -39,21 +40,21 @@ export const StyledRangeSliderFill = styled.div<FillTypes>`
       maxValue - minValue
     }) * 100%)`;
   }};
-  height: 0.6rem;
+  height: var(--component-progress-bar-height);
 
-  border-radius: 10rem;
-  background-color: var(--color-primary);
+  border-radius: var(--component-progress-bar-radius);
+  background-color: var(--color-brand-primary);
 
   z-index: 1;
 `;
 
 export const StyledRangeSlider = styled.input`
   width: 100%;
-  height: 0.6rem;
+  height: var(--component-progress-bar-height);
 
   appearance: none;
-  border-radius: 0.3rem;
-  background-color: var(--color-border-primary);
+  border-radius: var(--component-progress-bar-radius);
+  background-color: var(--component-progress-bar-track);
 
   position: absolute;
   top: 0;
@@ -62,33 +63,32 @@ export const StyledRangeSlider = styled.input`
   &::-webkit-slider-thumb {
     appearance: none;
 
-    width: 2rem;
-    height: 1.2rem;
+    width: 1.6rem;
+    height: 1.6rem;
 
-    border-radius: 10rem;
-    border: 1px solid var(--color-primary);
-    background-color: var(--color-bg-slider-thumb);
+    border-radius: var(--radius-circle);
+    border: var(--border-width-hairline) solid
+      var(--color-border-strong);
+    background-color: var(--component-toggle-knob);
 
-    box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.16);
+    box-shadow: var(--shadow-button);
 
-    transition: box-shadow 160ms ${themes.easing};
+    transition: transform var(--motion-duration-fast) ${themes.easing};
 
     cursor: pointer;
 
     position: relative;
     z-index: 2;
-
-    &:hover {
-      box-shadow: 0 0 0 0.4rem rgba(var(--color-primary-rgb), 0.16);
-    }
   }
 
-  &:focus::-webkit-slider-thumb {
-    box-shadow: 0 0 0 0.4rem rgba(var(--color-primary-rgb), 0.16);
-  }
-
+  &:hover::-webkit-slider-thumb,
   &:active::-webkit-slider-thumb {
-    box-shadow: 0 0 0 0.6rem rgba(var(--color-primary-rgb), 0.24);
+    transform: scale(1.15);
+  }
+
+  &:focus-visible::-webkit-slider-thumb {
+    outline: var(--border-width-thick) solid var(--color-border-focus);
+    outline-offset: 2px;
   }
 `;
 
@@ -98,6 +98,12 @@ export const StyledRangeInputWrapper = styled.div`
   justify-content: space-between;
 `;
 
-export const StyledRangeInputLabel = styled.p``;
+export const StyledRangeInputLabel = styled.p`
+  color: var(--color-text-primary);
+`;
 
-export const StyledRangeInputValue = styled.p``;
+export const StyledRangeInputValue = styled.p`
+  ${typeStyle("meta")};
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary-readable);
+`;

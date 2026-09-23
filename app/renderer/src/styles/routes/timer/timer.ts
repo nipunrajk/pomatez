@@ -1,5 +1,6 @@
 import styled from "styled-components/macro";
 import { themes } from "styles/themes";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledTimer = styled.main`
   width: 100%;
@@ -45,7 +46,7 @@ export const StyledSectionSeparator = styled.div`
 
 export const StyledPriorityCardContainer = styled.div`
   width: 100%;
-  height: 5.6rem;
+  min-height: 5.6rem;
   padding: 0 1.6rem;
 `;
 
@@ -61,22 +62,24 @@ export const StyledPriorityCardOption = styled.button`
   padding: 0.4rem 0rem;
   margin: 0.4rem 0.6rem;
 
-  color: var(--color-body-text);
+  color: var(--color-icon-muted);
 
   border: none;
+  border-radius: var(--radius-sm);
   background-color: transparent;
 
   transition: ${themes.transition};
 
   &:hover,
   &:focus {
-    color: var(--color-primary);
+    color: var(--color-icon-default);
   }
 
+  ${focusRing};
+
   & > svg {
-    width: 1.6rem;
-    height: 1.6rem;
-    fill: currentColor;
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
   }
 `;
 
@@ -90,12 +93,13 @@ export const StyledPriorityCardWrapper = styled.div`
   align-items: flex-start;
   justify-content: space-between;
 
-  padding: 0.5rem 1rem;
-  padding-bottom: 0.6rem;
+  min-height: 5.6rem;
+  padding: var(--layout-compact-task-box-padding);
 
-  border-radius: 3px;
-  border: 1px solid var(--color-border-secondary);
-  background-color: var(--color-bg-secondary);
+  border-radius: var(--layout-compact-task-box-radius);
+  border: none;
+  background-color: var(--layout-compact-task-box-bg);
+  box-shadow: var(--shadow-card);
 `;
 
 export const StyledPriorityCardHeader = styled.header`
@@ -103,17 +107,17 @@ export const StyledPriorityCardHeader = styled.header`
 `;
 
 export const StyledPriorityCardHeading = styled.h4`
+  ${typeStyle("card-title")};
   padding-right: 1.6rem;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--color-heading-text);
+  color: var(--color-text-primary);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 `;
 
 export const StyledPriorityCardDescription = styled.p`
-  color: var(--color-body-text);
+  ${typeStyle("meta")};
+  color: var(--color-text-secondary-readable);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;

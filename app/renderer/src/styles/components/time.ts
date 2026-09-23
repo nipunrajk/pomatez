@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components/macro";
+import { typeStyle } from "styles/mixins";
 
 type TimeWrapperProps = { disabled?: boolean };
 
@@ -12,22 +13,25 @@ export const StyledTimeWrapper = styled.div<TimeWrapperProps>`
   & > input[type="time"] {
     color: ${(p) => p.disabled && "transparent"};
     background-color: ${(p) =>
-      p.disabled && "var(--color-bg-tertiary)"};
+      p.disabled && "var(--color-background-surface-sunken)"};
   }
 `;
 
 export const StyledTimeInput = styled.input<{ error?: boolean }>`
   width: 100%;
 
-  padding: 0.6rem 0.8rem;
+  height: var(--component-button-height-md);
+  padding: 0 var(--space-3);
 
-  border-radius: 2px;
-  border: 1px solid var(--color-border-secondary);
-  background-color: var(--color-bg-secondary);
-  box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.16);
+  color: var(--component-input-text);
+  color-scheme: light dark;
+  border-radius: var(--component-input-radius);
+  border: var(--border-width-hairline) solid
+    var(--component-input-border);
+  background-color: var(--component-input-bg);
 
   &::-webkit-datetime-edit-fields-wrapper {
-    color: ${(p) => p.error && "var(--color-pink)"};
+    color: ${(p) => p.error && "var(--color-status-danger-readable)"};
   }
 
   &::-webkit-datetime-edit-text {
@@ -39,22 +43,24 @@ export const StyledTimeInput = styled.input<{ error?: boolean }>`
   }
 
   &:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.16);
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 var(--border-width-hairline)
+      var(--color-border-focus);
   }
 
   &:focus ~ label {
-    color: var(--color-primary);
+    color: var(--color-brand-primary-readable);
   }
 
   ${(p) =>
     p.error &&
     css`
-      border-color: var(--color-pink) !important;
-      box-shadow: 0 0 0 2px rgba(var(--color-pink-rgb), 0.16) !important;
+      border-color: var(--color-status-danger) !important;
+      box-shadow: 0 0 0 var(--border-width-hairline)
+        var(--color-status-danger) !important;
 
       & ~ label {
-        color: var(--color-pink) !important;
+        color: var(--color-status-danger-readable) !important;
       }
     `}
 `;
@@ -62,7 +68,6 @@ export const StyledTimeInput = styled.input<{ error?: boolean }>`
 export const StyledTimeInputLabel = styled.label`
   grid-row: 1 / 2;
 
-  font-size: 1.1rem;
-  font-weight: 500;
-  text-transform: capitalize;
+  ${typeStyle("eyebrow")};
+  color: var(--color-text-secondary-readable);
 `;

@@ -41,8 +41,8 @@ export const StyledLoaderBox = styled.div`
   width: 6px;
   height: 100%;
 
-  border-radius: 1px;
-  background-color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-brand-primary);
 
   animation: stretchAnimation 1.2s ease-in-out infinite;
 
