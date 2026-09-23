@@ -30,7 +30,8 @@
     "tauri": "cd app/tauri && tauri",
     "tauri:dev": "yarn tauri dev",
     "tauri:dev-with-updater": "yarn tauri dev --config ./release.conf.json",
-    "tauri:updateversion": "node ./app/tauri/util/cargo-version-updater.js"
+    "tauri:updateversion": "node ./app/tauri/util/cargo-version-updater.js",
+    "gen:theme": "lerna run gen:theme --stream"
   },
   "config": {
     "commitizen": {

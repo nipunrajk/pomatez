@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components/macro";
-import { darkTheme, lightTheme } from "./themes";
+import { darkTheme, modulaTheme } from "./themes";
+import { modulaTokens } from "./tokens.generated";
 
 type GlobalTypes = {
   isDarkMode?: boolean;
@@ -9,12 +10,8 @@ type GlobalTypes = {
 export const GlobalStyles = createGlobalStyle<GlobalTypes>`
 
   :root {
-    ${(p) => {
-      if (p.isDarkMode) {
-        return darkTheme;
-      }
-      return lightTheme;
-    }}
+    ${modulaTokens}
+    ${(p) => (p.isDarkMode ? darkTheme : modulaTheme)}
   }
 
   *,
@@ -67,7 +64,7 @@ export const GlobalStyles = createGlobalStyle<GlobalTypes>`
         ? "1px solid var(--color-border-window)"
         : "none"} ;
     box-shadow: ${(p) =>
-      !p.useNativeTitlebar && "0 1px 16px -4px rgba(0, 0, 0, 0.5)"};
+      !p.useNativeTitlebar && "var(--shadow-floating)"};
     box-sizing: border-box;
   }
 

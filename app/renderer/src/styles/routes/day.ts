@@ -181,13 +181,19 @@ export const StyledEntryPlay = styled.button<{ running: boolean }>`
   justify-content: center;
 
   cursor: pointer;
-  color: ${(p) => (p.running ? "#fff" : "var(--color-body-text)")};
+  color: ${(p) =>
+    p.running
+      ? "var(--color-text-on-primary)"
+      : "var(--color-body-text)"};
   background-color: ${(p) =>
     p.running ? "var(--color-primary)" : "var(--color-bg-tertiary)"};
   transition: ${themes.transition};
 
   &:hover:not(:disabled) {
-    color: ${(p) => (p.running ? "#fff" : "var(--color-primary)")};
+    color: ${(p) =>
+      p.running
+        ? "var(--color-text-on-primary)"
+        : "var(--color-primary)"};
   }
 
   &:disabled {
@@ -339,7 +345,7 @@ export const StyledModeToggle = styled.div`
     transition: ${themes.transition};
 
     &[aria-pressed="true"] {
-      color: #fff;
+      color: var(--color-text-on-primary);
       background-color: var(--color-primary);
     }
   }

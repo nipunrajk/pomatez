@@ -4,7 +4,7 @@ import {
   SettingTypes,
   TrayIconStyle,
 } from "./types";
-import { detectOS, isPreferredDark } from "utils";
+import { detectOS } from "utils";
 
 export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   alwaysOnTop: false,
@@ -12,8 +12,9 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   ignoreUpdate: "",
   enableFullscreenBreak: false,
   enableStrictMode: false,
-  enableDarkTheme: isPreferredDark(),
-  followSystemTheme: true,
+  // Modula (light) is the default; dark stays opt-in.
+  enableDarkTheme: false,
+  followSystemTheme: false,
   enableProgressAnimation: true,
   enableVoiceAssistance: false,
   notificationSoundOn: true,

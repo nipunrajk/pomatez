@@ -181,7 +181,10 @@ function createMainWindow() {
     show: false,
     frame: store.safeGet("useNativeTitlebar"),
     icon: getIcon(),
-    backgroundColor: store.safeGet("isDarkMode") ? "#141e25" : "#fff",
+    // Painted before the renderer loads: Modula window cream, or dark.
+    backgroundColor: store.safeGet("isDarkMode")
+      ? "#141e25"
+      : "#F5F5E7",
     webPreferences: {
       contextIsolation: true,
       backgroundThrottling: false,

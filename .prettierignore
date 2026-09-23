@@ -6,3 +6,8 @@
 *build/
 
 *.cache/
+
+# Design source of truth; keep it byte-identical to the design handoff.
+modula-theme.json
+# Generated from it; `yarn gen:theme --check` compares byte-for-byte.
+app/renderer/src/styles/tokens.generated.ts

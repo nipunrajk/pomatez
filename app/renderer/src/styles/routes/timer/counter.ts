@@ -104,7 +104,7 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
 `;
 
 export const StyledCounterType = styled.div`
-  color: #666;
+  color: var(--color-text-secondary-readable);
   text-align: center;
   padding-bottom: 0.4rem;
 

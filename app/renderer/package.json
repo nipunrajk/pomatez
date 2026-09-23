@@ -17,7 +17,8 @@
     "postbuild": "copyfiles -u 1 \"build/**/*\" ../electron/build",
     "dev:renderer": "react-scripts start",
     "start": "yarn dev:renderer",
-    "gen:tts": "node tts-generator.js"
+    "gen:tts": "node tts-generator.js",
+    "gen:theme": "node scripts/generate-theme-tokens.js"
   },
   "eslintConfig": {
     "extends": "react-app",

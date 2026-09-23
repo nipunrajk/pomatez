@@ -1,5 +1,4 @@
 import Store, { Options } from "electron-store";
-import { nativeTheme } from "electron";
 import { isWindow } from "./helpers";
 import ElectronStore from "electron-store";
 
@@ -58,7 +57,7 @@ class SafeStore<
 // Wrap the store due to a delete issue
 const store = new SafeStore<StoreProps>({
   defaults: {
-    isDarkMode: nativeTheme.shouldUseDarkColors,
+    isDarkMode: false,
     useNativeTitlebar: !isWindow(),
     compactMode: false,
     openAtLogin: false,

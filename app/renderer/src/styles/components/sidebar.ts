@@ -34,7 +34,7 @@ export const StyledSidebarLink = styled(NavLink)`
 
   font-family: Typo-Round, sans-serif;
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--color-text-sidebar-inactive-readable);
 
   border-radius: 0.8rem;
   transition: ${themes.transition};
@@ -45,13 +45,13 @@ export const StyledSidebarLink = styled(NavLink)`
   }
 
   &:hover {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--color-text-sidebar-active);
+    background-color: var(--layout-dashboard-sidebar-item-active-bg);
   }
 
   &.active {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.18);
+    color: var(--color-text-sidebar-active);
+    background-color: var(--layout-dashboard-sidebar-item-active-bg);
   }
 `;
 

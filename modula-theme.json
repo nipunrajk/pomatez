@@ -1,0 +1,309 @@
+{
+  "$meta": {
+    "name": "Modula",
+    "version": "1.0.0",
+    "mode": "light",
+    "note": "Colors sampled from the reference design. Sizes are measured from a 1762x1246 screenshot and rounded to a 4px grid."
+  },
+
+  "color": {
+    "brand": {
+      "primary": "#4673A6",
+      "primaryHover": "#3D6696",
+      "primaryActive": "#355A85",
+      "primaryDark": "#263E5A",
+      "primaryMuted": "rgba(70, 115, 166, 0.12)"
+    },
+    "background": {
+      "window": "#F5F5E7",
+      "surface": "#FCFBF5",
+      "surfaceSunken": "#E9E9DD",
+      "input": "#EEEEE2",
+      "kbd": "#DBDBCF",
+      "sidebar": "#263E5A",
+      "sidebarCard": "#4673A6",
+      "overlay": "rgba(38, 62, 90, 0.40)"
+    },
+    "text": {
+      "heading": "#3A5F8A",
+      "primary": "#1C1C1A",
+      "secondary": "#8C8C80",
+      "tertiary": "#A7A7A2",
+      "placeholder": "#89897E",
+      "onPrimary": "#FFFFFF",
+      "sidebarActive": "#FFFFFF",
+      "sidebarInactive": "#859EB7",
+      "sidebarCardBody": "#B7DAF9"
+    },
+    "icon": {
+      "default": "#1C1C1A",
+      "muted": "#8C8C80",
+      "active": "#4673A6",
+      "onSidebar": "#7A94AB",
+      "onSidebarActive": "#FFFFFF"
+    },
+    "border": {
+      "strong": "#1C1C1A",
+      "soft": "#E5E5D7",
+      "header": "#D9D7D5",
+      "input": "#DBDBCF",
+      "sidebarActive": "#ECF1F6",
+      "focus": "#4673A6"
+    },
+    "status": {
+      "pending": "#DED9C8",
+      "ongoing": "#2F3E62",
+      "completed": "#5BB77A",
+      "planning": "#C0846F",
+      "danger": "#C0846F",
+      "notification": "#C0846F",
+      "today": "#E0957A"
+    },
+    "progress": {
+      "track": "#E5E5D7",
+      "fillSuccess": "#5BB37B",
+      "fillPrimary": "#37476A"
+    },
+    "timer": {
+      "focus": "#4673A6",
+      "shortBreak": "#5BB77A",
+      "longBreak": "#C0846F",
+      "ringTrack": "#E5E5D7",
+      "gaugeTicks": "#F4FCFD"
+    },
+    "calendar": {
+      "weekday": "#9C9C90",
+      "day": "#67665B",
+      "selectedBg": "#4673A6",
+      "selectedText": "#FFFFFF"
+    },
+    "agenda": {
+      "blue":  { "bg": "#4673A6", "text": "#FFFFFF", "subtext": "rgba(255,255,255,0.70)" },
+      "tan":   { "bg": "#E6D6C3", "text": "#1C1C1A", "subtext": "#8C8C80" },
+      "grey":  { "bg": "#E9E9DD", "text": "#1C1C1A", "subtext": "#8C8C80" },
+      "green": { "bg": "#8FC6A6", "text": "#FFFFFF", "subtext": "rgba(255,255,255,0.70)" },
+      "red":   { "bg": "#C08570", "text": "#FFFFFF", "subtext": "rgba(255,255,255,0.70)" }
+    }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "display": "'Playfair Display', Georgia, 'Times New Roman', serif",
+      "body": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "mono": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    },
+    "fontWeight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "scale": {
+      "timerDisplay": { "family": "display", "size": "80px", "weight": 700, "lineHeight": 1.0, "letterSpacing": "-0.02em" },
+      "timerUnit":    { "family": "display", "size": "36px", "weight": 600, "lineHeight": 1.1 },
+      "pageTitle":    { "family": "display", "size": "40px", "weight": 500, "lineHeight": 1.15, "letterSpacing": "-0.01em" },
+      "sectionTitle": { "family": "display", "size": "30px", "weight": 500, "lineHeight": 1.2 },
+      "cardTitle":    { "family": "display", "size": "20px", "weight": 500, "lineHeight": 1.3 },
+      "listTitle":    { "family": "display", "size": "20px", "weight": 500, "lineHeight": 1.3 },
+      "brand":        { "family": "display", "size": "22px", "weight": 500, "lineHeight": 1.2 },
+      "body":         { "family": "body", "size": "15px", "weight": 400, "lineHeight": 1.5 },
+      "navItem":      { "family": "body", "size": "16px", "weight": 400, "lineHeight": 1.4 },
+      "button":       { "family": "body", "size": "15px", "weight": 500, "lineHeight": 1.0 },
+      "meta":         { "family": "body", "size": "12px", "weight": 400, "lineHeight": 1.4 },
+      "eyebrow":      { "family": "body", "size": "12px", "weight": 500, "lineHeight": 1.3, "letterSpacing": "0.08em", "textTransform": "uppercase" },
+      "tag":          { "family": "body", "size": "11px", "weight": 500, "lineHeight": 1.0, "letterSpacing": "0.08em", "textTransform": "uppercase" },
+      "kbd":          { "family": "body", "size": "11px", "weight": 500, "lineHeight": 1.0 }
+    }
+  },
+
+  "spacing": {
+    "0": "0px",
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "10": "40px",
+    "12": "48px",
+    "16": "64px"
+  },
+
+  "radius": {
+    "none": "0px",
+    "sm": "4px",
+    "md": "6px",
+    "lg": "8px",
+    "xl": "12px",
+    "2xl": "20px",
+    "pill": "999px",
+    "circle": "50%"
+  },
+
+  "borderWidth": {
+    "hairline": "1px",
+    "thick": "2px"
+  },
+
+  "shadow": {
+    "none": "none",
+    "card": "0 1px 2px rgba(28, 28, 26, 0.04), 0 1px 1px rgba(28, 28, 26, 0.03)",
+    "cardHover": "0 4px 12px rgba(28, 28, 26, 0.06)",
+    "dragging": "0 16px 32px rgba(38, 62, 90, 0.25)",
+    "button": "0 1px 2px rgba(38, 62, 90, 0.20)",
+    "floating": "0 8px 24px rgba(28, 28, 26, 0.10)"
+  },
+
+  "motion": {
+    "duration": { "fast": "120ms", "base": "200ms", "slow": "320ms" },
+    "easing": {
+      "standard": "cubic-bezier(0.2, 0, 0, 1)",
+      "emphasized": "cubic-bezier(0.3, 0, 0, 1.2)"
+    },
+    "dragTilt": "rotate(-4deg)"
+  },
+
+  "iconography": {
+    "style": "outline",
+    "strokeWidth": 1.5,
+    "size": { "sm": "16px", "md": "20px", "lg": "24px" },
+    "suggestedSet": "lucide"
+  },
+
+  "components": {
+    "button": {
+      "height": { "sm": "32px", "md": "40px", "lg": "44px" },
+      "paddingX": "16px",
+      "radius": "md",
+      "primary": { "bg": "brand.primary", "text": "text.onPrimary", "hoverBg": "brand.primaryHover" },
+      "outline": { "bg": "transparent", "text": "text.primary", "border": "border.strong", "radius": "pill", "typography": "tag" },
+      "ghost":   { "bg": "transparent", "text": "text.secondary", "hoverText": "text.primary" },
+      "icon":    { "size": "40px", "radius": "circle", "border": "border.strong", "bg": "transparent" }
+    },
+    "input": {
+      "height": "44px",
+      "radius": "lg",
+      "bg": "background.input",
+      "border": "border.input",
+      "text": "text.primary",
+      "placeholder": "text.placeholder",
+      "paddingX": "16px",
+      "kbdHint": { "bg": "background.kbd", "text": "text.tertiary", "radius": "sm", "paddingX": "8px", "height": "24px" }
+    },
+    "tag": {
+      "height": "26px",
+      "paddingX": "12px",
+      "radius": "pill",
+      "border": "border.strong",
+      "text": "text.primary",
+      "typography": "tag"
+    },
+    "countPill": {
+      "height": "22px",
+      "paddingX": "8px",
+      "radius": "pill",
+      "bg": "background.surfaceSunken",
+      "text": "text.tertiary",
+      "typography": "meta"
+    },
+    "statusDot": { "size": "8px", "radius": "circle" },
+    "card": {
+      "bg": "background.surface",
+      "radius": "lg",
+      "padding": "20px",
+      "gap": "16px",
+      "shadow": "card",
+      "border": "none",
+      "highlighted": { "bg": "brand.primary", "text": "text.onPrimary", "tagBorder": "#FFFFFF", "shadow": "dragging", "transform": "motion.dragTilt" }
+    },
+    "sectionHeader": {
+      "divider": "border.strong",
+      "dividerWidth": "1px",
+      "paddingBottom": "20px",
+      "subtitleTypography": "eyebrow",
+      "subtitleColor": "text.secondary"
+    },
+    "progressBar": { "height": "4px", "radius": "pill", "track": "progress.track" },
+    "toggle": {
+      "width": "60px",
+      "height": "34px",
+      "radius": "pill",
+      "onBg": "brand.primary",
+      "offBg": "background.surfaceSunken",
+      "knob": "#FFFFFF"
+    },
+    "avatar": { "sm": "24px", "md": "28px", "lg": "40px", "radius": "circle" },
+    "agendaEvent": { "radius": "sm", "paddingX": "12px", "paddingY": "10px", "minHeight": "56px" },
+    "calendarDay": { "size": "48px", "radius": "circle" }
+  },
+
+  "layout": {
+    "compact": {
+      "windowWidth": "340px",
+      "windowHeight": "480px",
+      "background": "background.window",
+      "tabBar": {
+        "height": "56px",
+        "bg": "background.window",
+        "border": "border.soft",
+        "activeText": "brand.primary",
+        "inactiveText": "text.secondary",
+        "indicatorHeight": "2px",
+        "indicatorColor": "brand.primary"
+      },
+      "timer": {
+        "ringSize": "240px",
+        "ringStroke": "6px",
+        "digitsTypography": "timerDisplay",
+        "digitsColor": "brand.primary",
+        "labelTypography": "eyebrow",
+        "labelColor": "text.secondary"
+      },
+      "taskBox": { "bg": "background.surface", "radius": "lg", "padding": "12px" },
+      "controls": { "primarySize": "64px", "secondarySize": "40px", "border": "border.strong" }
+    },
+    "dashboard": {
+      "minWidth": "1100px",
+      "sidebar": {
+        "width": "290px",
+        "collapsedWidth": "72px",
+        "bg": "background.sidebar",
+        "paddingX": "14px",
+        "brandHeight": "88px",
+        "itemHeight": "54px",
+        "itemGap": "0px",
+        "itemRadius": "pill",
+        "itemActiveBg": "rgba(255, 255, 255, 0.08)",
+        "itemActiveBorder": "border.sidebarActive",
+        "itemActiveBorderWidth": "2px",
+        "itemText": "text.sidebarInactive",
+        "itemActiveText": "text.sidebarActive",
+        "collapseButton": { "size": "28px", "bg": "background.window", "icon": "text.primary", "radius": "circle" },
+        "promoCard": { "bg": "background.sidebarCard", "radius": "2xl", "padding": "20px", "buttonRadius": "pill" }
+      },
+      "header": {
+        "height": "88px",
+        "paddingX": "52px",
+        "bg": "background.window",
+        "borderBottom": "border.strong",
+        "searchWidth": "440px"
+      },
+      "content": {
+        "bg": "background.window",
+        "paddingX": "52px",
+        "paddingY": "48px",
+        "sectionGap": "64px",
+        "boardColumns": 3,
+        "boardColumnGap": "24px",
+        "boardCardGap": "12px"
+      },
+      "rightRail": {
+        "width": "410px",
+        "paddingX": "24px",
+        "bg": "background.window",
+        "dividerColor": "border.strong"
+      }
+    }
+  }
+}
