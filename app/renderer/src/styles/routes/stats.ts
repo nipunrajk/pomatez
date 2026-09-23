@@ -65,9 +65,9 @@ export const StyledRangeButton = styled.button<{ active?: boolean }>`
     css`
       &,
       &:hover {
-        border-color: var(--color-brand-primary);
-        color: var(--color-text-on-primary);
-        background-color: var(--color-brand-primary);
+        border-color: var(--component-button-primary-bg);
+        color: var(--component-button-primary-text);
+        background-color: var(--component-button-primary-bg);
       }
     `};
 `;

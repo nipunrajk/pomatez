@@ -101,7 +101,8 @@ const windowState: WindowStateProps = {
 };
 
 const DASHBOARD_SIZE = { width: 1200, height: 760 };
-const DASHBOARD_MIN_SIZE = { width: 960, height: 620 };
+// layout.dashboard.minWidth in modula-theme.json.
+const DASHBOARD_MIN_SIZE = { width: 1100, height: 620 };
 
 const isDashboardLayout = () => windowState.layout === "dashboard";
 

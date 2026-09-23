@@ -1,9 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "hooks/storeHooks";
-import { dashboardRoutes } from "config";
+import { APP_NAME, dashboardRoutes } from "config";
 import {
   StyledSidebar,
+  StyledSidebarBrand,
   StyledSidebarLink,
   StyledSidebarNotify,
 } from "styles";
@@ -16,6 +17,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <StyledSidebar>
+      <StyledSidebarBrand>{APP_NAME}</StyledSidebarBrand>
       {items.map(({ name, icon, exact, path, notify }) => (
         <StyledSidebarLink
           key={path}

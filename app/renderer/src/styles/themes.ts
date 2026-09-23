@@ -209,6 +209,10 @@ export const darkTheme = css`
   --color-timer-long-break-readable: var(--color-yellow);
   --color-status-danger-readable: var(--color-pink);
   --color-status-completed-readable: var(--color-green);
+
+  /* #0098f7 is 3.1:1 under white text; deeper fill for text-on-blue. */
+  --component-button-primary-bg: #0079c5;
+  --component-button-primary-hover-bg: #006db1;
 `;
 
 const enterFromLeft = keyframes`

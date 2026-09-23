@@ -23,6 +23,7 @@ import {
   StyledEntryProgress,
   StyledEntryRange,
   StyledEntryRow,
+  StyledEntryTag,
   StyledEntryText,
   StyledIconButton,
 } from "styles";
@@ -94,10 +95,10 @@ const EntryRow: React.FC<Props> = ({ entry, now, onEdit }) => {
   };
 
   const accent = isOn
-    ? "var(--color-primary)"
+    ? "var(--color-brand-primary)"
     : isPomodoro
-    ? "var(--color-pink)"
-    : "var(--color-green)";
+    ? "var(--color-status-planning)"
+    : "var(--color-status-completed)";
 
   return (
     <StyledEntryRow running={isOn} accent={accent}>
@@ -116,7 +117,11 @@ const EntryRow: React.FC<Props> = ({ entry, now, onEdit }) => {
 
       <StyledEntryText>
         <small>
-          {entry.tag || t("day.noTag")}
+          {entry.tag ? (
+            <StyledEntryTag>{entry.tag}</StyledEntryTag>
+          ) : (
+            <span>{t("day.noTag")}</span>
+          )}
           <StyledEntryModeChip pomodoro={isPomodoro}>
             {onBreak ? t("day.onBreak") : t(`day.mode_${entry.mode}`)}
           </StyledEntryModeChip>

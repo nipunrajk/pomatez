@@ -26,8 +26,9 @@ impl WindowSize {
         width: 1200,
         height: 760,
     };
+    // layout.dashboard.minWidth in modula-theme.json.
     pub const DASHBOARD_MIN: LogicalSize<u32> = LogicalSize {
-        width: 960,
+        width: 1100,
         height: 620,
     };
 }

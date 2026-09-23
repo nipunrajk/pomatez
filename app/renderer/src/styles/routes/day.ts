@@ -1,13 +1,13 @@
 import styled, { css } from "styled-components/macro";
 import { themes } from "styles/themes";
-import { StyledScrollbar } from "styles/mixins";
+import { StyledScrollbar, focusRing, typeStyle } from "styles/mixins";
 
 export const StyledDay = styled.main`
   flex: 1 1;
   min-height: 0;
   width: 100%;
 
-  padding: 2.4rem 3.2rem 4rem;
+  padding-bottom: var(--layout-dashboard-content-padding-y);
 
   overflow: hidden auto;
   ${StyledScrollbar};
@@ -15,14 +15,27 @@ export const StyledDay = styled.main`
   animation: 240ms ${themes.enterFromRight} ease;
 `;
 
+/** layout.dashboard.header: sticky page header with a hairline rule. */
 export const StyledDayTopBar = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  height: var(--layout-dashboard-header-height);
+  padding: 0 var(--layout-dashboard-header-padding-x);
+  margin-bottom: var(--layout-dashboard-content-padding-y);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2.4rem;
+
+  background-color: var(--layout-dashboard-header-bg);
+  border-bottom: var(--border-width-hairline) solid
+    var(--layout-dashboard-header-border-bottom);
 
   h2 {
-    font-size: 2rem;
+    ${typeStyle("page-title")};
+    color: var(--color-text-heading);
   }
 
   button {
@@ -31,118 +44,140 @@ export const StyledDayTopBar = styled.header`
 `;
 
 export const StyledDayGroup = styled.section`
-  margin-bottom: 3.2rem;
+  margin: 0 var(--layout-dashboard-content-padding-x);
+
+  & + & {
+    margin-top: var(--layout-dashboard-content-section-gap);
+  }
 `;
 
+/** components.sectionHeader */
 export const StyledDayGroupHeader = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
 
-  padding: 0 1.6rem 1.2rem;
-  margin-bottom: 0.8rem;
-  border-bottom: 1px solid var(--color-border-primary);
+  padding-bottom: var(--component-section-header-padding-bottom);
+  margin-bottom: var(--space-4);
+  border-bottom: var(--component-section-header-divider-width) solid
+    var(--component-section-header-divider);
 
   h3 {
-    font-size: 1.8rem;
-    font-weight: 400;
-    color: var(--color-heading-text);
+    ${typeStyle("section-title")};
+    color: var(--color-text-heading);
+    font-variant-numeric: lining-nums;
 
     strong {
-      font-weight: 600;
+      font-weight: var(--font-weight-semibold);
     }
   }
 `;
 
 export const StyledDayTotal = styled.div`
-  font-size: 1.8rem;
-  font-weight: 500;
-  color: var(--color-heading-text);
-  font-variant-numeric: tabular-nums;
+  ${typeStyle("card-title")};
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--color-text-primary);
 `;
 
 export const StyledDayEmpty = styled.p`
-  padding: 2rem 1.6rem;
-  color: var(--color-disabled-text);
+  padding: var(--space-5) 0;
+  color: var(--color-text-secondary-readable);
 `;
 
 type RowProps = { running: boolean; accent: string };
 
+/** Entry card (components.card). */
 export const StyledEntryRow = styled.div<RowProps>`
   position: relative;
 
   display: grid;
-  grid-template-columns: 12rem 0.3rem minmax(0, 1fr) 10rem 9.6rem 3.6rem 6.4rem;
+  grid-template-columns: 12rem 0.3rem minmax(0, 1fr) 10rem 10rem 4rem 6.4rem;
   align-items: center;
-  column-gap: 1.6rem;
+  column-gap: var(--component-card-gap);
 
-  min-height: 7.2rem;
-  padding: 0.8rem 1.6rem;
+  min-height: 7.6rem;
+  padding: var(--space-4) var(--component-card-padding);
 
-  border-radius: 0.6rem;
-  transition: ${themes.transition};
+  border-radius: var(--component-card-radius);
+  background-color: var(--component-card-bg);
+  box-shadow: var(--component-card-shadow);
+  transition: box-shadow var(--motion-duration-base)
+    var(--motion-easing-standard);
+
+  & + & {
+    margin-top: var(--layout-dashboard-content-board-card-gap);
+  }
 
   &:hover {
-    background-color: var(--color-bg-secondary);
+    box-shadow: var(--shadow-card-hover);
   }
 
   ${(p) =>
     p.running &&
     css`
-      background-color: var(--color-bg-primary);
-      box-shadow: 0 0.4rem 2.4rem -0.8rem var(--color-shadow-primary);
-
-      &:hover {
-        background-color: var(--color-bg-primary);
-      }
+      box-shadow: 0 0 0 var(--border-width-hairline)
+          var(--color-brand-primary),
+        var(--shadow-card-hover);
     `}
 
   & > .accent {
     align-self: stretch;
-    border-radius: 0.2rem;
+    border-radius: var(--radius-pill);
     background-color: ${(p) => p.accent};
   }
 `;
 
 export const StyledEntryRange = styled.div`
-  font-size: 1.4rem;
-  color: var(--color-heading-text);
   font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
 
   span {
-    color: var(--color-disabled-text);
+    color: var(--color-text-secondary-readable);
   }
 `;
 
 export const StyledEntryText = styled.div`
   min-width: 0;
 
-  small {
-    display: block;
-    margin-bottom: 0.2rem;
-    font-size: 1.1rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--color-disabled-text);
+  & > small {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+
+    ${typeStyle("tag")};
+    color: var(--color-text-secondary-readable);
   }
 
   p {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: var(--color-heading-text);
+    ${typeStyle("card-title")};
+    color: var(--color-text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 `;
 
+/** components.tag: outlined pill. */
+export const StyledEntryTag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  height: var(--component-tag-height);
+  padding: 0 var(--component-tag-padding-x);
+
+  ${typeStyle("tag")};
+  color: var(--component-tag-text);
+  border-radius: var(--component-tag-radius);
+  border: var(--border-width-hairline) solid var(--component-tag-border);
+`;
+
 export const StyledEntryProgress = styled.div<{
   percent: number | null;
   done: boolean;
 }>`
-  height: 0.3rem;
-  border-radius: 0.2rem;
-  background-color: var(--color-border-secondary);
+  height: var(--component-progress-bar-height);
+  border-radius: var(--component-progress-bar-radius);
+  background-color: var(--component-progress-bar-track);
   overflow: hidden;
 
   &::after {
@@ -150,31 +185,43 @@ export const StyledEntryProgress = styled.div<{
     display: block;
     height: 100%;
     width: ${(p) => (p.percent === null ? 0 : p.percent)}%;
+    border-radius: var(--component-progress-bar-radius);
     background-color: ${(p) =>
-      p.done ? "var(--color-green)" : "var(--color-yellow)"};
-    transition: width 400ms ease;
+      p.done
+        ? "var(--color-progress-fill-success)"
+        : "var(--color-progress-fill-primary)"};
+    transition: width var(--motion-duration-slow)
+      var(--motion-easing-standard);
   }
 `;
 
 export const StyledEntryDuration = styled.div<{ running: boolean }>`
   text-align: right;
-  font-size: 1.5rem;
-  font-variant-numeric: tabular-nums;
+  ${typeStyle("card-title")};
+  font-variant-numeric: lining-nums tabular-nums;
   color: ${(p) =>
-    p.running ? "var(--color-heading-text)" : "var(--color-body-text)"};
+    p.running
+      ? "var(--color-brand-primary-readable)"
+      : "var(--color-text-primary)"};
 
   small {
     display: block;
-    font-size: 1.1rem;
-    color: var(--color-disabled-text);
+    ${typeStyle("meta")};
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary-readable);
   }
 `;
 
+/** components.button.icon; filled brand blue while running. */
 export const StyledEntryPlay = styled.button<{ running: boolean }>`
-  width: 3.6rem;
-  height: 3.6rem;
-  border-radius: 50%;
-  border: none;
+  width: var(--component-button-icon-size);
+  height: var(--component-button-icon-size);
+  border-radius: var(--component-button-icon-radius);
+  border: var(--border-width-hairline) solid
+    ${(p) =>
+      p.running
+        ? "var(--color-brand-primary)"
+        : "var(--component-button-icon-border)"};
 
   display: flex;
   align-items: center;
@@ -184,20 +231,24 @@ export const StyledEntryPlay = styled.button<{ running: boolean }>`
   color: ${(p) =>
     p.running
       ? "var(--color-text-on-primary)"
-      : "var(--color-body-text)"};
+      : "var(--color-icon-default)"};
   background-color: ${(p) =>
-    p.running ? "var(--color-primary)" : "var(--color-bg-tertiary)"};
+    p.running
+      ? "var(--color-brand-primary)"
+      : "var(--component-button-icon-bg)"};
   transition: ${themes.transition};
 
   &:hover:not(:disabled) {
-    color: ${(p) =>
+    background-color: ${(p) =>
       p.running
-        ? "var(--color-text-on-primary)"
-        : "var(--color-primary)"};
+        ? "var(--color-brand-primary-hover)"
+        : "var(--color-background-surface-sunken)"};
   }
 
+  ${focusRing};
+
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
   }
 
@@ -211,7 +262,7 @@ export const StyledEntryPlay = styled.button<{ running: boolean }>`
 export const StyledEntryActions = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 0.4rem;
+  gap: var(--space-1);
 
   opacity: 0;
   transition: ${themes.transition};
@@ -223,10 +274,10 @@ export const StyledEntryActions = styled.div`
 `;
 
 export const StyledIconButton = styled.button<{ danger?: boolean }>`
-  width: 2.8rem;
-  height: 2.8rem;
+  width: 3.2rem;
+  height: 3.2rem;
   border: none;
-  border-radius: 0.4rem;
+  border-radius: var(--radius-circle);
   background: transparent;
 
   display: flex;
@@ -235,67 +286,93 @@ export const StyledIconButton = styled.button<{ danger?: boolean }>`
 
   cursor: pointer;
   color: ${(p) =>
-    p.danger ? "var(--color-pink)" : "var(--color-body-text)"};
+    p.danger
+      ? "var(--color-status-danger-readable)"
+      : "var(--color-icon-muted)"};
 
   &:hover {
-    background-color: var(--color-border-primary);
+    color: ${(p) =>
+      p.danger
+        ? "var(--color-status-danger-readable)"
+        : "var(--color-icon-default)"};
+    background-color: var(--color-background-surface-sunken);
   }
 
+  ${focusRing};
+
   svg {
-    width: 1.3rem;
-    height: 1.3rem;
-    fill: currentColor;
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
   }
 `;
 
+/** Entry mode as a statusDot plus meta label. */
 export const StyledEntryModeChip = styled.span<{ pomodoro: boolean }>`
-  display: inline-block;
-  margin-left: 0.8rem;
-  padding: 0.1rem 0.6rem;
-  border-radius: 1rem;
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+
+  ${typeStyle("meta")};
   text-transform: none;
-  letter-spacing: 0;
-  color: ${(p) =>
-    p.pomodoro ? "var(--color-pink)" : "var(--color-green)"};
-  background-color: ${(p) =>
-    p.pomodoro
-      ? "rgba(var(--color-pink-rgb), 0.12)"
-      : "rgba(var(--color-green-rgb), 0.12)"};
+  letter-spacing: normal;
+  color: var(--color-text-secondary-readable);
+
+  &::before {
+    content: "";
+    width: var(--component-status-dot-size);
+    height: var(--component-status-dot-size);
+    border-radius: var(--component-status-dot-radius);
+    background-color: ${(p) =>
+      p.pomodoro
+        ? "var(--color-status-planning)"
+        : "var(--color-status-completed)"};
+  }
 `;
 
 export const StyledEntryForm = styled.form`
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 11rem 11rem auto;
-  gap: 1.2rem;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 16rem 16rem;
+  gap: var(--space-3);
   align-items: end;
 
-  padding: 1.6rem;
-  margin-bottom: 1.2rem;
+  padding: var(--component-card-padding);
+  margin-bottom: var(--layout-dashboard-content-board-card-gap);
 
-  border-radius: 0.6rem;
-  border: 1px solid var(--color-border-primary);
-  background-color: var(--color-bg-secondary);
+  border-radius: var(--component-card-radius);
+  background-color: var(--component-card-bg);
+  box-shadow: var(--shadow-floating);
 
   label {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    font-size: 1.2rem;
-    color: var(--color-body-text);
+    gap: var(--space-2);
+    ${typeStyle("eyebrow")};
+    color: var(--color-text-secondary-readable);
+  }
+
+  label > input,
+  label > div {
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  /* Row two: the mode toggle, then the actions. */
+  label:nth-of-type(5) {
+    grid-column: 1 / 3;
   }
 
   .form-footer {
-    grid-column: 1 / -1;
+    grid-column: 3 / -1;
+    align-self: end;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.2rem;
+    gap: var(--space-3);
   }
 
   .form-buttons {
     display: flex;
-    gap: 0.8rem;
+    gap: var(--space-2);
 
     button {
       width: auto;
@@ -303,8 +380,8 @@ export const StyledEntryForm = styled.form`
   }
 
   .form-error {
-    color: var(--color-pink);
-    font-size: 1.2rem;
+    ${typeStyle("meta")};
+    color: var(--color-status-danger-readable);
   }
 `;
 
@@ -313,40 +390,55 @@ export const StyledEntryTimeInput = styled.input.attrs(() => ({
   type: "time",
 }))`
   width: 100%;
-  height: 3.6rem;
-  padding: 0.5rem 1rem;
+  height: var(--component-input-height);
+  padding: 0 var(--space-3);
 
-  color: var(--color-heading-text);
+  ${typeStyle("body")};
+  font-variant-numeric: tabular-nums;
+  color: var(--component-input-text);
   color-scheme: light dark;
 
-  border-radius: 3px;
-  border: 1px solid var(--color-border-primary);
-  background-color: var(--color-bg-input);
+  border-radius: var(--component-input-radius);
+  border: var(--border-width-hairline) solid
+    var(--component-input-border);
+  background-color: var(--component-input-bg);
 
   &:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb), 0.16);
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 var(--border-width-hairline)
+      var(--color-border-focus);
   }
 `;
 
+/** Segmented outlined pill for the entry mode. */
 export const StyledModeToggle = styled.div`
   display: inline-flex;
-  height: 3.6rem;
-  border-radius: 3px;
-  border: 1px solid var(--color-border-primary);
-  overflow: hidden;
+  height: var(--component-input-height);
+  padding: var(--space-1);
+  gap: var(--space-1);
+
+  border-radius: var(--radius-pill);
+  border: var(--border-width-hairline) solid var(--color-border-strong);
 
   button {
-    padding: 0 1.4rem;
+    padding: 0 var(--space-4);
     border: none;
-    background: var(--color-bg-input);
-    color: var(--color-body-text);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    ${typeStyle("tag")};
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: ${themes.transition};
 
+    &:hover {
+      background-color: var(--color-background-surface-sunken);
+    }
+
+    ${focusRing};
+
     &[aria-pressed="true"] {
-      color: var(--color-text-on-primary);
-      background-color: var(--color-primary);
+      color: var(--component-button-primary-text);
+      background-color: var(--component-button-primary-bg);
     }
   }
 `;
