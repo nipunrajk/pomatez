@@ -32,7 +32,7 @@ export const StyledSidebarLink = styled(NavLink)`
   align-items: center;
   gap: 0.6rem;
 
-  font-family: Typo-Round, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.1rem;
   color: var(--color-text-sidebar-inactive-readable);
 

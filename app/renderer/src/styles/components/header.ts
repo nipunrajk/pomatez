@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import { typeStyle } from "styles/mixins";
 import { themes } from "styles/themes";
 
 export const StyledHeader = styled.header`
@@ -14,8 +15,8 @@ export const StyledHeader = styled.header`
 `;
 
 export const StyledHeaderHeading = styled.h3`
-  font-size: 1.5rem;
-  text-transform: uppercase;
+  ${typeStyle("card-title")};
+  color: var(--color-text-heading);
 `;
 
 type HeaderButtonTypes = { success?: boolean };

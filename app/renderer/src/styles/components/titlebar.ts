@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components/macro";
+import { typeStyle } from "styles/mixins";
 import { themes } from "styles";
 
 const TitlebarButton = css`
@@ -50,8 +51,10 @@ export const StyledMarkLogo = styled.img`
 `;
 
 export const StyledMarkName = styled.h1<{ type?: string }>`
-  font-size: 1.4rem;
-  color: var(--color-heading-text);
+  ${typeStyle("brand")};
+  /* The titlebar is 40px tall; the brand role's 22px would crowd it. */
+  font-size: 1.6rem;
+  color: var(--color-text-heading);
 
   display: flex;
   align-items: flex-start;

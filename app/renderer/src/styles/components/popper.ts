@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import { typeStyle } from "styles/mixins";
 import { themes } from "styles";
 
 export const StyledPopper = styled.div``;
@@ -42,8 +43,8 @@ export const StyledPopperHeader = styled.header`
   }
 
   & > h4 {
-    font-weight: 400;
-    color: var(--color-body-text);
+    ${typeStyle("eyebrow")};
+    color: var(--color-text-secondary-readable);
   }
 
   & > button {

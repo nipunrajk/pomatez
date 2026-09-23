@@ -28,7 +28,7 @@ export const StyledNavList = styled.ul`
   height: 100%;
 
   list-style: none;
-  font-family: Typo-Round, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.2rem;
   font-weight: 400;
 

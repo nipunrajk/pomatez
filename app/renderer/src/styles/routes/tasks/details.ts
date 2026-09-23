@@ -1,6 +1,6 @@
 import styled from "styled-components/macro";
 import { themes, StyledTextArea, StyledButtonDanger } from "styles";
-import { StyledScrollbar } from "styles/mixins";
+import { StyledScrollbar, typeStyle } from "styles/mixins";
 
 export const StyledDetailContainer = styled.div`
   position: absolute;
@@ -89,10 +89,8 @@ export const StyledDescriptionWrappper = styled.div`
 `;
 
 export const StyledDescriptionHeading = styled.h4`
-  font-size: 1.4rem;
-  font-weight: 400;
-  color: var(--color-body-text);
-  text-transform: capitalize;
+  ${typeStyle("eyebrow")};
+  color: var(--color-text-secondary-readable);
 
   display: flex;
   align-items: center;

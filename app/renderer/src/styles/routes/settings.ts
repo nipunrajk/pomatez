@@ -1,6 +1,6 @@
 import styled from "styled-components/macro";
 import { themes } from "styles/themes";
-import { StyledScrollbar } from "styles/mixins";
+import { StyledScrollbar, typeStyle } from "styles/mixins";
 import { StyledButtonSecondary } from "styles";
 
 export const StyledSettings = styled.main`
@@ -39,12 +39,8 @@ export const StyledSettingSection = styled.section`
 `;
 
 export const StyledSectionHeading = styled.h4`
-  font-size: 1rem;
-  font-weight: 500;
-
-  color: var(--color-disabled-text);
-
-  text-transform: uppercase;
+  ${typeStyle("eyebrow")};
+  color: var(--color-text-secondary-readable);
 `;
 
 export const StyledStarButton = styled(StyledButtonSecondary)`

@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components/macro";
 import { themes } from "styles/themes";
-import { StyledScrollbar } from "styles/mixins";
+import { StyledScrollbar, typeStyle } from "styles/mixins";
 
 export const StyledStats = styled.main`
   width: 100%;
@@ -189,8 +189,7 @@ export const StyledBreakdownHeadingRow = styled.div`
 `;
 
 export const StyledBreakdownSectionsHeading = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
+  ${typeStyle("card-title")};
 
   color: var(--color-heading-text);
 `;
