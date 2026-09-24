@@ -1,20 +1,30 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StyledRightRail, StyledRightRailHeading } from "styles";
 import { Timer } from "routes";
+import { controlPanelRoute } from "config";
+import PomodoroDial from "./PomodoroDial";
+import RailAgenda from "./RailAgenda";
 
-/**
- * Persistent Timer widget shown on every dashboard page: the ring,
- * controls, and stat cards, without the classic-only header/menu (Timer
- * itself already gates that on the current layout).
- */
 const RightRail: React.FC = () => {
   const { t } = useTranslation();
-
+  const { pathname } = useLocation();
   return (
     <StyledRightRail>
-      <StyledRightRailHeading>{t("nav.timer")}</StyledRightRailHeading>
-      <Timer />
+      {pathname === controlPanelRoute.path ? (
+        <>
+          <PomodoroDial />
+          <RailAgenda />
+        </>
+      ) : (
+        <>
+          <StyledRightRailHeading>
+            {t("nav.timer")}
+          </StyledRightRailHeading>
+          <Timer />
+        </>
+      )}
     </StyledRightRail>
   );
 };

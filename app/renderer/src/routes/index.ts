@@ -9,3 +9,4 @@ export { default as Stats } from "./Stats";
 
 export const TaskList = lazy(() => import("./Tasks"));
 export const Day = lazy(() => import("./Day"));
+export const ControlPanel = lazy(() => import("./ControlPanel"));

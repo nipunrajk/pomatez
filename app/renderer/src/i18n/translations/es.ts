@@ -6,6 +6,7 @@ export const es = {
     stats: "Estadísticas",
     settings: "Ajustes",
     day: "Día",
+    controlPanel: "Panel de control",
   },
   day: {
     heading: "Registros de tiempo",

@@ -17,6 +17,9 @@ const modulaReadable = css`
   --color-timer-long-break-readable: #a25e47;
   --color-status-danger-readable: #a25e47;
   --color-status-completed-readable: #377d4f;
+  /* Ticks and numbers on the Pomodoro dial, which is filled with the
+     readable timer color. */
+  --color-timer-dial-text: var(--color-timer-gauge-ticks);
 `;
 
 /**
@@ -213,6 +216,14 @@ export const darkTheme = css`
   /* #0098f7 is 3.1:1 under white text; deeper fill for text-on-blue. */
   --component-button-primary-bg: #0079c5;
   --component-button-primary-hover-bg: #006db1;
+  --component-card-highlighted-bg: #0079c5;
+  --color-calendar-selected-bg: #0079c5;
+  --color-calendar-day: var(--color-body-text);
+  --color-agenda-blue-bg: #0079c5;
+  --color-agenda-grey-bg: var(--color-bg-tertiary);
+  --color-agenda-grey-text: var(--color-heading-text);
+  /* Dark timer colors are bright, so the dial's ticks and numbers go dark. */
+  --color-timer-dial-text: var(--color-bg-primary);
 `;
 
 const enterFromLeft = keyframes`

@@ -95,6 +95,22 @@ export const StyledSidebarNotify = styled.span`
   background-color: var(--color-status-notification);
 `;
 
+/** Everything right of the sidebar: optional top bar over content + rail. */
+export const StyledDashboardMain = styled.div`
+  flex: 1 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+`;
+
+export const StyledDashboardBody = styled.div`
+  flex: 1 1;
+  min-height: 0;
+
+  display: flex;
+`;
+
 export const StyledDashboardContent = styled.div`
   flex: 1 1;
   min-width: 0;

@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useHistory, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { ActionCreators as UndoActionCreator } from "redux-undo";
 import {
@@ -24,6 +25,19 @@ export default function Tasks() {
   const tasks = useAppSelector((state) => state.tasks);
 
   const dispatch = useAppDispatch();
+
+  // Control Panel's "Create New" lands here (?add=list) with the add-list
+  // form open. Hash history drops location state, hence the query string.
+  const history = useHistory();
+  const location = useLocation();
+  const [openAddList] = useState(
+    () => new URLSearchParams(location.search).get("add") === "list"
+  );
+  useEffect(() => {
+    if (openAddList) history.replace(location.pathname);
+    // Only clear the one-shot flag once, on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onListAdd = (value: string) => dispatch(addTaskList(value));
 
@@ -92,7 +106,11 @@ export default function Tasks() {
                 {provided.placeholder}
 
                 <StyledTaskStickySection>
-                  <TaskFormButton forList onSubmit={onListAdd} />
+                  <TaskFormButton
+                    forList
+                    defaultOpen={openAddList}
+                    onSubmit={onListAdd}
+                  />
                 </StyledTaskStickySection>
               </StyledTaskWrapper>
             )}

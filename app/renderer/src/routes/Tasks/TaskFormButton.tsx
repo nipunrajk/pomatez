@@ -15,16 +15,25 @@ import { useTargetOutside } from "hooks";
 
 type Props = {
   forList?: boolean;
+  defaultOpen?: boolean;
   onSubmit?: (value: string) => void;
 };
 
-const TaskFormButton: React.FC<Props> = ({ forList, onSubmit }) => {
+const TaskFormButton: React.FC<Props> = ({
+  forList,
+  defaultOpen,
+  onSubmit,
+}) => {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const [isOpen, setOpen] = useTargetOutside({ ref: formRef });
+
+  useEffect(() => {
+    if (defaultOpen) setOpen(true);
+  }, [defaultOpen, setOpen]);
 
   const doSubmit = useCallback(
     (ref: HTMLInputElement | HTMLTextAreaElement, keepOpen = false) => {

@@ -9,6 +9,7 @@ import undoableTasksReducer from "./tasks";
 import updateReducer from "./update";
 import historyReducer from "./history";
 import entriesReducer from "./entries";
+import boardReducer from "./board";
 
 export type AppStateTypes = ReturnType<typeof store.getState>;
 export type AppDispatchTypes = typeof store.dispatch;
@@ -22,6 +23,7 @@ const store = configureStore({
     update: updateReducer,
     history: historyReducer,
     entries: entriesReducer,
+    board: boardReducer,
   },
 });
 
@@ -31,6 +33,7 @@ const getPersistedState = () => ({
   tasks: store.getState().tasks.present,
   history: store.getState().history,
   entries: store.getState().entries,
+  board: store.getState().board,
 });
 
 const storedState = getFromStorage("state");

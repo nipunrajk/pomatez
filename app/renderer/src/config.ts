@@ -1,5 +1,13 @@
 import { SVGTypes } from "components";
-import { TaskList, Config, Timer, Settings, Stats, Day } from "routes";
+import {
+  TaskList,
+  Config,
+  Timer,
+  Settings,
+  Stats,
+  Day,
+  ControlPanel,
+} from "routes";
 import { ConfigSliderProps } from "routes";
 import { AppStateTypes } from "./store";
 import { DefaultRootState } from "react-redux";
@@ -61,6 +69,15 @@ export const routes: (state?: AppStateTypes) => NavItemTypes[] = (
 ];
 
 /** Home of the dashboard layout; not part of the classic 340px layout. */
+export const controlPanelRoute: NavItemTypes = {
+  icon: "dashboard",
+  name: "nav.controlPanel",
+  exact: true,
+  path: "/control-panel",
+  component: ControlPanel,
+  notify: false,
+};
+
 export const dayRoute: NavItemTypes = {
   icon: "calendar",
   name: "nav.day",
@@ -77,6 +94,7 @@ export const dayRoute: NavItemTypes = {
 export const dashboardRoutes = (
   state?: AppStateTypes
 ): NavItemTypes[] => [
+  controlPanelRoute,
   dayRoute,
   ...routes(state).filter((route) => route.path !== "/"),
 ];

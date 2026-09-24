@@ -8,18 +8,21 @@ import React, {
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import {
   StyledDashboard,
+  StyledDashboardBody,
   StyledDashboardContent,
+  StyledDashboardMain,
   StyledLayout,
 } from "styles";
 
 import Titlebar from "./Titlebar";
 import Sidebar from "./Sidebar";
 import RightRail from "./RightRail";
+import DashboardTopBar from "./DashboardTopBar";
 import { ThemeContext } from "contexts";
 import { TimerStatus } from "store/timer/types";
 import { AppLayout } from "store/settings/types";
 import { useAppSelector } from "hooks/storeHooks";
-import { dayRoute } from "config";
+import { controlPanelRoute } from "config";
 
 type Props = {} & RouteComponentProps;
 
@@ -49,14 +52,14 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
   }, [registerKey]);
 
   // On launch and whenever the layout changes, land on a page that exists
-  // in that layout: the dashboard opens on Day, classic only has "/" (it's
-  // a single-purpose timer popup with no tabs).
+  // in that layout: the dashboard opens on Control Panel, classic only has
+  // "/" (it's a single-purpose timer popup with no tabs).
   const appliedLayout = useRef<AppLayout | null>(null);
   useEffect(() => {
     if (appliedLayout.current === settings.layout) return;
     appliedLayout.current = settings.layout;
     if (isDashboard && location.pathname === "/") {
-      history.replace(dayRoute.path);
+      history.replace(controlPanelRoute.path);
     } else if (!isDashboard && location.pathname !== "/") {
       history.replace("/");
     }
@@ -95,8 +98,17 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
       {isDashboard ? (
         <StyledDashboard>
           <Sidebar />
-          <StyledDashboardContent>{children}</StyledDashboardContent>
-          <RightRail />
+          <StyledDashboardMain>
+            {location.pathname === controlPanelRoute.path && (
+              <DashboardTopBar />
+            )}
+            <StyledDashboardBody>
+              <StyledDashboardContent>
+                {children}
+              </StyledDashboardContent>
+              <RightRail />
+            </StyledDashboardBody>
+          </StyledDashboardMain>
         </StyledDashboard>
       ) : (
         children

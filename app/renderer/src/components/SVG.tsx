@@ -1,6 +1,10 @@
 import React, { SVGProps } from "react";
 import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
   Bed,
+  Bell,
   CalendarDays,
   ChartNoAxesColumn,
   ChevronDown,
@@ -11,7 +15,11 @@ import {
   EllipsisVertical,
   ExternalLink,
   Laptop,
+  LayoutDashboard,
+  ListChecks,
   LucideIcon,
+  MessageSquare,
+  Minus,
   Pause,
   Pencil,
   Play,
@@ -19,11 +27,13 @@ import {
   RefreshCw,
   RotateCw,
   Save,
+  Search,
   Settings,
   SkipForward,
   SquarePen,
   Timer,
   Trash2,
+  User,
   UtensilsCrossed,
   Volume2,
   VolumeX,
@@ -62,7 +72,17 @@ export type SVGTypes = {
     | "alert"
     | "chevron-down"
     | "stats"
-    | "calendar";
+    | "calendar"
+    | "dashboard"
+    | "search"
+    | "bell"
+    | "arrow-up-right"
+    | "list-checks"
+    | "message"
+    | "user"
+    | "minus"
+    | "arrow-left"
+    | "arrow-right";
 };
 
 const ICONS: Record<
@@ -96,6 +116,16 @@ const ICONS: Record<
   "chevron-down": ChevronDown,
   stats: ChartNoAxesColumn,
   calendar: CalendarDays,
+  dashboard: LayoutDashboard,
+  search: Search,
+  bell: Bell,
+  "arrow-up-right": ArrowUpRight,
+  "list-checks": ListChecks,
+  message: MessageSquare,
+  user: User,
+  minus: Minus,
+  "arrow-left": ArrowLeft,
+  "arrow-right": ArrowRight,
 };
 
 /**
