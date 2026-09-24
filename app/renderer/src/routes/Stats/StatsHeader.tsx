@@ -30,7 +30,7 @@ const StatsHeader: React.FC<Props> = ({
 
   return (
     <>
-      <Header heading={t("stats.title")} />
+      <Header heading={t("stats.title")} wide />
       <StyledStatsSubheading>
         {t("stats.subtitle")}
       </StyledStatsSubheading>

@@ -19,7 +19,7 @@ const SettingHeader: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <Header heading={t("settings.title")}>
+    <Header heading={t("settings.title")} wide>
       <StyledHeaderButton success={success} onClick={restoreSettings}>
         {success
           ? t("settings.restored")

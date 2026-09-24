@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
+  StyledBreakdownColumns,
   StyledBreakdownHeadingRow,
   StyledBreakdownSectionsHeading,
   StyledBreakdownSectionsSub,
@@ -31,8 +32,10 @@ const UsageBreakdown: React.FC<Props> = ({
         </StyledBreakdownSectionsSub>
       </StyledBreakdownHeadingRow>
 
-      <AppSplit entries={appSplit} />
-      <BrowserActivity entries={browserActivity} />
+      <StyledBreakdownColumns>
+        <AppSplit entries={appSplit} />
+        <BrowserActivity entries={browserActivity} />
+      </StyledBreakdownColumns>
     </>
   );
 };

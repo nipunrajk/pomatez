@@ -2,15 +2,18 @@ import styled from "styled-components/macro";
 import { themes, StyledTextArea, StyledButtonDanger } from "styles";
 import { StyledScrollbar, typeStyle } from "styles/mixins";
 
+/** A centered modal now that its parent isn't a 340px column. */
 export const StyledDetailContainer = styled.div`
   position: absolute;
   top: 0;
-  left: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 4rem);
+  max-width: 48rem;
 
-  z-index: 100;
+  z-index: 110;
 
   padding: 1.8rem 2rem;
 
@@ -21,6 +24,7 @@ export const StyledDetailContainer = styled.div`
   grid-template-rows: max-content 1fr max-content;
 
   background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-floating);
 
   overflow: hidden auto;
 

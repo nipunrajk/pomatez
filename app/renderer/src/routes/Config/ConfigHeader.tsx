@@ -19,7 +19,7 @@ const ConfigHeader: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <Header heading={t("config.title")}>
+    <Header heading={t("config.title")} wide>
       <StyledHeaderButton success={success} onClick={restoreConfig}>
         {success ? t("config.restored") : t("config.restoreDefault")}
       </StyledHeaderButton>

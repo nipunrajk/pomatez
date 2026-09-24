@@ -1,8 +1,15 @@
-import styled from "styled-components/macro";
+import styled, { css } from "styled-components/macro";
 import { focusRing, typeStyle } from "styles/mixins";
 import { themes } from "styles/themes";
 
-export const StyledHeader = styled.header`
+type WideProps = { wide?: boolean };
+
+/**
+ * Default: the narrow classic-window header (card-title size, no side
+ * padding). `wide`: the dashboard's sticky page header, matching Day's
+ * StyledDayTopBar (page-title size, side padding, hairline rule).
+ */
+export const StyledHeader = styled.header<WideProps>`
   width: 100%;
   height: max-content;
 
@@ -12,10 +19,28 @@ export const StyledHeader = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  ${(p) =>
+    p.wide &&
+    css`
+      position: sticky;
+      top: 0;
+      z-index: 2;
+
+      height: var(--layout-dashboard-header-height);
+      margin: 0 0 var(--layout-dashboard-content-padding-y);
+
+      /* No horizontal padding here: the page container already provides
+         it, so the header's border/background stay flush with the rest
+         of the page's content instead of double-indenting. */
+      background-color: var(--layout-dashboard-header-bg);
+      border-bottom: var(--border-width-hairline) solid
+        var(--layout-dashboard-header-border-bottom);
+    `}
 `;
 
-export const StyledHeaderHeading = styled.h3`
-  ${typeStyle("card-title")};
+export const StyledHeaderHeading = styled.h3<WideProps>`
+  ${(p) => typeStyle(p.wide ? "page-title" : "card-title")};
   color: var(--color-text-heading);
 `;
 

@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import {
-  StyledClassicPageFrame,
   StyledDashboard,
   StyledDashboardContent,
   StyledLayout,
@@ -15,6 +14,7 @@ import {
 
 import Titlebar from "./Titlebar";
 import Sidebar from "./Sidebar";
+import RightRail from "./RightRail";
 import { ThemeContext } from "contexts";
 import { TimerStatus } from "store/timer/types";
 import { AppLayout } from "store/settings/types";
@@ -84,8 +84,6 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
     settings.enableFullscreenBreak,
   ]);
 
-  const isWidePage = location.pathname === dayRoute.path;
-
   return (
     <StyledLayout noTransition={noTransition}>
       {!settings.useNativeTitlebar && (
@@ -97,15 +95,8 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
       {isDashboard ? (
         <StyledDashboard>
           <Sidebar />
-          <StyledDashboardContent wide={isWidePage}>
-            {isWidePage ? (
-              children
-            ) : (
-              <StyledClassicPageFrame>
-                {children}
-              </StyledClassicPageFrame>
-            )}
-          </StyledDashboardContent>
+          <StyledDashboardContent>{children}</StyledDashboardContent>
+          <RightRail />
         </StyledDashboard>
       ) : (
         children

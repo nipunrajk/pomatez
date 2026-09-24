@@ -70,9 +70,16 @@ export const dayRoute: NavItemTypes = {
   notify: false,
 };
 
+/**
+ * The dashboard doesn't list Timer as a tab: it's a persistent right rail
+ * (see components/RightRail.tsx) shown on every dashboard page instead.
+ */
 export const dashboardRoutes = (
   state?: AppStateTypes
-): NavItemTypes[] => [dayRoute, ...routes(state)];
+): NavItemTypes[] => [
+  dayRoute,
+  ...routes(state).filter((route) => route.path !== "/"),
+];
 
 export const compactRoutes: NavItemTypes[] = [
   {

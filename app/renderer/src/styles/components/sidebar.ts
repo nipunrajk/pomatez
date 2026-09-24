@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components/macro";
+import styled from "styled-components/macro";
 import { NavLink } from "react-router-dom";
 import { themes } from "../themes";
 import { typeStyle } from "styles/mixins";
@@ -95,36 +95,33 @@ export const StyledSidebarNotify = styled.span`
   background-color: var(--color-status-notification);
 `;
 
-export const StyledDashboardContent = styled.div<{ wide: boolean }>`
+export const StyledDashboardContent = styled.div`
   flex: 1 1;
   min-width: 0;
 
   display: flex;
   flex-direction: column;
   background-color: var(--layout-dashboard-content-bg);
-
-  ${(p) =>
-    !p.wide &&
-    css`
-      align-items: center;
-      justify-content: center;
-      padding: var(--layout-dashboard-content-padding-y)
-        var(--layout-dashboard-content-padding-x);
-    `}
 `;
 
-/**
- * Pages built for the 340px window keep their original width, as an
- * unboxed column on the cream content area.
- */
-export const StyledClassicPageFrame = styled.div`
-  width: var(--layout-compact-window-width);
-  /* Taller than the 502px window so Settings and Tasks can breathe. */
-  height: min(100%, 64rem);
+/** Persistent Timer widget shown on every dashboard page (RightRail.tsx). */
+export const StyledRightRail = styled.aside`
+  flex: 0 0 var(--layout-dashboard-right-rail-width);
 
   display: flex;
   flex-direction: column;
+  gap: var(--space-4);
 
-  background-color: var(--layout-compact-background);
-  overflow: hidden;
+  padding: var(--layout-dashboard-content-padding-y)
+    var(--layout-dashboard-right-rail-padding-x);
+  overflow-y: auto;
+
+  background-color: var(--layout-dashboard-right-rail-bg);
+  border-left: var(--border-width-hairline) solid
+    var(--layout-dashboard-right-rail-divider-color);
+`;
+
+export const StyledRightRailHeading = styled.h3`
+  ${typeStyle("eyebrow")};
+  color: var(--color-text-secondary-readable);
 `;

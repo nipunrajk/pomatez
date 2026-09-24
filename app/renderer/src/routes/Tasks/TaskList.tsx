@@ -9,7 +9,11 @@ import {
   setTaskListPriority,
   removeTaskCard,
 } from "store";
-import { StyledTaskSectionItem, StyledCardWrapper } from "styles";
+import {
+  StyledTaskSectionItem,
+  StyledCardWrapper,
+  StyledTaskDimmer,
+} from "styles";
 import type { TaskList as TaskListType } from "store";
 import TaskHeader from "./TaskHeader";
 import TaskFormButton from "./TaskFormButton";
@@ -121,12 +125,15 @@ const TaskList: React.FC<Props> = ({
       </Draggable>
 
       {showDetails && (
-        <TaskDetails
-          ref={detailRef}
-          listId={listId}
-          cardId={cardId}
-          onExit={() => setShowDetails(false)}
-        />
+        <>
+          <StyledTaskDimmer onClick={() => setShowDetails(false)} />
+          <TaskDetails
+            ref={detailRef}
+            listId={listId}
+            cardId={cardId}
+            onExit={() => setShowDetails(false)}
+          />
+        </>
       )}
     </>
   );

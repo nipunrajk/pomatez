@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { ActionCreators as UndoActionCreator } from "redux-undo";
 import {
@@ -13,11 +14,13 @@ import {
   StyledTaskMain,
 } from "styles";
 import { addTaskList, dragList } from "store";
+import { Header } from "components";
 
 import TaskFormButton from "./TaskFormButton";
 import TaskInnerList from "./TaskInnerList";
 
 export default function Tasks() {
+  const { t } = useTranslation();
   const tasks = useAppSelector((state) => state.tasks);
 
   const dispatch = useAppDispatch();
@@ -70,12 +73,13 @@ export default function Tasks() {
   }, [dispatch, tasks.past.length, tasks.future.length]);
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <StyledTaskMain>
+    <StyledTaskMain>
+      <Header heading={t("nav.taskList")} wide />
+      <DragDropContext onDragEnd={onDragEnd}>
         <StyledTaskContainer>
           <Droppable
             droppableId="task-list"
-            direction="vertical"
+            direction="horizontal"
             type="list"
           >
             {(provided) => (
@@ -94,7 +98,7 @@ export default function Tasks() {
             )}
           </Droppable>
         </StyledTaskContainer>
-      </StyledTaskMain>
-    </DragDropContext>
+      </DragDropContext>
+    </StyledTaskMain>
   );
 }

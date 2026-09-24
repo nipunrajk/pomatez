@@ -20,6 +20,7 @@ import {
 } from "store";
 import { Toggler, TogglerProps, Collapse, Radio } from "components";
 import { ThemeContext } from "contexts";
+import { StyledFeatureToggleGrid } from "styles";
 
 import SettingSection from "./SettingSection";
 import { detectOS } from "utils";
@@ -191,22 +192,24 @@ const FeatureSection: React.FC = () => {
 
   return (
     <SettingSection heading={t("settings.appFeatures")}>
-      {featureList.map(
-        (
-          { id, label, checked, onChange, disabled = false, ...rest },
-          index
-        ) => (
-          <Toggler
-            id={id}
-            key={index}
-            label={label}
-            checked={checked}
-            disabled={disabled}
-            onChange={onChange}
-            {...rest}
-          />
-        )
-      )}
+      <StyledFeatureToggleGrid>
+        {featureList.map(
+          (
+            { id, label, checked, onChange, disabled = false, ...rest },
+            index
+          ) => (
+            <Toggler
+              id={id}
+              key={index}
+              label={label}
+              checked={checked}
+              disabled={disabled}
+              onChange={onChange}
+              {...rest}
+            />
+          )
+        )}
+      </StyledFeatureToggleGrid>
       <Collapse heading={t("settings.notificationTypes")}>
         <Radio
           id="none"

@@ -11,37 +11,54 @@ export const StyledTaskMain = styled.main`
   position: relative;
   overflow: hidden;
   flex: 1 1;
+
+  padding: 0 var(--layout-dashboard-content-padding-x);
+
+  display: flex;
+  flex-direction: column;
 `;
 
+/** The board itself: fixed-width columns scrolling horizontally.
+ * No horizontal padding here (unlike the header above it): it's provided
+ * by the parent, so the board's edges line up with the header's. */
 export const StyledTaskContainer = styled.div`
   width: 100%;
-  height: 100%;
+  flex: 1 1;
+  min-height: 0;
 
-  padding-left: 2rem;
-  padding-right: 1.4rem;
+  padding-bottom: var(--layout-dashboard-content-padding-y);
 
   background-color: var(--color-bg-primary);
 
   animation: 320ms ${themes.enterFromLeft} ease;
 
-  overflow: hidden scroll;
+  overflow-x: auto;
+  overflow-y: hidden;
 
   ${StyledScrollbar};
 `;
 
-export const StyledTaskWrapper = styled.div``;
+export const StyledTaskWrapper = styled.div`
+  height: 100%;
+
+  /* stretch (default): every column matches the row's height, so each
+     can scroll its own cards independently. */
+  display: flex;
+  flex-direction: row;
+  gap: var(--layout-dashboard-content-board-column-gap);
+`;
 
 export const StyledTaskSection = styled.section`
-  width: 100%;
-  height: calc(100% + 6.4rem);
+  height: 100%;
 
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: row;
+  gap: var(--layout-dashboard-content-board-column-gap);
 
   padding-top: 1rem;
 
   & > div[data-rbd-draggable-context-id] {
-    margin: 0.6rem 0;
+    height: 100%;
   }
 `;
 
@@ -50,10 +67,15 @@ type SectionTypes = {
   priority?: boolean;
 };
 
+/** A kanban column: fixed width, header fixed, card list scrolls within it. */
 export const StyledTaskSectionItem = styled.div<SectionTypes>`
-  width: 100%;
-  height: max-content;
+  flex: 0 0 30rem;
+  width: 30rem;
+  height: 100%;
   min-height: 7.8rem;
+
+  display: flex;
+  flex-direction: column;
 
   padding: var(--space-3);
 
@@ -147,22 +169,13 @@ export const StyledTaskHeaderOption = styled.button`
   }
 `;
 
+/** The trailing "+ Add another list" column, same width as the others. */
 export const StyledTaskStickySection = styled.div`
-  position: sticky;
-  bottom: 0;
-  left: 0;
-
-  width: 100%;
+  flex: 0 0 30rem;
+  width: 30rem;
   height: max-content;
-  min-height: 6.4rem;
 
-  padding-top: 1.2rem;
-  padding-bottom: 2rem;
-
-  backdrop-filter: blur(12px);
-  background-color: rgba(var(--color-background-window-rgb), 0.85);
-  border-top: var(--border-width-hairline) solid
-    var(--color-border-strong);
+  padding-top: 1rem;
 `;
 
 export const StyledTaskForm = styled.form`

@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components/macro";
 import { StyledHeaderHeading } from "styles";
 import { themes } from "styles/themes";
-import { focusRing, typeStyle } from "styles/mixins";
+import { StyledScrollbar, focusRing, typeStyle } from "styles/mixins";
 
 export const StyledConfig = styled.main`
   padding: 0 2rem;
@@ -16,6 +16,8 @@ export const StyledConfigSliderSection = styled.section`
   height: max-content;
 
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: var(--space-4);
   row-gap: 0.4rem;
 `;
 
@@ -192,9 +194,12 @@ export const StyledSpecialField = styled.div<SpecialBreakProps>`
   }
 `;
 
+/** A centered modal now that its parent isn't a 340px column. */
 export const StyledSpecialBreakSetter = styled.form`
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 4rem);
+  max-width: 44rem;
+  height: max-content;
+  max-height: calc(100% - 4rem);
 
   padding: 1.6rem 2rem;
 
@@ -204,12 +209,17 @@ export const StyledSpecialBreakSetter = styled.form`
   transform: translate(-50%, -50%);
   z-index: 10;
 
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-floating);
   background-color: var(--color-background-window);
 
   display: grid;
   row-gap: 2rem;
   align-content: start;
   grid-template-rows: max-content 1fr max-content;
+
+  overflow: hidden auto;
+  ${StyledScrollbar};
 
   animation: enter 180ms ease;
 

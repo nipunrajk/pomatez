@@ -47,6 +47,51 @@ export const StyledSectionHeading = styled.h4`
   color: var(--color-text-secondary-readable);
 `;
 
+/**
+ * Layout/Language/Tray Icon Style as cards, side by side. It's the first
+ * block after the header (so a small top margin, no top rule, like any
+ * first StyledSettingSection would get), and carries its own bottom rule
+ * to separate it from FeatureSection below — which, now that Layout/
+ * Language/TrayIcon's sections live one level deeper in this row, is
+ * itself `:first-of-type` among StyledSettings' direct section children
+ * and would otherwise render with no separating rule of its own.
+ * Each tile's own divider styling is overridden (via !important) since
+ * here they're cards in a row, not items in a vertical list.
+ */
+export const StyledSettingsTileRow = styled.div`
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: var(--component-section-header-divider-width) solid
+    var(--component-section-header-divider);
+
+  & > section {
+    margin-top: 0 !important;
+    padding: var(--space-3) !important;
+    border-top: none !important;
+
+    border-radius: var(--component-card-radius);
+    background-color: var(--component-card-bg);
+    box-shadow: var(--component-card-shadow);
+  }
+`;
+
+/** Toggle rows split into two columns once there's room for it. */
+export const StyledFeatureToggleGrid = styled.div`
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: var(--space-4);
+  row-gap: var(--space-2);
+`;
+
 export const StyledStarButton = styled(StyledButtonSecondary)`
   width: auto;
   flex: 1 1 auto;

@@ -6,8 +6,8 @@ export const StyledStats = styled.main`
   width: 100%;
   height: 100%;
 
-  padding-left: 2rem;
-  padding-right: 1.4rem;
+  padding: 0 var(--layout-dashboard-content-padding-x)
+    var(--layout-dashboard-content-padding-y);
 
   flex: 1 1;
 
@@ -16,6 +16,17 @@ export const StyledStats = styled.main`
   overflow: hidden scroll;
 
   ${StyledScrollbar};
+`;
+
+/** App usage and Browser activity side by side under the chart. */
+export const StyledBreakdownColumns = styled.div`
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+
+  align-items: start;
 `;
 
 export const StyledStatsSubheading = styled.p`
@@ -133,8 +144,6 @@ export const StyledStatsCardLabel = styled.p`
 
 export const StyledStatsCardValue = styled.p`
   ${typeStyle("timer-unit")};
-  /* timerUnit is 36px; scaled for the half-width cards in 340px. */
-  font-size: 2.4rem;
   font-variant-numeric: lining-nums tabular-nums;
 
   color: var(--color-text-heading);

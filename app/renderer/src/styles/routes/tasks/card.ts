@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components/macro";
 import { StyledButton, StyledButtonPrimary } from "styles";
-import { focusRing } from "styles/mixins";
+import { focusRing, StyledScrollbar } from "styles/mixins";
 
 export const StyledCardText = styled.p<{ done?: boolean }>`
   min-height: 2.4rem;
@@ -141,4 +141,11 @@ export const StyledCard = styled.div<CardProps>`
     `}
 `;
 
-export const StyledCardWrapper = styled.div``;
+/** The scrolling middle of a kanban column; header and add-card stay put. */
+export const StyledCardWrapper = styled.div`
+  flex: 1 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  ${StyledScrollbar};
+`;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getFromStorage, saveToStorage } from "utils";
-import { StyledSettings } from "styles";
+import { StyledSettings, StyledSettingsTileRow } from "styles";
 import { Alert } from "components";
 
 import FeatureSection from "./FeatureSection";
@@ -38,10 +38,12 @@ export default function Settings() {
           }}
         />
       )}
-      <LayoutSection />
-      <LanguageSection />
+      <StyledSettingsTileRow>
+        <LayoutSection />
+        <LanguageSection />
+        <TrayIconSection />
+      </StyledSettingsTileRow>
       <FeatureSection />
-      <TrayIconSection />
       <ShortcutSection />
       <HelpSection />
       <StickySection />
