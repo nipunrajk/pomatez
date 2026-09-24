@@ -34,12 +34,29 @@ function mergeSettings(
   return merged as SettingTypes;
 }
 
+/**
+ * Installs from before Modula persisted the old defaults (dark when the OS
+ * is dark, following the system theme), and stored values win over new
+ * defaults. Reset those two once so Modula light shows; later choices stick.
+ */
+function migrateToModulaTheme(
+  stored: Partial<SettingTypes> | undefined
+): Partial<SettingTypes> | undefined {
+  if (!stored || stored.modulaThemeMigrated) return stored;
+  return {
+    ...stored,
+    enableDarkTheme: false,
+    followSystemTheme: false,
+    modulaThemeMigrated: true,
+  };
+}
+
 const settings = mergeSettings(
   defaultSettings,
-  getFromStorage("state") && getFromStorage("state").settings
+  migrateToModulaTheme(
+    getFromStorage("state") && getFromStorage("state").settings
+  ) || {}
 );
-
-console.log("settings", settings);
 
 const initialState: SettingTypes = settings;
 

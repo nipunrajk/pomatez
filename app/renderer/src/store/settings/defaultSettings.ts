@@ -14,6 +14,7 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   // Modula (light) is the default; dark stays opt-in.
   enableDarkTheme: false,
   followSystemTheme: false,
+  modulaThemeMigrated: true,
   enableProgressAnimation: true,
   enableVoiceAssistance: false,
   notificationSoundOn: true,

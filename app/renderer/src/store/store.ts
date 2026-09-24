@@ -33,7 +33,10 @@ const getPersistedState = () => ({
   entries: store.getState().entries,
 });
 
-if (!getFromStorage("state")) {
+const storedState = getFromStorage("state");
+// Also save right away when the settings slice just ran its one-time
+// Modula migration, so it isn't repeated until something else changes.
+if (!storedState || !storedState.settings?.modulaThemeMigrated) {
   saveToStorage("state", getPersistedState());
 }
 
