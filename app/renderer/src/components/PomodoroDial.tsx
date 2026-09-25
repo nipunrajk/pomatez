@@ -2,21 +2,18 @@ import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { CounterContext } from "contexts";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
-import {
-  setLongBreak,
-  setPlay,
-  setShorBreak,
-  setStayFocus,
-} from "store";
+import { useTimerControls } from "hooks/useTimerControls";
+import { setLongBreak, setShorBreak, setStayFocus } from "store";
 import { TimerStatus } from "store/timer/types";
 import { getTimerPhaseLabelKey } from "routes/Timer/timerPhaseLabel";
 import {
+  StyledCountPill,
+  StyledDialActions,
   StyledDialHeader,
   StyledDialReadout,
   StyledDialSvg,
   StyledPomodoroDial,
   StyledRoundButton,
-  StyledTogglerSwitch,
 } from "styles";
 import { timerColor } from "styles/mixins";
 import SVG from "./SVG";
@@ -51,18 +48,25 @@ const PHASE_SETTING = {
 } as const;
 
 /**
- * Control Panel's Pomodoro widget: the switch starts/pauses the timer,
- * -/+ set the current phase's length, and the dial shows the time left.
+ * Control Panel's Pomodoro widget: -/+ set the current phase's length,
+ * the action bar resets, starts/pauses and skips, and the dial shows the
+ * time left.
  */
 const PomodoroDial: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { count, timerType } = useContext(CounterContext);
-  const playing = useAppSelector((state) => state.timer.playing);
+  const { count, duration, timerType, resetTimerAction } =
+    useContext(CounterContext);
+  const { playing, round } = useAppSelector((state) => state.timer);
   const config = useAppSelector((state) => state.config);
-  const strict = useAppSelector(
-    (state) => state.settings.enableStrictMode
-  );
+  const { warn, onPlay, onReset, onSkip } =
+    useTimerControls(resetTimerAction);
+
+  const playState = playing
+    ? "pause"
+    : count < duration
+    ? "resume"
+    : "start";
 
   const phase =
     timerType && timerType !== TimerStatus.SPECIAL_BREAK
@@ -91,22 +95,17 @@ const PomodoroDial: React.FC = () => {
   return (
     <StyledPomodoroDial accent={timerColor(timerType, true)}>
       <StyledDialHeader>
-        <label htmlFor="pomodoro-switch">
-          {t("controlPanel.pomodoroTimer")}
-        </label>
-        <StyledTogglerSwitch
-          id="pomodoro-switch"
-          type="checkbox"
-          role="switch"
-          checked={playing}
-          disabled={playing && strict}
-          onChange={() => dispatch(setPlay(!playing))}
-        />
+        <h3>{t("controlPanel.pomodoroTimer")}</h3>
+        <StyledCountPill>
+          {t("controlPanel.round", {
+            round,
+            total: config.sessionRounds,
+          })}
+        </StyledCountPill>
       </StyledDialHeader>
 
       <StyledDialReadout>
         <StyledRoundButton
-          size="lg"
           aria-label={`${t("controlPanel.decrease")} (${phaseLabel})`}
           disabled={!phase || playing || setting === 1}
           onClick={() => adjust(-1)}
@@ -118,7 +117,6 @@ const PomodoroDial: React.FC = () => {
           <span>{t("controlPanel.minutes", { count: minutes })}</span>
         </p>
         <StyledRoundButton
-          size="lg"
           aria-label={`${t("controlPanel.increase")} (${phaseLabel})`}
           disabled={!phase || playing || setting === max}
           onClick={() => adjust(1)}
@@ -126,6 +124,33 @@ const PomodoroDial: React.FC = () => {
           <SVG name="add" />
         </StyledRoundButton>
       </StyledDialReadout>
+
+      <StyledDialActions>
+        <StyledRoundButton
+          aria-label={t("controlPanel.resetTimer")}
+          onClick={onReset}
+        >
+          <SVG name="reset" />
+        </StyledRoundButton>
+        <button
+          type="button"
+          aria-label={t(`controlPanel.${playState}Timer`)}
+          onClick={onPlay}
+        >
+          <SVG name={playing ? "pause" : "play"} />
+          {t(`controlPanel.${playState}`)}
+        </button>
+        <StyledRoundButton
+          aria-label={t("controlPanel.skipPhase")}
+          onClick={onSkip}
+        >
+          <SVG name="skip" />
+        </StyledRoundButton>
+      </StyledDialActions>
+      {/* Strict mode refuses pause/reset/skip while running. */}
+      <p role="status" className="dial-status">
+        {warn ? t("day.strictMode") : ""}
+      </p>
 
       <StyledDialSvg
         viewBox={`0 0 ${W} ${H}`}

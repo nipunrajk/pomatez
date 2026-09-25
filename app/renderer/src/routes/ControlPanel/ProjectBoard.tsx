@@ -23,15 +23,14 @@ import {
   StyledBoardColumnHeader,
   StyledBoardEyebrow,
   StyledBoardFooter,
-  StyledButtonSecondary,
+  StyledButtonPrimary,
   StyledCountPill,
   StyledCPLink,
-  StyledCPProgressRow,
+  StyledCPHeaderControls,
   StyledCPSection,
   StyledCPSectionHeader,
   StyledEntryProgress,
   StyledEntryTag,
-  StyledRoundButton,
   StyledStatusDot,
   StyledTagRow,
 } from "styles";
@@ -155,24 +154,25 @@ const ProjectBoard: React.FC = () => {
             })}
           </p>
         </div>
-        <StyledCPLink onClick={() => history.push("/task-list")}>
-          {t("controlPanel.seeAll")}
-        </StyledCPLink>
-        <StyledCPProgressRow>
+        <StyledCPHeaderControls>
           <StyledEntryProgress
             percent={percent}
             done={percent === 100}
           />
           <span>{percent}%</span>
-          <StyledButtonSecondary
+          <StyledButtonPrimary
             onClick={() =>
               setDialog({ mode: "create", column: "pending" })
             }
           >
             <SVG name="add" />
             {t("controlPanel.createCard")}
-          </StyledButtonSecondary>
-        </StyledCPProgressRow>
+          </StyledButtonPrimary>
+          <StyledCPLink onClick={() => history.push("/task-list")}>
+            {t("controlPanel.seeAll")}
+            <SVG name="arrow-up-right" />
+          </StyledCPLink>
+        </StyledCPHeaderControls>
       </StyledCPSectionHeader>
 
       <DragDropContext
@@ -189,17 +189,6 @@ const ProjectBoard: React.FC = () => {
                   <StyledStatusDot color={COLUMN_DOT[id]} />
                   <h4 id={`board-column-${id}`}>{label}</h4>
                   <StyledCountPill>{cards.length}</StyledCountPill>
-                  <StyledRoundButton
-                    size="sm"
-                    aria-label={t("controlPanel.addCard", {
-                      column: label,
-                    })}
-                    onClick={() =>
-                      setDialog({ mode: "create", column: id })
-                    }
-                  >
-                    <SVG name="add" />
-                  </StyledRoundButton>
                 </StyledBoardColumnHeader>
 
                 <Droppable droppableId={id}>

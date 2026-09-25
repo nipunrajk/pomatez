@@ -6,7 +6,7 @@ export const zh = {
     stats: "统计",
     settings: "偏好设置",
     day: "日程",
-    controlPanel: "控制面板",
+    controlPanel: "工作区",
   },
   day: {
     heading: "时间记录",

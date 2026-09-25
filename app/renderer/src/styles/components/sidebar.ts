@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import styled, { css } from "styled-components/macro";
 import { NavLink } from "react-router-dom";
 import { themes } from "../themes";
 import { typeStyle } from "styles/mixins";
@@ -121,7 +121,11 @@ export const StyledDashboardContent = styled.div`
 `;
 
 /** Persistent Timer widget shown on every dashboard page (RightRail.tsx). */
-export const StyledRightRail = styled.aside`
+/**
+ * `compact` (Control Panel): tighter spacing and a fixed height; the
+ * agenda inside scrolls instead of the rail.
+ */
+export const StyledRightRail = styled.aside<{ compact?: boolean }>`
   flex: 0 0 var(--layout-dashboard-right-rail-width);
 
   display: flex;
@@ -135,6 +139,15 @@ export const StyledRightRail = styled.aside`
   background-color: var(--layout-dashboard-right-rail-bg);
   border-left: var(--border-width-hairline) solid
     var(--layout-dashboard-right-rail-divider-color);
+
+  ${(p) =>
+    p.compact &&
+    css`
+      gap: var(--space-3);
+      padding: var(--space-4)
+        var(--layout-dashboard-right-rail-padding-x);
+      overflow: hidden;
+    `}
 `;
 
 export const StyledRightRailHeading = styled.h3`

@@ -10,9 +10,10 @@ import RailAgenda from "./RailAgenda";
 const RightRail: React.FC = () => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
+  const onControlPanel = pathname === controlPanelRoute.path;
   return (
-    <StyledRightRail>
-      {pathname === controlPanelRoute.path ? (
+    <StyledRightRail compact={onControlPanel}>
+      {onControlPanel ? (
         <>
           <PomodoroDial />
           <RailAgenda />

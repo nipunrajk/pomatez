@@ -6,7 +6,7 @@ export const ja = {
     stats: "統計",
     settings: "設定",
     day: "デイ",
-    controlPanel: "コントロールパネル",
+    controlPanel: "ワークスペース",
   },
   day: {
     heading: "時間の記録",

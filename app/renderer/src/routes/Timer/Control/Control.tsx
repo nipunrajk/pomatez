@@ -1,15 +1,9 @@
-import WarningBell from "assets/audios/warning-bell.wav";
 import { SVG } from "components";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
+import { useTimerControls } from "hooks/useTimerControls";
 import { TimerStatus } from "store/timer/types";
-import {
-  setPlay,
-  setRound,
-  setTimerType,
-  skipTimer,
-  toggleNotificationSound,
-} from "store";
+import { setRound, setTimerType, toggleNotificationSound } from "store";
 import {
   StyledControl,
   StyledControlMain,
@@ -37,106 +31,17 @@ const Control: React.FC<Props> = ({ resetTimerAction }) => {
 
   const dispatch = useAppDispatch();
 
-  const [warn, setWarn] = useState(false);
-
-  const activateWarning = useCallback(() => {
-    const warnSound = new Audio(WarningBell);
-
-    setWarn(true);
-    warnSound.play().catch((e) => {
-      console.warn("There was a problem playing sound", e);
-    });
-  }, []);
-
-  const onResetCallback = useCallback(() => {
-    if (timer.playing && settings.enableStrictMode) {
-      activateWarning();
-      return;
-    }
-    resetTimerAction();
-  }, [
-    resetTimerAction,
-    activateWarning,
-    timer.playing,
-    settings.enableStrictMode,
-  ]);
-
-  const onPlayCallback = useCallback(() => {
-    if (timer.playing && settings.enableStrictMode) {
-      activateWarning();
-      return;
-    }
-    dispatch(setPlay(!timer.playing));
-  }, [
-    dispatch,
-    activateWarning,
-    timer.playing,
-    settings.enableStrictMode,
-  ]);
+  const { warn, onPlay, onReset, onSkip } =
+    useTimerControls(resetTimerAction);
 
   const onNotifacationSoundCallback = useCallback(() => {
     dispatch(toggleNotificationSound());
   }, [dispatch]);
 
-  const onSkipAction = useCallback(() => {
-    if (timer.playing && settings.enableStrictMode) {
-      activateWarning();
-      return;
-    }
-
-    switch (timer.timerType) {
-      case TimerStatus.STAY_FOCUS:
-        if (timer.round < config.sessionRounds) {
-          dispatch(skipTimer(TimerStatus.SHORT_BREAK));
-        } else {
-          dispatch(skipTimer(TimerStatus.LONG_BREAK));
-        }
-        if (!timer.playing) dispatch(setPlay(!timer.playing));
-        break;
-
-      case TimerStatus.SHORT_BREAK:
-        dispatch(skipTimer(TimerStatus.STAY_FOCUS));
-        dispatch(setRound(timer.round + 1));
-        if (!timer.playing) dispatch(setPlay(!timer.playing));
-        break;
-
-      case TimerStatus.LONG_BREAK:
-        dispatch(skipTimer(TimerStatus.STAY_FOCUS));
-        dispatch(setRound(1));
-        if (!timer.playing) dispatch(setPlay(!timer.playing));
-        break;
-
-      case TimerStatus.SPECIAL_BREAK:
-        dispatch(skipTimer(TimerStatus.STAY_FOCUS));
-        if (!timer.playing) dispatch(setPlay(!timer.playing));
-        break;
-    }
-  }, [
-    dispatch,
-    timer.round,
-    timer.playing,
-    timer.timerType,
-    settings.enableStrictMode,
-    config.sessionRounds,
-    activateWarning,
-  ]);
-
   const onResetSessionCallback = useCallback(() => {
     dispatch(setTimerType(TimerStatus.STAY_FOCUS));
     dispatch(setRound(1));
   }, [dispatch]);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    if (warn) {
-      timeout = setTimeout(() => {
-        setWarn(false);
-      }, 3000);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [warn]);
 
   return (
     <StyledControl type={timer.timerType}>
@@ -149,9 +54,9 @@ const Control: React.FC<Props> = ({ resetTimerAction }) => {
 
       <StyledControlSpacer />
       <StyledControlMain>
-        <ResetButton onClick={onResetCallback} />
-        <PlayButton playing={timer.playing} onClick={onPlayCallback} />
-        <SkipButton onClick={onSkipAction} />
+        <ResetButton onClick={onReset} />
+        <PlayButton playing={timer.playing} onClick={onPlay} />
+        <SkipButton onClick={onSkip} />
         <VolumeButton
           soundOn={settings.notificationSoundOn}
           onClick={onNotifacationSoundCallback}

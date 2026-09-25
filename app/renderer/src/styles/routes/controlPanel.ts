@@ -22,17 +22,26 @@ export const StyledCPSection = styled.section`
   }
 `;
 
-/** components.sectionHeader: title + eyebrow subtitle over a hairline. */
+/**
+ * components.sectionHeader: title + eyebrow subtitle on the left, actions
+ * on the right; the actions wrap under the title when there's no room.
+ */
 export const StyledCPSectionHeader = styled.header`
-  display: grid;
-  grid-template-columns: 1fr max-content;
-  align-items: end;
-  row-gap: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   column-gap: var(--space-4);
+  row-gap: var(--space-3);
 
-  padding-bottom: var(--component-section-header-padding-bottom);
+  padding-bottom: var(--space-3);
   border-bottom: var(--component-section-header-divider-width) solid
     var(--component-section-header-divider);
+
+  /* The right-hand item stays right-aligned when it wraps. */
+  & > :last-child:not(:first-child) {
+    margin-left: auto;
+  }
 
   h3 {
     ${typeStyle("section-title")};
@@ -50,6 +59,10 @@ export const StyledCPSectionHeader = styled.header`
 export const StyledCPLink = styled.button`
   padding: var(--space-1) 0;
 
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+
   ${typeStyle("button")};
   color: var(--color-brand-primary-readable);
 
@@ -62,17 +75,27 @@ export const StyledCPLink = styled.button`
   }
 
   ${focusRing};
+
+  & > svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
 `;
 
-export const StyledCPProgressRow = styled.div`
-  grid-column: 1 / -1;
+/** Progress, %, Create card, See all: right-aligned, wrapping if needed. */
+export const StyledCPHeaderControls = styled.div`
+  flex: 1 1 auto;
 
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-3);
 
-  & > div {
-    flex: 1 1;
+  /* Up to 140px; shrinks first when the column is narrow. */
+  & > div:first-child {
+    flex: 0 1 14rem;
+    min-width: 6rem;
   }
 
   & > span {
@@ -81,8 +104,9 @@ export const StyledCPProgressRow = styled.div`
     color: var(--color-text-primary);
   }
 
-  & > button {
+  & > button:not(${StyledCPLink}) {
     width: auto;
+    height: var(--component-button-height-sm);
   }
 `;
 
@@ -158,12 +182,11 @@ export const StyledCountPill = styled.span`
 const ROUND_SIZE = {
   sm: "var(--component-button-height-sm)",
   md: "var(--component-button-icon-size)",
-  lg: "var(--space-12)",
 };
 
 /** Outlined circular icon button (column "+", row arrow, dial -/+). */
 export const StyledRoundButton = styled.button<{
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md";
 }>`
   flex-shrink: 0;
   width: ${(p) => ROUND_SIZE[p.size || "md"]};
@@ -571,28 +594,35 @@ export const StyledCPEmpty = styled.p`
 
 /* ---------- Right rail: calendar + agenda ---------- */
 
+/** Takes the rail's leftover height so only the agenda list scrolls. */
 export const StyledRailCalendar = styled.section`
-  margin-top: var(--space-4);
+  flex: 1 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
 `;
 
 export const StyledCalendarHeader = styled.div`
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
 
   h3 {
     flex: 1 1;
-    ${typeStyle("section-title")};
+    ${typeStyle("card-title")};
     color: var(--color-text-heading);
   }
 `;
 
 export const StyledCalendarGrid = styled.div`
+  /* Smaller days than the 48px token, for this one-week strip only. */
+  --component-calendar-day-size: 3.2rem;
+
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   justify-items: center;
-  row-gap: var(--space-1);
 
   & > abbr {
     padding-bottom: var(--space-1);
@@ -668,26 +698,35 @@ export const StyledCalendarDay = styled.button<{
 `;
 
 export const StyledAgenda = styled.section`
-  margin-top: var(--space-5);
+  margin-top: var(--space-3);
+  flex: 1 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
 
   h3 {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
     ${typeStyle("eyebrow")};
     color: var(--color-text-secondary-readable);
   }
 
   ul {
+    flex: 1 1;
+    min-height: 0;
+    overflow-y: auto;
+    ${StyledScrollbar};
+
     list-style: none;
     display: grid;
+    align-content: start;
     gap: var(--space-2);
   }
 `;
 
 /** components.agendaEvent: blue for Pomodoro entries, grey for stopwatch. */
 export const StyledAgendaEvent = styled.li<{ pomodoro: boolean }>`
-  min-height: var(--component-agenda-event-min-height);
-  padding: var(--component-agenda-event-padding-y)
-    var(--component-agenda-event-padding-x);
+  padding: var(--space-1) var(--space-2);
 
   display: flex;
   flex-direction: column;
@@ -728,28 +767,37 @@ export const StyledPomodoroDial = styled.section<{ accent: string }>`
 
   display: flex;
   flex-direction: column;
+
+  /* Strict-mode refusal; space is reserved so the dial doesn't jump. */
+  .dial-status {
+    min-height: var(--space-5);
+    padding-top: var(--space-1);
+
+    ${typeStyle("meta")};
+    text-align: center;
+    color: var(--color-status-danger-readable);
+  }
 `;
 
-/** components.sectionHeader with the on/off switch on the right. */
+/** components.sectionHeader with the round badge on the right. */
 export const StyledDialHeader = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
 
-  padding-bottom: var(--component-section-header-padding-bottom);
+  padding-bottom: var(--space-3);
   border-bottom: var(--component-section-header-divider-width) solid
     var(--component-section-header-divider);
 
-  label {
+  h3 {
     ${typeStyle("section-title")};
     color: var(--color-text-heading);
-    cursor: pointer;
   }
 `;
 
 export const StyledDialReadout = styled.div`
-  margin: var(--space-8) 0 var(--space-6);
+  margin: var(--space-3) 0 var(--space-2);
 
   display: grid;
   grid-template-columns: max-content 1fr max-content;
@@ -775,6 +823,9 @@ export const StyledDialReadout = styled.div`
 
   strong {
     ${typeStyle("timer-display")};
+    /* Smaller than the 80px token so the rail fits without scrolling. */
+    font-size: 5rem;
+    line-height: 1;
     font-variant-numeric: lining-nums tabular-nums;
   }
 
@@ -783,11 +834,77 @@ export const StyledDialReadout = styled.div`
   }
 `;
 
+const ACTION_SIZE = "3.6rem";
+
+/** Reset, Start/Pause, Skip: between the readout and the dial. */
+export const StyledDialActions = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+
+  & > button {
+    transition: transform var(--motion-duration-fast)
+        var(--motion-easing-standard),
+      background-color var(--motion-duration-fast)
+        var(--motion-easing-standard);
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &:hover,
+      &:active {
+        transform: none;
+      }
+    }
+  }
+
+  & > button:first-child,
+  & > button:last-child {
+    width: ${ACTION_SIZE};
+    height: ${ACTION_SIZE};
+    color: var(--dial-accent);
+    border-color: var(--dial-accent);
+  }
+
+  /* Solid pill in the phase color; text uses the dial's on-color. */
+  & > button:nth-child(2) {
+    height: ${ACTION_SIZE};
+    padding: 0 var(--space-5);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    ${typeStyle("button")};
+    color: var(--color-timer-dial-text);
+    border: none;
+    border-radius: var(--radius-pill);
+    background-color: var(--dial-accent);
+    box-shadow: var(--shadow-button);
+    cursor: pointer;
+
+    ${focusRing};
+
+    & > svg {
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+    }
+  }
+`;
+
 /** The dial: the top of a disc, clipped flat with rounded bottom corners. */
 export const StyledDialSvg = styled.svg`
   display: block;
   width: 100%;
   height: auto;
+  max-height: 11rem;
 
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
   overflow: hidden;
