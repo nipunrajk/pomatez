@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getFromStorage } from "utils";
+import { recordFocusSession } from "store/history";
 import {
   EntriesState,
   EntryClockPayload,
@@ -111,6 +112,16 @@ const entriesSlice = createSlice({
       });
       state.activeId = id;
     },
+  },
+  extraReducers: (builder) => {
+    // A focus period that ran to the end counts for the active Pomodoro
+    // entry (the completed-Pomodoro count on linked board cards).
+    builder.addCase(recordFocusSession, (state) => {
+      const entry = state.items.find((e) => e.id === state.activeId);
+      if (entry && entry.mode === EntryMode.POMODORO) {
+        entry.focusSessions = (entry.focusSessions || 0) + 1;
+      }
+    });
   },
 });
 

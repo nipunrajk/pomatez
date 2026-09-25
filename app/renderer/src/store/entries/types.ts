@@ -20,8 +20,14 @@ export type TimeEntry = {
   /** Epoch ms the current run started, or null when not running. */
   runningSince: number | null;
   createdAt: number;
-  /** Google Calendar event this entry was started from, if any. */
+  /** What this entry was started from, if anything (one at most). */
   calendarEventId?: string;
+  boardCardId?: string;
+  /** A Task List card, and the list (milestone) it belongs to. */
+  taskCardId?: string;
+  taskListId?: string;
+  /** Focus periods that ran to the end while this entry was active. */
+  focusSessions?: number;
 };
 
 export type EntriesState = {
@@ -33,7 +39,13 @@ export type EntriesState = {
 export type EntryDraft = Pick<
   TimeEntry,
   "title" | "tag" | "start" | "end" | "mode" | "date"
-> & { calendarEventId?: string };
+> &
+  Partial<
+    Pick<
+      TimeEntry,
+      "calendarEventId" | "boardCardId" | "taskCardId" | "taskListId"
+    >
+  >;
 
 export type EntryClockPayload = PayloadAction<{
   id: string;

@@ -8,6 +8,10 @@ export const zh = {
     day: "日程",
     controlPanel: "工作区",
   },
+  controlPanel: {
+    boardTitle: "任务看板",
+    breakdownTitle: "项目里程碑",
+  },
   day: {
     heading: "时间记录",
     add: "添加记录",

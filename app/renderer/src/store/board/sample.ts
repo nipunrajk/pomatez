@@ -10,7 +10,9 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
     title: string,
     tags: string[],
     due: number,
-    document: string
+    document: string,
+    priority: BoardCard["priority"],
+    estimate: number
   ): BoardCard => ({
     id,
     category,
@@ -18,6 +20,8 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
     tags,
     dueDate: inDays(due),
     document,
+    priority,
+    estimate,
     createdAt: now,
   });
 
@@ -29,9 +33,11 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
           "sample-p1",
           "Research",
           "Lorem ipsum dolor sit amet, consectetur adipiscing",
-          ["Design", "Low"],
+          ["Design"],
           7,
-          "Collect references and summarize the main findings."
+          "Collect references and summarize the main findings.",
+          "low",
+          3
         ),
         card(
           "sample-p2",
@@ -39,15 +45,19 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
           "Sed do eiusmod tempor incididunt",
           ["Content"],
           9,
-          "First draft, then a review pass for tone."
+          "First draft, then a review pass for tone.",
+          "medium",
+          2
         ),
         card(
           "sample-p3",
           "Planning",
           "Ut enim ad minim veniam, quis nostrud exercitation",
-          ["Sprint", "Medium"],
+          ["Sprint"],
           12,
-          "Break the work into tasks and estimate each one."
+          "Break the work into tasks and estimate each one.",
+          "medium",
+          4
         ),
       ],
       ongoing: [
@@ -55,9 +65,11 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
           "sample-o1",
           "Design",
           "Duis aute irure dolor in reprehenderit",
-          ["UI", "High"],
+          ["UI"],
           4,
-          "Wireframes are done; visual design in progress."
+          "Wireframes are done; visual design in progress.",
+          "high",
+          4
         ),
         card(
           "sample-o2",
@@ -65,7 +77,9 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
           "Excepteur sint occaecat cupidatat non proident",
           ["Build"],
           5,
-          "Set up the project and the first screens."
+          "Set up the project and the first screens.",
+          "high",
+          6
         ),
       ],
       completed: [
@@ -75,7 +89,9 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
           "Sunt in culpa qui officia deserunt mollit",
           ["QA"],
           -1,
-          "Checked against the acceptance notes."
+          "Checked against the acceptance notes.",
+          "low",
+          2
         ),
         card(
           "sample-c2",
@@ -83,7 +99,9 @@ export const createSampleBoard = (now = Date.now()): BoardState => {
           "Nemo enim ipsam voluptatem quia voluptas",
           ["Design"],
           -3,
-          "Findings shared with the team."
+          "Findings shared with the team.",
+          "low",
+          1
         ),
       ],
     },

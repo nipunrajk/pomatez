@@ -20,6 +20,9 @@ const modulaReadable = css`
   /* Ticks and numbers on the Pomodoro dial, which is filled with the
      readable timer color. */
   --color-timer-dial-text: var(--color-timer-gauge-ticks);
+  /* Warning text (due soon, high priority, under review): danger's hue,
+     dark enough for 11px text on a tinted pill. */
+  --color-warning-text-readable: #945440;
 `;
 
 /**
@@ -224,6 +227,7 @@ export const darkTheme = css`
   --color-agenda-grey-text: var(--color-heading-text);
   /* Dark timer colors are bright, so the dial's ticks and numbers go dark. */
   --color-timer-dial-text: var(--color-bg-primary);
+  --color-warning-text-readable: #ef7d96;
   /* Calendar events: each pair swapped, deep fill with the light tint. */
   --color-calendar-event-blue-bg: #1f4a78;
   --color-calendar-event-blue-text: #f4f1ea;

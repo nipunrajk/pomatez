@@ -1,7 +1,12 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { getFromStorage } from "utils";
-import type { Task, TaskList, ListPayload } from "./types";
+import type {
+  Task,
+  TaskList,
+  ListPayload,
+  MilestoneDetails,
+} from "./types";
 import undoable from "redux-undo";
 import {
   addTaskToList,
@@ -29,6 +34,15 @@ const tasksSlice = createSlice({
       const taskList = createTaskList({ title, priority });
 
       return [...state, taskList];
+    },
+
+    setTaskListDetails: (
+      state,
+      action: PayloadAction<{ listId: string } & MilestoneDetails>
+    ) => {
+      const { listId, ...details } = action.payload;
+      const list = state.find((l) => l._id === listId);
+      if (list) Object.assign(list, details);
     },
 
     removeTaskList: (state, action: ListPayload<"_id">) => {
@@ -296,6 +310,7 @@ export const {
   removeTaskList,
   setTaskCardDone,
   setTaskCardNotDone,
+  setTaskListDetails,
   setTaskListPriority,
   skipTaskCard,
 } = tasksSlice.actions;

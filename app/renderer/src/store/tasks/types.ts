@@ -12,9 +12,28 @@ export type Task = {
   done: boolean;
 };
 
+export type MilestoneStatus = "ongoing" | "review" | "paused";
+
+export const MILESTONE_STATUSES: MilestoneStatus[] = [
+  "ongoing",
+  "review",
+  "paused",
+];
+
 export type TaskList = {
   _id: string;
   title: string;
   cards: Task[];
   priority: boolean;
+  /** Milestone details, set from the Workspace (all optional). */
+  category?: string;
+  /** Unset means "ongoing". */
+  status?: MilestoneStatus;
+  /** `YYYY-MM-DD`, or unset. */
+  deadline?: string;
 };
+
+export type MilestoneDetails = Pick<
+  TaskList,
+  "category" | "status" | "deadline"
+>;

@@ -8,6 +8,10 @@ export const ja = {
     day: "デイ",
     controlPanel: "ワークスペース",
   },
+  controlPanel: {
+    boardTitle: "タスクボード",
+    breakdownTitle: "プロジェクトのマイルストーン",
+  },
   day: {
     heading: "時間の記録",
     add: "記録を追加",

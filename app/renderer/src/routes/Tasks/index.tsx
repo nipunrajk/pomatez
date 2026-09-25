@@ -26,16 +26,24 @@ export default function Tasks() {
 
   const dispatch = useAppDispatch();
 
-  // Control Panel's "Create New" lands here (?add=list) with the add-list
+  // Workspace's "Create New" lands here (?add=list) with the add-list
   // form open. Hash history drops location state, hence the query string.
   const history = useHistory();
   const location = useLocation();
-  const [openAddList] = useState(
-    () => new URLSearchParams(location.search).get("add") === "list"
-  );
+  // Workspace's milestone rows land here with ?list=<id> to show that list.
+  const [params] = useState(() => new URLSearchParams(location.search));
+  const openAddList = params.get("add") === "list";
   useEffect(() => {
-    if (openAddList) history.replace(location.pathname);
-    // Only clear the one-shot flag once, on arrival.
+    const listId = params.get("list");
+    if (listId) {
+      const column = document.querySelector<HTMLElement>(
+        `[data-list-id="${CSS.escape(listId)}"]`
+      );
+      column?.scrollIntoView({ block: "nearest", inline: "center" });
+      column?.focus();
+    }
+    if (location.search) history.replace(location.pathname);
+    // Only handle the one-shot query once, on arrival.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

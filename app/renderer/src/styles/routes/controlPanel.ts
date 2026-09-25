@@ -346,10 +346,15 @@ export const StyledTagRow = styled.div<{ lifted?: boolean }>`
     `}
 `;
 
-export const StyledBoardFooter = styled.div<{ lifted?: boolean }>`
+export const StyledBoardFooter = styled.div<{
+  lifted?: boolean;
+  warn?: boolean;
+}>`
+  min-height: var(--component-button-height-sm);
+
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
 
   ${typeStyle("meta")};
   font-variant-numeric: tabular-nums;
@@ -358,7 +363,98 @@ export const StyledBoardFooter = styled.div<{ lifted?: boolean }>`
       ? "var(--component-card-highlighted-text)"
       : "var(--color-text-secondary-readable)"};
 
+  & > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  /* Due today or overdue (not on completed cards). */
+  .due {
+    color: ${(p) =>
+      p.warn && !p.lifted
+        ? "var(--color-warning-text-readable)"
+        : "inherit"};
+    font-weight: ${(p) =>
+      p.warn ? "var(--font-weight-semibold)" : "inherit"};
+  }
+
   svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+`;
+
+const PRIORITY_COLOR = {
+  high: "var(--color-warning-text-readable)",
+  medium: "var(--color-brand-primary-readable)",
+  low: "var(--color-text-secondary-readable)",
+};
+
+/** components.tag in the priority's color. */
+export const StyledPriorityTag = styled.span<{
+  level: "low" | "medium" | "high";
+}>`
+  display: inline-flex;
+  align-items: center;
+  height: var(--component-tag-height);
+  padding: 0 var(--component-tag-padding-x);
+
+  ${typeStyle("tag")};
+  color: ${(p) => PRIORITY_COLOR[p.level]};
+  border-radius: var(--component-tag-radius);
+  border: var(--border-width-hairline) solid currentColor;
+`;
+
+/** "Focus on this card": quiet until the card is hovered or focused. */
+export const StyledCardFocus = styled.button`
+  flex-shrink: 0;
+  margin-left: auto;
+
+  width: var(--component-button-height-sm);
+  height: var(--component-button-height-sm);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-icon-muted);
+  border: var(--border-width-hairline) solid transparent;
+  border-radius: var(--radius-circle);
+  background-color: transparent;
+  cursor: pointer;
+
+  transition: ${themes.transition};
+
+  article:hover &,
+  article:focus-within &,
+  &:focus-visible {
+    color: var(--color-brand-primary-readable);
+    border-color: var(--color-border-strong);
+  }
+
+  &:hover {
+    background-color: var(--color-brand-primary-muted);
+  }
+
+  &[aria-pressed="true"] {
+    color: var(--color-text-on-primary);
+    border-color: transparent;
+    background-color: var(--component-button-primary-bg);
+  }
+
+  ${focusRing};
+
+  & > svg {
     width: var(--icon-size-sm);
     height: var(--icon-size-sm);
   }
@@ -467,7 +563,34 @@ export const StyledCardForm = styled.form`
   }
 `;
 
-// Not an extension of StyledInput: its attrs pin type="text".
+// Not extensions of StyledInput: its attrs pin type="text".
+export const StyledNumberInput = styled.input.attrs(() => ({
+  type: "number",
+  inputMode: "numeric",
+}))`
+  width: 100%;
+  height: var(--component-input-height);
+  padding: 0 var(--component-input-padding-x);
+
+  font-variant-numeric: tabular-nums;
+  color: var(--component-input-text);
+
+  border-radius: var(--component-input-radius);
+  border: var(--border-width-hairline) solid
+    var(--component-input-border);
+  background-color: var(--component-input-bg);
+
+  &::placeholder {
+    color: var(--color-text-placeholder-readable);
+  }
+
+  &:focus {
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 var(--border-width-hairline)
+      var(--color-border-focus);
+  }
+`;
+
 export const StyledDateInput = styled.input.attrs(() => ({
   type: "date",
 }))`
@@ -491,100 +614,202 @@ export const StyledDateInput = styled.input.attrs(() => ({
   }
 `;
 
-/* ---------- Task Breakdown ---------- */
+/* ---------- Project Milestones ---------- */
 
-export const StyledBreakdownRows = styled.ul`
+export const StyledMilestones = styled.ul`
+  margin-top: var(--space-5);
   list-style: none;
-`;
 
-export const StyledBreakdownRowItem = styled.li`
-  padding: var(--space-5) 0;
-  border-bottom: var(--border-width-hairline) solid
-    var(--color-border-soft);
-`;
-
-export const StyledTaskRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr max-content;
-  column-gap: var(--space-4);
-  row-gap: var(--space-2);
-  align-items: center;
-
-  h4 {
-    ${typeStyle("body")};
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    overflow-wrap: anywhere;
-  }
+  gap: var(--space-3);
 `;
 
-export const StyledTaskRowMeta = styled.div`
-  grid-column: 1 / -1;
+/** One milestone: title row, badges, progress + deadline, then subtasks. */
+export const StyledMilestoneRow = styled.li<{ open: boolean }>`
+  padding: var(--space-4) var(--space-5);
 
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
+  display: grid;
+  gap: var(--space-3);
 
-  & > p {
-    margin-left: auto;
+  border-radius: var(--component-card-radius);
+  background-color: var(--component-card-bg);
+  box-shadow: ${(p) =>
+    p.open
+      ? "var(--shadow-card-hover)"
+      : "var(--component-card-shadow)"};
+  cursor: pointer;
+
+  transition: transform var(--motion-duration-fast)
+      var(--motion-easing-standard),
+    box-shadow var(--motion-duration-base) var(--motion-easing-standard);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .milestone-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    h4 {
+      flex: 1 1;
+      min-width: 0;
+    }
+
+    h4 > button {
+      padding: 0;
+
+      ${typeStyle("body")};
+      font-size: 1.6rem;
+      font-weight: var(--font-weight-semibold);
+      text-align: left;
+      color: var(--color-text-primary);
+      overflow-wrap: anywhere;
+
+      border: none;
+      background: none;
+      cursor: pointer;
+
+      ${focusRing};
+    }
+  }
+
+  .milestone-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+
+    p {
+      margin-left: auto;
+      ${typeStyle("meta")};
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-secondary-readable);
+    }
+  }
+
+  .milestone-progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+
+    & > div {
+      flex: 1 1 12rem;
+    }
+
+    .percent {
+      ${typeStyle("meta")};
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-primary);
+    }
+  }
+
+  .milestone-panel {
+    padding-top: var(--space-3);
+    border-top: var(--border-width-hairline) solid
+      var(--color-border-soft);
+    cursor: auto;
+  }
+
+  .milestone-hours {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
+
     ${typeStyle("meta")};
     font-variant-numeric: tabular-nums;
     color: var(--color-text-secondary-readable);
+
+    svg {
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+    }
   }
 `;
 
-export const StyledTaskRowProgress = styled.div`
-  grid-column: 1 / -1;
+const STATUS_TONE = {
+  ongoing: css`
+    color: var(--color-status-completed-readable);
+    /* Light tint: at 12% the green text drops below 4.5:1. */
+    background-color: rgba(var(--color-status-completed-rgb), 0.06);
+  `,
+  review: css`
+    color: var(--color-warning-text-readable);
+    background-color: rgba(var(--color-status-planning-rgb), 0.14);
+  `,
+  paused: css`
+    color: var(--color-text-secondary-readable);
+    background-color: var(--color-background-surface-sunken);
+  `,
+};
 
-  display: flex;
+/** components.tag, tinted by milestone status. */
+export const StyledStatusTag = styled.span<{
+  status: "ongoing" | "review" | "paused";
+}>`
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
+  height: var(--component-tag-height);
+  padding: 0 var(--component-tag-padding-x);
 
-  & > div {
-    flex: 1 1;
-  }
+  ${typeStyle("tag")};
+  border-radius: var(--component-tag-radius);
+  border: var(--border-width-hairline) solid currentColor;
+  ${(p) => STATUS_TONE[p.status]};
+`;
 
-  & > span {
-    min-width: 4ch;
-    text-align: right;
-    ${typeStyle("meta")};
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text-primary);
-  }
+/** Terracotta when due within 3 days or past due. */
+export const StyledMilestoneDeadline = styled.span<{ soon: boolean }>`
+  margin-left: auto;
+
+  ${typeStyle("tag")};
+  font-variant-numeric: tabular-nums;
+  color: ${(p) =>
+    p.soon
+      ? "var(--color-warning-text-readable)"
+      : "var(--color-text-secondary-readable)"};
 `;
 
 export const StyledSubtaskList = styled.ul`
   list-style: none;
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-4);
-
-  border-radius: var(--component-card-radius);
-  background-color: var(--component-card-bg);
-  box-shadow: var(--component-card-shadow);
 `;
 
 export const StyledSubtask = styled.li<{ done: boolean }>`
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) 0;
-
-  color: ${(p) =>
-    p.done
-      ? "var(--color-text-secondary-readable)"
-      : "var(--color-text-primary)"};
-  text-decoration: ${(p) => (p.done ? "line-through" : "none")};
-  overflow-wrap: anywhere;
+  padding: var(--space-1) 0;
 
   & + & {
     border-top: var(--border-width-hairline) solid
       var(--color-border-soft);
   }
 
-  & > span:first-child {
-    position: relative;
-    top: -0.1em;
+  & > label {
+    flex: 1 1;
+    min-width: 0;
+    color: ${(p) =>
+      p.done
+        ? "var(--color-text-secondary-readable)"
+        : "var(--color-text-primary)"};
+    text-decoration: ${(p) => (p.done ? "line-through" : "none")};
+    overflow-wrap: anywhere;
+  }
+
+  /* The focus button is always visible here (no card hover to reveal it). */
+  & > button {
+    color: var(--color-brand-primary-readable);
+    border-color: var(--color-border-strong);
   }
 `;
 

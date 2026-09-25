@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   DragDropContext,
@@ -9,12 +8,15 @@ import {
 } from "react-beautiful-dnd";
 import { SVG } from "components";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
+import { useStartFocus } from "hooks/useStartFocus";
 import {
   BOARD_COLUMNS,
   BoardCard,
   BoardColumnId,
   moveBoardCard,
+  TimeEntry,
 } from "store";
+import { getDayKey } from "store/history/utils";
 import {
   StyledBoard,
   StyledBoardCard,
@@ -24,13 +26,14 @@ import {
   StyledBoardEyebrow,
   StyledBoardFooter,
   StyledButtonPrimary,
+  StyledCardFocus,
   StyledCountPill,
-  StyledCPLink,
   StyledCPHeaderControls,
   StyledCPSection,
   StyledCPSectionHeader,
   StyledEntryProgress,
   StyledEntryTag,
+  StyledPriorityTag,
   StyledStatusDot,
   StyledTagRow,
 } from "styles";
@@ -62,11 +65,36 @@ const categoryColor = (name: string) => {
 type CardProps = {
   card: BoardCard;
   lifted: boolean;
-  locale: string;
+  /** In the Completed column: no due-date warning. */
+  completed: boolean;
+  /** Finished focus sessions credited to this card. */
+  pomodoros: number;
+  focusing: boolean;
+  onFocus: () => void;
 };
 
-const CardBody: React.FC<CardProps> = ({ card, lifted, locale }) => {
+const CardBody: React.FC<CardProps> = ({
+  card,
+  lifted,
+  completed,
+  pomodoros,
+  focusing,
+  onFocus,
+}) => {
+  const { t, i18n } = useTranslation();
   const [y, m, d] = card.dueDate.split("-").map(Number);
+  const due = card.dueDate ? new Date(y, m - 1, d) : null;
+  const todayKey = getDayKey(Date.now());
+  const dueState =
+    !due || completed
+      ? null
+      : card.dueDate < todayKey
+      ? "overdue"
+      : card.dueDate === todayKey
+      ? "today"
+      : null;
+  const showPomodoros = !!card.estimate || pomodoros > 0;
+
   return (
     <>
       {card.category && (
@@ -83,31 +111,90 @@ const CardBody: React.FC<CardProps> = ({ card, lifted, locale }) => {
       )}
       <h5>{card.title}</h5>
       {card.document && <p>{card.document}</p>}
-      {card.tags.length > 0 && (
+      {(card.priority || card.tags.length > 0) && (
         <StyledTagRow lifted={lifted}>
+          {card.priority && (
+            <StyledPriorityTag level={card.priority}>
+              {t(`controlPanel.priority_${card.priority}`)}
+            </StyledPriorityTag>
+          )}
           {card.tags.map((tag) => (
             <StyledEntryTag key={tag}>{tag}</StyledEntryTag>
           ))}
         </StyledTagRow>
       )}
-      {card.dueDate && (
-        <StyledBoardFooter lifted={lifted}>
-          <SVG name="calendar" />
-          {new Date(y, m - 1, d).toLocaleDateString(locale, {
-            month: "short",
-            day: "numeric",
+      <StyledBoardFooter lifted={lifted} warn={!!dueState}>
+        {due && (
+          <span
+            className="due"
+            title={
+              dueState ? t(`controlPanel.due_${dueState}`) : undefined
+            }
+          >
+            <SVG name={dueState ? "alert" : "calendar"} />
+            {due.toLocaleDateString(i18n.language, {
+              month: "short",
+              day: "numeric",
+            })}
+            {dueState && (
+              <span className="visually-hidden">
+                {" "}
+                ({t(`controlPanel.due_${dueState}`)})
+              </span>
+            )}
+          </span>
+        )}
+        {showPomodoros && (
+          <span
+            className="pomodoros"
+            aria-label={t(
+              card.estimate
+                ? "controlPanel.pomodorosOfEstimate"
+                : "controlPanel.pomodorosDone",
+              { count: pomodoros, estimate: card.estimate }
+            )}
+          >
+            <SVG name="timer" />
+            {card.estimate
+              ? `${pomodoros}/${card.estimate}`
+              : pomodoros}
+          </span>
+        )}
+        <StyledCardFocus
+          type="button"
+          aria-pressed={focusing}
+          aria-label={t("controlPanel.focusOnCardLabel", {
+            title: card.title,
           })}
-        </StyledBoardFooter>
-      )}
+          title={t("controlPanel.focusOnCard")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onFocus();
+          }}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          <SVG name="play" />
+        </StyledCardFocus>
+      </StyledBoardFooter>
     </>
   );
 };
 
 const ProjectBoard: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const history = useHistory();
   const dispatch = useAppDispatch();
   const board = useAppSelector((state) => state.board);
+  const entries = useAppSelector((state) => state.entries.items);
+  const activeId = useAppSelector((state) => state.entries.activeId);
+  const playing = useAppSelector((state) => state.timer.playing);
+  const startLinkedFocus = useStartFocus();
+  const linked = useMemo(() => {
+    const map: Record<string, TimeEntry> = {};
+    entries.forEach((e) => {
+      if (e.boardCardId) map[e.boardCardId] = e;
+    });
+    return map;
+  }, [entries]);
   const [dialog, setDialog] = useState<CardDialogTarget | null>(null);
   const closeDialog = useCallback(() => setDialog(null), []);
 
@@ -168,10 +255,6 @@ const ProjectBoard: React.FC = () => {
             <SVG name="add" />
             {t("controlPanel.createCard")}
           </StyledButtonPrimary>
-          <StyledCPLink onClick={() => history.push("/task-list")}>
-            {t("controlPanel.seeAll")}
-            <SVG name="arrow-up-right" />
-          </StyledCPLink>
         </StyledCPHeaderControls>
       </StyledCPSectionHeader>
 
@@ -232,7 +315,27 @@ const ProjectBoard: React.FC = () => {
                               <CardBody
                                 card={card}
                                 lifted={dragState.isDragging}
-                                locale={i18n.language}
+                                completed={id === "completed"}
+                                pomodoros={
+                                  linked[card.id]?.focusSessions || 0
+                                }
+                                focusing={
+                                  !!linked[card.id] &&
+                                  linked[card.id].id === activeId &&
+                                  playing
+                                }
+                                onFocus={() =>
+                                  startLinkedFocus(
+                                    { boardCardId: card.id },
+                                    {
+                                      title: card.title,
+                                      tag: card.category,
+                                      date: getDayKey(Date.now()),
+                                      start: "",
+                                      end: "",
+                                    }
+                                  )
+                                }
                               />
                             </StyledBoardCard>
                           )}

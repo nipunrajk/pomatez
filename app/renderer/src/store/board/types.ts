@@ -6,6 +6,14 @@ export const BOARD_COLUMNS: BoardColumnId[] = [
   "completed",
 ];
 
+export type BoardPriority = "low" | "medium" | "high";
+
+export const BOARD_PRIORITIES: BoardPriority[] = [
+  "low",
+  "medium",
+  "high",
+];
+
 export type BoardCard = {
   id: string;
   title: string;
@@ -15,6 +23,9 @@ export type BoardCard = {
   dueDate: string;
   /** Free-form notes for the card. */
   document: string;
+  priority?: BoardPriority;
+  /** Estimated Pomodoros. */
+  estimate?: number;
   createdAt: number;
 };
 

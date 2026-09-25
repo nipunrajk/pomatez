@@ -1,11 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
+import { useModalDialog } from "hooks/useModalDialog";
 import {
   addBoardCard,
   BOARD_COLUMNS,
+  BOARD_PRIORITIES,
   BoardCard,
   BoardColumnId,
+  BoardPriority,
   removeBoardCard,
   updateBoardCard,
 } from "store";
@@ -17,6 +20,7 @@ import {
   StyledCardForm,
   StyledDateInput,
   StyledInput,
+  StyledNumberInput,
   StyledSelect,
   StyledSelectWrapper,
   StyledTextArea,
@@ -30,6 +34,8 @@ type Props = {
   target: CardDialogTarget | null;
   onClose: () => void;
 };
+
+const MAX_ESTIMATE = 20;
 
 const parseTags = (value: string) =>
   Array.from(
@@ -46,8 +52,7 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const columns = useAppSelector((state) => state.board.columns);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
+  const dialogRef = useModalDialog(!!target);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -55,33 +60,25 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
   const [dueDate, setDueDate] = useState("");
   const [column, setColumn] = useState<BoardColumnId>("pending");
   const [notes, setNotes] = useState("");
+  const [priority, setPriority] = useState<BoardPriority | "">("");
+  const [estimate, setEstimate] = useState("");
   const [error, setError] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // Load the card (or blanks) each time the dialog opens.
   useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (!target) {
-      if (dialog.open) {
-        dialog.close();
-        // Back to whatever opened the dialog, if it's still on the page.
-        if (openerRef.current?.isConnected) openerRef.current.focus();
-      }
-      return;
-    }
+    if (!target) return;
     const card = target.mode === "edit" ? target.card : null;
     setTitle(card?.title ?? "");
     setCategory(card?.category ?? "");
     setTags(card?.tags.join(", ") ?? "");
     setDueDate(card?.dueDate ?? "");
     setNotes(card?.document ?? "");
+    setPriority(card?.priority ?? "");
+    setEstimate(card?.estimate ? String(card.estimate) : "");
     setColumn(target.column);
     setError(false);
     setConfirmDelete(false);
-    if (!dialog.open) {
-      openerRef.current = document.activeElement as HTMLElement | null;
-      dialog.showModal();
-    }
   }, [target]);
 
   const categories = Array.from(
@@ -106,6 +103,12 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
       tags: parseTags(tags),
       dueDate,
       document: notes.trim(),
+      priority: priority || undefined,
+      estimate:
+        Math.min(
+          MAX_ESTIMATE,
+          Math.max(0, Math.round(Number(estimate)))
+        ) || undefined,
     };
     if (target?.mode === "edit") {
       dispatch(
@@ -212,6 +215,36 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
           <StyledDateInput
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+          />
+        </label>
+
+        <label>
+          {t("controlPanel.fieldPriority")}
+          <StyledSelectWrapper>
+            <StyledSelect
+              value={priority}
+              onChange={(e) =>
+                setPriority(e.target.value as BoardPriority | "")
+              }
+            >
+              <option value="">{t("controlPanel.priorityNone")}</option>
+              {BOARD_PRIORITIES.map((p) => (
+                <option key={p} value={p}>
+                  {t(`controlPanel.priority_${p}`)}
+                </option>
+              ))}
+            </StyledSelect>
+          </StyledSelectWrapper>
+        </label>
+
+        <label>
+          {t("controlPanel.fieldEstimate")}
+          <StyledNumberInput
+            min={0}
+            max={MAX_ESTIMATE}
+            value={estimate}
+            placeholder={t("controlPanel.estimateHint")}
+            onChange={(e) => setEstimate(e.target.value)}
           />
         </label>
 

@@ -8,6 +8,10 @@ export const es = {
     day: "Día",
     controlPanel: "Espacio de trabajo",
   },
+  controlPanel: {
+    boardTitle: "Tablero de tareas",
+    breakdownTitle: "Hitos del proyecto",
+  },
   day: {
     heading: "Registros de tiempo",
     add: "Añadir registro",

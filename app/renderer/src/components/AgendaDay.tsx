@@ -6,17 +6,9 @@ import {
   GOOGLE_CALENDAR_DISCONNECT,
 } from "@pomatez/shareables";
 import { getInvokeConnector } from "contexts";
-import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
-import {
-  addEntry,
-  CalendarEvent,
-  EntryMode,
-  setActiveEntry,
-  setPlay,
-  skipTimer,
-  TimeEntry,
-} from "store";
-import { TimerStatus } from "store/timer/types";
+import { useAppSelector } from "hooks/storeHooks";
+import { useStartFocus } from "hooks/useStartFocus";
+import { CalendarEvent, EntryMode, TimeEntry } from "store";
 import {
   StyledAgendaCard,
   StyledAgendaConfirm,
@@ -59,13 +51,8 @@ const AgendaDay: React.FC<Props> = ({
   syncing,
 }) => {
   const { t, i18n } = useTranslation();
-  const dispatch = useAppDispatch();
   const calendar = useAppSelector((state) => state.calendar);
-  const allEntries = useAppSelector((state) => state.entries.items);
-  const timer = useAppSelector((state) => state.timer);
-  const strict = useAppSelector(
-    (state) => state.settings.enableStrictMode
-  );
+  const startLinkedFocus = useStartFocus();
   const focusMinutes = useAppSelector(
     (state) => state.config.stayFocus
   );
@@ -128,37 +115,20 @@ const AgendaDay: React.FC<Props> = ({
   const eventTitle = (event: CalendarEvent) =>
     event.title || t("controlPanel.untitledEvent");
 
-  /**
-   * Starts a Pomodoro credited to this event: reuses the time entry
-   * linked to it (or creates one), like the Day page's play button.
-   */
   const startFocus = (event: CalendarEvent) => {
-    let id = allEntries.find((e) => e.calendarEventId === event.id)?.id;
-    if (!id) {
-      const start = new Date(event.start);
-      const end = new Date(event.end);
-      const sameDay = !event.allDay && hhmm(end) > hhmm(start);
-      id = dispatch(
-        addEntry({
-          title: eventTitle(event),
-          tag: "",
-          date: event.date,
-          start: event.allDay ? "" : hhmm(start),
-          end: sameDay ? hhmm(end) : "",
-          mode: EntryMode.POMODORO,
-          calendarEventId: event.id,
-        })
-      ).payload.id;
-    }
-    // Strict mode can't leave a running break early.
-    if (
-      timer.timerType !== TimerStatus.STAY_FOCUS &&
-      !(strict && timer.playing)
-    ) {
-      dispatch(skipTimer(TimerStatus.STAY_FOCUS));
-    }
-    dispatch(setActiveEntry({ id, now: Date.now() }));
-    if (!timer.playing) dispatch(setPlay(true));
+    const start = new Date(event.start);
+    const end = new Date(event.end);
+    const sameDay = !event.allDay && hhmm(end) > hhmm(start);
+    startLinkedFocus(
+      { calendarEventId: event.id },
+      {
+        title: eventTitle(event),
+        tag: "",
+        date: event.date,
+        start: event.allDay ? "" : hhmm(start),
+        end: sameDay ? hhmm(end) : "",
+      }
+    );
     setConfirmId(null);
   };
 
