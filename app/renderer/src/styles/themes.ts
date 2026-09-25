@@ -224,6 +224,17 @@ export const darkTheme = css`
   --color-agenda-grey-text: var(--color-heading-text);
   /* Dark timer colors are bright, so the dial's ticks and numbers go dark. */
   --color-timer-dial-text: var(--color-bg-primary);
+  /* Calendar events: each pair swapped, deep fill with the light tint. */
+  --color-calendar-event-blue-bg: #1f4a78;
+  --color-calendar-event-blue-text: #f4f1ea;
+  --color-calendar-event-sand-bg: #5c4430;
+  --color-calendar-event-sand-text: #f2e3d0;
+  --color-calendar-event-sage-bg: #384c37;
+  --color-calendar-event-sage-text: #dee8dd;
+  --color-calendar-event-mint-bg: #1e4e42;
+  --color-calendar-event-mint-text: #a8e0d2;
+  --color-calendar-event-terracotta-bg: #6e3326;
+  --color-calendar-event-terracotta-text: #f6d9d2;
 `;
 
 const enterFromLeft = keyframes`

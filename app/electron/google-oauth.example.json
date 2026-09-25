@@ -1,0 +1,5 @@
+{
+  "_comment": "Copy to google-oauth.json (gitignored) to enable Google Calendar sync. In Google Cloud Console: enable the Google Calendar API, configure the OAuth consent screen (add yourself under Test users while it's in Testing), then create an OAuth client ID of type 'Desktop app' and paste its values below. Testing-mode refresh tokens expire after 7 days; publishing for everyone needs Google's verification for the calendar.events.readonly scope. A copy in the app's userData folder takes precedence over this one.",
+  "clientId": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+  "clientSecret": "YOUR_CLIENT_SECRET"
+}

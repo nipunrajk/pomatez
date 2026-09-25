@@ -14,6 +14,7 @@ import {
   Ellipsis,
   EllipsisVertical,
   ExternalLink,
+  Globe,
   Laptop,
   LayoutDashboard,
   ListChecks,
@@ -82,7 +83,8 @@ export type SVGTypes = {
     | "user"
     | "minus"
     | "arrow-left"
-    | "arrow-right";
+    | "arrow-right"
+    | "globe";
 };
 
 const ICONS: Record<
@@ -126,6 +128,7 @@ const ICONS: Record<
   minus: Minus,
   "arrow-left": ArrowLeft,
   "arrow-right": ArrowRight,
+  globe: Globe,
 };
 
 /**

@@ -83,6 +83,13 @@
       "grey":  { "bg": "#E9E9DD", "text": "#1C1C1A", "subtext": "#8C8C80" },
       "green": { "bg": "#8FC6A6", "text": "#FFFFFF", "subtext": "rgba(255,255,255,0.70)" },
       "red":   { "bg": "#C08570", "text": "#FFFFFF", "subtext": "rgba(255,255,255,0.70)" }
+    },
+    "calendarEvent": {
+      "blue":       { "bg": "#3A6594", "text": "#FFFFFF" },
+      "sand":       { "bg": "#F2E3D0", "text": "#5C4430" },
+      "sage":       { "bg": "#DEE8DD", "text": "#384C37" },
+      "mint":       { "bg": "#A8E0D2", "text": "#1E4E42" },
+      "terracotta": { "bg": "#E59F91", "text": "#5E271D" }
     }
   },
 

@@ -710,13 +710,16 @@ export const StyledAgenda = styled.section`
     ${typeStyle("eyebrow")};
     color: var(--color-text-secondary-readable);
   }
+`;
+
+/** The part of the agenda that scrolls, so the rail itself never does. */
+export const StyledAgendaScroll = styled.div`
+  flex: 1 1;
+  min-height: 0;
+  overflow-y: auto;
+  ${StyledScrollbar};
 
   ul {
-    flex: 1 1;
-    min-height: 0;
-    overflow-y: auto;
-    ${StyledScrollbar};
-
     list-style: none;
     display: grid;
     align-content: start;
@@ -724,8 +727,24 @@ export const StyledAgenda = styled.section`
   }
 `;
 
+/** Time on the left, card on the right. */
+export const StyledAgendaRow = styled.li`
+  display: grid;
+  grid-template-columns: 6.4rem minmax(0, 1fr);
+  column-gap: var(--space-2);
+  align-items: start;
+`;
+
+export const StyledAgendaTime = styled.span`
+  padding-top: var(--space-1);
+
+  ${typeStyle("meta")};
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary-readable);
+`;
+
 /** components.agendaEvent: blue for Pomodoro entries, grey for stopwatch. */
-export const StyledAgendaEvent = styled.li<{ pomodoro: boolean }>`
+export const StyledAgendaEvent = styled.div<{ pomodoro: boolean }>`
   padding: var(--space-1) var(--space-2);
 
   display: flex;
@@ -757,6 +776,147 @@ export const StyledAgendaEvent = styled.li<{ pomodoro: boolean }>`
       p.pomodoro
         ? "var(--color-agenda-blue-text)"
         : "var(--color-text-secondary-readable)"};
+  }
+`;
+
+/** A Google Calendar event in its color theme; activating it offers focus. */
+export const StyledAgendaCard = styled.button<{
+  tone: "blue" | "sand" | "sage" | "mint" | "terracotta";
+}>`
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  text-align: left;
+  color: ${(p) => `var(--color-calendar-event-${p.tone}-text)`};
+  border: none;
+  border-radius: var(--component-agenda-event-radius);
+  background-color: ${(p) =>
+    `var(--color-calendar-event-${p.tone}-bg)`};
+  cursor: pointer;
+
+  transition: box-shadow var(--motion-duration-base)
+    var(--motion-easing-standard);
+
+  &:hover,
+  &[aria-expanded="true"] {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  ${focusRing};
+
+  strong {
+    ${typeStyle("body")};
+    font-weight: var(--font-weight-semibold);
+    overflow-wrap: anywhere;
+  }
+
+  span {
+    ${typeStyle("meta")};
+    font-variant-numeric: tabular-nums;
+  }
+`;
+
+export const StyledAgendaConfirm = styled.div`
+  margin-top: var(--space-1);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+
+  & > button {
+    width: auto;
+    height: var(--component-button-height-sm);
+  }
+`;
+
+/** Account + sync state (connected), or the slim connect link. */
+export const StyledAgendaMeta = styled.div`
+  margin-bottom: var(--space-2);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  ${typeStyle("meta")};
+  color: var(--color-text-secondary-readable);
+
+  & > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & > button {
+    margin-left: auto;
+    flex-shrink: 0;
+    ${typeStyle("meta")};
+  }
+
+  ${StyledAgendaScroll} & {
+    margin: var(--space-2) 0 0;
+  }
+`;
+
+/** Shown instead of the empty state until Google Calendar is connected. */
+export const StyledConnectCard = styled.div`
+  padding: var(--space-3);
+
+  display: grid;
+  gap: var(--space-2);
+
+  border-radius: var(--component-card-radius);
+  background-color: var(--component-card-bg);
+  box-shadow: var(--component-card-shadow);
+
+  & > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-brand-primary-readable);
+
+    svg {
+      width: var(--icon-size-md);
+      height: var(--icon-size-md);
+    }
+  }
+
+  h4 {
+    ${typeStyle("body")};
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  p {
+    ${typeStyle("meta")};
+    color: var(--color-text-secondary-readable);
+  }
+
+  .connect-actions {
+    display: flex;
+    gap: var(--space-2);
+
+    button {
+      width: auto;
+      height: var(--component-button-height-sm);
+    }
+
+    button:first-child {
+      border-radius: var(--radius-pill);
+    }
+  }
+
+  .connect-status:empty {
+    display: none;
+  }
+
+  .connect-status {
+    color: var(--color-status-danger-readable);
   }
 `;
 

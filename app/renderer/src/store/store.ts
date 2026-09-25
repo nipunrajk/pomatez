@@ -10,6 +10,7 @@ import updateReducer from "./update";
 import historyReducer from "./history";
 import entriesReducer from "./entries";
 import boardReducer from "./board";
+import calendarReducer from "./calendar";
 
 export type AppStateTypes = ReturnType<typeof store.getState>;
 export type AppDispatchTypes = typeof store.dispatch;
@@ -24,6 +25,7 @@ const store = configureStore({
     history: historyReducer,
     entries: entriesReducer,
     board: boardReducer,
+    calendar: calendarReducer,
   },
 });
 

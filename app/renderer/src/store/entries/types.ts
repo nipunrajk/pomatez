@@ -20,6 +20,8 @@ export type TimeEntry = {
   /** Epoch ms the current run started, or null when not running. */
   runningSince: number | null;
   createdAt: number;
+  /** Google Calendar event this entry was started from, if any. */
+  calendarEventId?: string;
 };
 
 export type EntriesState = {
@@ -31,7 +33,7 @@ export type EntriesState = {
 export type EntryDraft = Pick<
   TimeEntry,
   "title" | "tag" | "start" | "end" | "mode" | "date"
->;
+> & { calendarEventId?: string };
 
 export type EntryClockPayload = PayloadAction<{
   id: string;

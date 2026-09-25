@@ -23,6 +23,9 @@ import {
   SET_ENABLE_RPC,
   SET_ENABLE_ACTIVITY_TRACKING,
   ACTIVITY_SAMPLE,
+  GOOGLE_CALENDAR_EVENTS,
+  GOOGLE_CALENDAR_STATUS,
+  GOOGLE_CALENDAR_STATUS_REQUEST,
 } from "@pomatez/shareables";
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
@@ -30,8 +33,12 @@ import { TimerStatus } from "store/timer/types";
 import { TrayIconStyle } from "store/settings/types";
 import { padNum } from "utils";
 import {
+  CalendarEvent,
+  CalendarStatus,
   recordActivitySample,
   RecordActivitySamplePayload,
+  setCalendarEvents,
+  setCalendarStatus,
 } from "store";
 
 export const ElectronInvokeConnector: InvokeConnector = {
@@ -230,6 +237,22 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
         dispatch(recordActivitySample(sample));
       }
     );
+  }, [electron, dispatch]);
+
+  useEffect(() => {
+    electron.receive(
+      GOOGLE_CALENDAR_STATUS,
+      (status: CalendarStatus) => {
+        dispatch(setCalendarStatus(status));
+      }
+    );
+    electron.receive(
+      GOOGLE_CALENDAR_EVENTS,
+      (payload: { key: string; events: CalendarEvent[] }) => {
+        dispatch(setCalendarEvents(payload));
+      }
+    );
+    electron.send(GOOGLE_CALENDAR_STATUS_REQUEST);
   }, [electron, dispatch]);
 
   return (

@@ -87,7 +87,16 @@
     },
     "snap": {
       "category": "Utility"
-    }
+    },
+    "extraResources": [
+      {
+        "from": ".",
+        "to": ".",
+        "filter": [
+          "google-oauth.json"
+        ]
+      }
+    ]
   },
   "dependencies": {
     "@pomatez/shareables": "^1.0.0",

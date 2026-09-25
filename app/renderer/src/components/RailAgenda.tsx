@@ -2,17 +2,17 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "hooks/storeHooks";
 import { getDayKey } from "store/history/utils";
-import { EntryMode, TimeEntry } from "store/entries/types";
+import { TimeEntry } from "store/entries/types";
+import { useCalendarWeek } from "hooks/useCalendarWeek";
 import {
   StyledAgenda,
-  StyledAgendaEvent,
   StyledCalendarDay,
   StyledCalendarGrid,
   StyledCalendarHeader,
-  StyledCPEmpty,
   StyledRailCalendar,
   StyledRoundButton,
 } from "styles";
+import AgendaDay from "./AgendaDay";
 import SVG from "./SVG";
 
 const byStartThenCreated = (a: TimeEntry, b: TimeEntry) =>
@@ -30,7 +30,7 @@ const startOfWeek = (date: Date) =>
 const addDays = (date: Date, days: number) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 
-/** One-week strip (current week by default) + that day's time entries. */
+/** One-week strip (current week by default) + that day's agenda. */
 const RailAgenda: React.FC = () => {
   const { t, i18n } = useTranslation();
   const entries = useAppSelector((state) => state.entries.items);
@@ -45,16 +45,26 @@ const RailAgenda: React.FC = () => {
   );
   const weekEnd = days[6];
 
+  const { events: weekEvents, loading } = useCalendarWeek(weekStart);
+
   const daysWithEntries = useMemo(
-    () => new Set(entries.map((entry) => entry.date)),
-    [entries]
+    () =>
+      new Set([
+        ...entries.map((entry) => entry.date),
+        ...weekEvents.map((event) => event.date),
+      ]),
+    [entries, weekEvents]
   );
-  const agenda = useMemo(
+  const dayEntries = useMemo(
     () =>
       entries
         .filter((entry) => entry.date === selected)
         .sort(byStartThenCreated),
     [entries, selected]
+  );
+  const dayEvents = useMemo(
+    () => weekEvents.filter((event) => event.date === selected),
+    [weekEvents, selected]
   );
 
   // Keep the same weekday selected when paging weeks.
@@ -139,29 +149,13 @@ const RailAgenda: React.FC = () => {
       </StyledCalendarGrid>
 
       <StyledAgenda aria-label={t("controlPanel.agenda")}>
-        <h3>
-          {t("controlPanel.agenda")} · {selectedLabel}
-        </h3>
-        {agenda.length === 0 ? (
-          <StyledCPEmpty>{t("controlPanel.noAgenda")}</StyledCPEmpty>
-        ) : (
-          <ul>
-            {agenda.map((entry) => (
-              <StyledAgendaEvent
-                key={entry.id}
-                pomodoro={entry.mode === EntryMode.POMODORO}
-              >
-                <strong>{entry.title}</strong>
-                <span>
-                  {entry.start && entry.end
-                    ? `${entry.start}–${entry.end}`
-                    : t("controlPanel.unplanned")}
-                  {entry.tag && ` · ${entry.tag}`}
-                </span>
-              </StyledAgendaEvent>
-            ))}
-          </ul>
-        )}
+        <AgendaDay
+          day={selected}
+          label={selectedLabel}
+          entries={dayEntries}
+          events={dayEvents}
+          syncing={loading}
+        />
       </StyledAgenda>
     </StyledRailCalendar>
   );

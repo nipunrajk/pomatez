@@ -11,6 +11,8 @@ type StoreProps = {
   openAtLogin?: boolean;
   /** Mirrors the renderer's layout so the window opens at the right size. */
   layout?: AppLayoutName;
+  /** Google Calendar OAuth tokens, encrypted with safeStorage (base64). */
+  googleCalendar?: string;
 };
 
 /**
@@ -43,6 +45,18 @@ class SafeStore<
    * Safely get a value from the store and catch errors
    * @param key
    */
+  /**
+   * Safely remove a value from the store and catch errors
+   * @param key
+   */
+  safeDelete<Key extends keyof T>(key: Key) {
+    try {
+      this.store.delete(key);
+    } catch (error) {
+      console.error("[Store] Safe Delete", error);
+    }
+  }
+
   safeGet<Key extends keyof T>(key: Key): T[Key] | undefined {
     try {
       return this.store.get(key);

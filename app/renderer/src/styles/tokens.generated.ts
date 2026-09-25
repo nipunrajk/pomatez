@@ -71,6 +71,16 @@ export const modulaTokens = `
   --color-agenda-red-bg: #C08570;
   --color-agenda-red-text: #FFFFFF;
   --color-agenda-red-subtext: rgba(255,255,255,0.70);
+  --color-calendar-event-blue-bg: #3A6594;
+  --color-calendar-event-blue-text: #FFFFFF;
+  --color-calendar-event-sand-bg: #F2E3D0;
+  --color-calendar-event-sand-text: #5C4430;
+  --color-calendar-event-sage-bg: #DEE8DD;
+  --color-calendar-event-sage-text: #384C37;
+  --color-calendar-event-mint-bg: #A8E0D2;
+  --color-calendar-event-mint-text: #1E4E42;
+  --color-calendar-event-terracotta-bg: #E59F91;
+  --color-calendar-event-terracotta-text: #5E271D;
   --color-brand-primary-rgb: 70, 115, 166;
   --color-brand-primary-hover-rgb: 61, 102, 150;
   --color-brand-primary-active-rgb: 53, 90, 133;
@@ -133,6 +143,16 @@ export const modulaTokens = `
   --color-agenda-green-text-rgb: 255, 255, 255;
   --color-agenda-red-bg-rgb: 192, 133, 112;
   --color-agenda-red-text-rgb: 255, 255, 255;
+  --color-calendar-event-blue-bg-rgb: 58, 101, 148;
+  --color-calendar-event-blue-text-rgb: 255, 255, 255;
+  --color-calendar-event-sand-bg-rgb: 242, 227, 208;
+  --color-calendar-event-sand-text-rgb: 92, 68, 48;
+  --color-calendar-event-sage-bg-rgb: 222, 232, 221;
+  --color-calendar-event-sage-text-rgb: 56, 76, 55;
+  --color-calendar-event-mint-bg-rgb: 168, 224, 210;
+  --color-calendar-event-mint-text-rgb: 30, 78, 66;
+  --color-calendar-event-terracotta-bg-rgb: 229, 159, 145;
+  --color-calendar-event-terracotta-text-rgb: 94, 39, 29;
   /* typography */
   --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

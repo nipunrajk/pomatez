@@ -8,6 +8,7 @@ import {
   shell,
   nativeImage,
   dialog,
+  safeStorage,
 } from "electron";
 import debounce from "lodash.debounce";
 import notifier from "node-notifier";
@@ -27,6 +28,13 @@ import {
   SET_OPEN_AT_LOGIN,
   SET_ENABLE_RPC,
   SET_ENABLE_ACTIVITY_TRACKING,
+  GOOGLE_CALENDAR_CONNECT,
+  GOOGLE_CALENDAR_CANCEL,
+  GOOGLE_CALENDAR_DISCONNECT,
+  GOOGLE_CALENDAR_FETCH,
+  GOOGLE_CALENDAR_STATUS_REQUEST,
+  GOOGLE_CALENDAR_STATUS,
+  GOOGLE_CALENDAR_EVENTS,
 } from "@pomatez/shareables";
 import {
   activateGlobalShortcuts,
@@ -51,6 +59,7 @@ import {
   FullscreenState,
   setFullscreenBreakHandler,
 } from "./lifecycleEventHandlers/fullScreenBreak";
+import { createGoogleCalendar } from "./helpers/googleCalendar";
 import WindowsToaster from "node-notifier/notifiers/toaster";
 import NotificationCenter from "node-notifier/notifiers/notificationcenter";
 
@@ -593,6 +602,62 @@ ipcMain.on(
 ipcMain.on(TRAY_TITLE_UPDATE, (e, title) => {
   tray?.setTitle(title || "");
 });
+
+const GOOGLE_OAUTH_FILE = "google-oauth.json";
+
+const googleCalendar = createGoogleCalendar({
+  configPaths: () => [
+    path.join(app.getPath("userData"), GOOGLE_OAUTH_FILE),
+    onProduction
+      ? path.join(process.resourcesPath, GOOGLE_OAUTH_FILE)
+      : path.join(app.getAppPath(), GOOGLE_OAUTH_FILE),
+  ],
+  openExternal: (url) => shell.openExternal(url),
+  encryptionAvailable: () => safeStorage.isEncryptionAvailable(),
+  encrypt: (plain) =>
+    safeStorage.encryptString(plain).toString("base64"),
+  decrypt: (cipher) =>
+    safeStorage.decryptString(Buffer.from(cipher, "base64")),
+  readSecret: () => store.safeGet("googleCalendar"),
+  writeSecret: (cipher) => store.safeSet("googleCalendar", cipher),
+  clearSecret: () => store.safeDelete("googleCalendar"),
+  onStatus: (status) =>
+    win?.webContents.send(GOOGLE_CALENDAR_STATUS, status),
+  onEvents: (key, events) =>
+    win?.webContents.send(GOOGLE_CALENDAR_EVENTS, { key, events }),
+});
+
+ipcMain.on(GOOGLE_CALENDAR_STATUS_REQUEST, () => {
+  googleCalendar.emitStatus();
+});
+
+ipcMain.on(GOOGLE_CALENDAR_CONNECT, () => {
+  googleCalendar.connect().catch((error) => {
+    console.error("[GoogleCalendar] Connect failed", error);
+  });
+});
+
+ipcMain.on(GOOGLE_CALENDAR_CANCEL, () => {
+  googleCalendar.cancel();
+});
+
+ipcMain.on(GOOGLE_CALENDAR_DISCONNECT, () => {
+  googleCalendar.disconnect();
+});
+
+ipcMain.on(
+  GOOGLE_CALENDAR_FETCH,
+  (e, { key, timeMin, timeMax }: Record<string, unknown>) => {
+    if (
+      typeof key !== "string" ||
+      typeof timeMin !== "string" ||
+      typeof timeMax !== "string"
+    ) {
+      return;
+    }
+    googleCalendar.fetchRange(key, timeMin, timeMax);
+  }
+);
 
 ipcMain.on(SET_ENABLE_ACTIVITY_TRACKING, (e, { enable }) => {
   if (enable) {

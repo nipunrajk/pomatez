@@ -22,3 +22,6 @@ yarn-error.log*
 *.iml
 /lerna-debug.log
 /release/
+
+# Google OAuth client for calendar sync (see google-oauth.example.json)
+app/electron/google-oauth.json
