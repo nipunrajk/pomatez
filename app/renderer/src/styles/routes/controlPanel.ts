@@ -7,8 +7,9 @@ export const StyledControlPanel = styled.main`
   min-height: 0;
   width: 100%;
 
-  padding: var(--layout-dashboard-content-padding-y)
-    var(--layout-dashboard-content-padding-x);
+  /* Top padding matches the compact right rail so both headers align. */
+  padding: var(--space-6) var(--layout-dashboard-content-padding-x)
+    var(--layout-dashboard-content-padding-y);
 
   overflow: hidden auto;
   ${StyledScrollbar};
@@ -946,6 +947,8 @@ export const StyledDialHeader = styled.header`
   justify-content: space-between;
   gap: var(--space-4);
 
+  /* Same metrics as StyledCPSectionHeader (title + eyebrow subtitle), so
+     the two headers and their rules line up across the page. */
   padding-bottom: var(--space-3);
   border-bottom: var(--component-section-header-divider-width) solid
     var(--component-section-header-divider);
@@ -953,6 +956,101 @@ export const StyledDialHeader = styled.header`
   h3 {
     ${typeStyle("section-title")};
     color: var(--color-text-heading);
+  }
+
+  p {
+    margin-top: var(--space-1);
+    ${typeStyle("eyebrow")};
+    color: var(--color-text-secondary-readable);
+  }
+`;
+
+/** Anchors the round popover under its badge. */
+export const StyledRoundSetup = styled.div`
+  position: relative;
+  flex-shrink: 0;
+`;
+
+/** components.countPill, as a button that opens the round setup. */
+export const StyledRoundBadge = styled.button`
+  height: var(--component-count-pill-height);
+  padding: 0 var(--component-count-pill-padding-x);
+
+  display: inline-flex;
+  align-items: center;
+
+  ${typeStyle("meta")};
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-tertiary-readable);
+
+  border: var(--border-width-hairline) solid transparent;
+  border-radius: var(--component-count-pill-radius);
+  background-color: var(--component-count-pill-bg);
+  cursor: pointer;
+
+  transition: ${themes.transition};
+
+  &:hover,
+  &[aria-expanded="true"] {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
+  }
+
+  ${focusRing};
+`;
+
+export const StyledRoundPopover = styled.div`
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 10;
+
+  width: 28rem;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+
+  display: grid;
+  gap: var(--space-3);
+
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background-surface);
+  box-shadow: var(--shadow-floating);
+
+  h4 {
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-width-hairline) solid
+      var(--color-border-soft);
+
+    ${typeStyle("eyebrow")};
+    color: var(--color-text-secondary-readable);
+  }
+`;
+
+/** Label, then [-] value [+]. */
+export const StyledRoundStepper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+
+  & > span {
+    ${typeStyle("body")};
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+
+  & > div {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  output {
+    min-width: 2ch;
+    text-align: center;
+    ${typeStyle("body")};
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
   }
 `;
 

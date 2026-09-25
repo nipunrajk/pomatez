@@ -120,10 +120,11 @@ export const StyledDashboardContent = styled.div`
   background-color: var(--layout-dashboard-content-bg);
 `;
 
-/** Persistent Timer widget shown on every dashboard page (RightRail.tsx). */
 /**
- * `compact` (Control Panel): tighter spacing and a fixed height; the
- * agenda inside scrolls instead of the rail.
+ * Persistent Timer widget shown on every dashboard page (RightRail.tsx).
+ * `compact` (Workspace): no divider, so board and rail read as one page;
+ * top padding matches StyledControlPanel so both headers line up; fixed
+ * height, where only the agenda scrolls.
  */
 export const StyledRightRail = styled.aside<{ compact?: boolean }>`
   flex: 0 0 var(--layout-dashboard-right-rail-width);
@@ -144,9 +145,10 @@ export const StyledRightRail = styled.aside<{ compact?: boolean }>`
     p.compact &&
     css`
       gap: var(--space-3);
-      padding: var(--space-4)
-        var(--layout-dashboard-right-rail-padding-x);
+      padding: var(--space-6)
+        var(--layout-dashboard-right-rail-padding-x) var(--space-4);
       overflow: hidden;
+      border-left: none;
     `}
 `;
 

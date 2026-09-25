@@ -7,7 +7,6 @@ import { setLongBreak, setShorBreak, setStayFocus } from "store";
 import { TimerStatus } from "store/timer/types";
 import { getTimerPhaseLabelKey } from "routes/Timer/timerPhaseLabel";
 import {
-  StyledCountPill,
   StyledDialActions,
   StyledDialHeader,
   StyledDialReadout,
@@ -16,6 +15,7 @@ import {
   StyledRoundButton,
 } from "styles";
 import { timerColor } from "styles/mixins";
+import RoundSetup from "./RoundSetup";
 import SVG from "./SVG";
 
 // Dial geometry (SVG units): the top of a disc, flat-clipped at the bottom.
@@ -57,7 +57,7 @@ const PomodoroDial: React.FC = () => {
   const dispatch = useAppDispatch();
   const { count, duration, timerType, resetTimerAction } =
     useContext(CounterContext);
-  const { playing, round } = useAppSelector((state) => state.timer);
+  const playing = useAppSelector((state) => state.timer.playing);
   const config = useAppSelector((state) => state.config);
   const { warn, onPlay, onReset, onSkip } =
     useTimerControls(resetTimerAction);
@@ -95,13 +95,11 @@ const PomodoroDial: React.FC = () => {
   return (
     <StyledPomodoroDial accent={timerColor(timerType, true)}>
       <StyledDialHeader>
-        <h3>{t("controlPanel.pomodoroTimer")}</h3>
-        <StyledCountPill>
-          {t("controlPanel.round", {
-            round,
-            total: config.sessionRounds,
-          })}
-        </StyledCountPill>
+        <div>
+          <h3>{t("controlPanel.pomodoroTimer")}</h3>
+          <p>{phaseLabel}</p>
+        </div>
+        <RoundSetup />
       </StyledDialHeader>
 
       <StyledDialReadout>
