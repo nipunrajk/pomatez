@@ -129,6 +129,7 @@ export const es = {
     minimizeToTray: "Minimizar a la bandeja",
     closeToTray: "Cerrar a la bandeja",
     showTimerInTrayBar: "Mostrar temporizador en la barra de menú",
+    showNotchIsland: "Mostrar temporizador en el notch",
     enableUsageTracking: "Rastrear uso de apps y sitios web",
     voiceAssistance: "Asistencia de voz",
     openAtLogin: "Abrir al iniciar",

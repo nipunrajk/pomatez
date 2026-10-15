@@ -26,6 +26,10 @@ export type BoardCard = {
   priority?: BoardPriority;
   /** Estimated Pomodoros. */
   estimate?: number;
+  /** Project Milestone (Task List list) this card belongs to. */
+  taskListId?: string;
+  /** The milestone subtask (Task List card) it was sent from, if any. */
+  taskCardId?: string;
   createdAt: number;
 };
 

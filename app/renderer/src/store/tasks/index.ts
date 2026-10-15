@@ -36,6 +36,21 @@ const tasksSlice = createSlice({
       return [...state, taskList];
     },
 
+    /** A new list with its milestone details, as one undoable step. */
+    addMilestone: (
+      state,
+      action: PayloadAction<{ title: string } & MilestoneDetails>
+    ) => {
+      const { title, ...details } = action.payload;
+      // Same conventions as addTaskList: upper-case title, and the first
+      // list becomes the priority list.
+      const list = createTaskList({
+        title: title.trim().toUpperCase(),
+        priority: state.length === 0,
+      });
+      state.push({ ...list, ...details });
+    },
+
     setTaskListDetails: (
       state,
       action: PayloadAction<{ listId: string } & MilestoneDetails>
@@ -302,6 +317,7 @@ const tasksSlice = createSlice({
 export const {
   addTaskCard,
   addTaskList,
+  addMilestone,
   dragList,
   editTaskCard,
   editTaskCardText,

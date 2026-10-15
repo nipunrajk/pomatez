@@ -1,52 +1,36 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { getFromStorage, saveToStorage } from "utils";
+import React from "react";
 import { StyledSettings, StyledSettingsTileRow } from "styles";
-import { Alert } from "components";
 
 import FeatureSection from "./FeatureSection";
 import LayoutSection from "./LayoutSection";
 import TrayIconSection from "./TrayIconSection";
 import LanguageSection from "./LanguageSection";
 import HelpSection from "./HelpSection";
+import DataSection from "./DataSection";
+import ObsidianSection from "./ObsidianSection";
 import ShortcutSection from "./ShortcutSection";
-import StickySection from "./StickySection";
 import SettingHeader from "./SettingHeader";
 import { useAppSelector } from "hooks/storeHooks";
 import { Updater } from "../../components";
 
 export default function Settings() {
-  const { t } = useTranslation();
-  const alertState = getFromStorage("alert") || null;
-
   const update = useAppSelector((state) => state.update);
-
-  const [alert, setAlert] = useState(alertState);
 
   return update.updateBody ? (
     <Updater />
   ) : (
     <StyledSettings>
       <SettingHeader />
-      {alert === null && (
-        <Alert
-          heading={t("settings.alertHeading")}
-          body={t("settings.alertBody")}
-          onClose={() => {
-            saveToStorage("alert", "hide");
-            setAlert("hide");
-          }}
-        />
-      )}
       <StyledSettingsTileRow>
         <LayoutSection />
         <LanguageSection />
         <TrayIconSection />
       </StyledSettingsTileRow>
       <FeatureSection />
+      <DataSection />
+      <ObsidianSection />
       <ShortcutSection />
       <HelpSection />
-      <StickySection />
     </StyledSettings>
   );
 }

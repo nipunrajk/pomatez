@@ -273,8 +273,8 @@
     "dashboard": {
       "minWidth": "1100px",
       "sidebar": {
-        "width": "290px",
-        "collapsedWidth": "72px",
+        "width": "210px",
+        "collapsedWidth": "68px",
         "bg": "background.sidebar",
         "paddingX": "14px",
         "brandHeight": "88px",

@@ -7,6 +7,7 @@ import {
   Bell,
   CalendarDays,
   ChartNoAxesColumn,
+  Check,
   ChevronDown,
   CircleAlert,
   Clock,
@@ -84,7 +85,8 @@ export type SVGTypes = {
     | "minus"
     | "arrow-left"
     | "arrow-right"
-    | "globe";
+    | "globe"
+    | "check";
 };
 
 const ICONS: Record<
@@ -129,6 +131,7 @@ const ICONS: Record<
   "arrow-left": ArrowLeft,
   "arrow-right": ArrowRight,
   globe: Globe,
+  check: Check,
 };
 
 /**

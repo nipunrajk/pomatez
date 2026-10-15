@@ -4,13 +4,14 @@ import { focusRing, typeStyle } from "styles/mixins";
 
 /** layout.dashboard.header, spanning the content column and right rail. */
 export const StyledTopBar = styled.header`
-  flex: 0 0 var(--layout-dashboard-header-height);
+  /* Compact: 52px, so the board and milestones fit a 760px window. */
+  flex: 0 0 5.2rem;
 
   display: flex;
   align-items: center;
-  gap: var(--space-6);
+  gap: var(--space-4);
 
-  padding: 0 var(--layout-dashboard-header-padding-x);
+  padding: 0 var(--space-5);
 
   background-color: var(--layout-dashboard-header-bg);
   border-bottom: var(--border-width-hairline) solid
@@ -18,7 +19,7 @@ export const StyledTopBar = styled.header`
 
   h2 {
     flex-shrink: 0;
-    ${typeStyle("page-title")};
+    ${typeStyle("card-title")};
     color: var(--color-text-heading);
     white-space: nowrap;
   }
@@ -47,7 +48,7 @@ export const StyledTopBarSearch = styled.label`
 
   & > input {
     width: 100%;
-    height: var(--component-input-height);
+    height: 3.6rem;
     padding: 0 calc(var(--space-12) + var(--space-4)) 0
       calc(
         var(--component-input-padding-x) + var(--icon-size-sm) +
@@ -107,6 +108,7 @@ export const StyledTopBarActions = styled.div`
 
   & > button:first-child {
     width: auto;
+    height: 3.6rem;
   }
 `;
 
@@ -114,8 +116,8 @@ export const StyledTopBarActions = styled.div`
 export const StyledTopBarIconButton = styled.button`
   position: relative;
 
-  width: var(--component-button-icon-size);
-  height: var(--component-button-icon-size);
+  width: 3.6rem;
+  height: 3.6rem;
 
   display: flex;
   align-items: center;
@@ -157,8 +159,8 @@ export const StyledTopBarDot = styled.span`
 `;
 
 export const StyledTopBarAvatar = styled.div`
-  width: var(--component-avatar-lg);
-  height: var(--component-avatar-lg);
+  width: 3.2rem;
+  height: 3.2rem;
 
   display: flex;
   align-items: center;

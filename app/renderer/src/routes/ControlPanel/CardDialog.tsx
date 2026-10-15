@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { useModalDialog } from "hooks/useModalDialog";
+import { useBoardMilestoneSync } from "hooks/useBoardMilestoneSync";
 import {
   addBoardCard,
   BOARD_COLUMNS,
@@ -47,15 +48,23 @@ const parseTags = (value: string) =>
     )
   );
 
-/** Create or edit a Project Board card in a modal dialog. */
+/** Create or edit a Task Board card in a modal dialog. */
 const CardDialog: React.FC<Props> = ({ target, onClose }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const columns = useAppSelector((state) => state.board.columns);
+  const milestones = useAppSelector((state) => state.tasks.present);
+  const { syncSubtask } = useBoardMilestoneSync();
   const dialogRef = useModalDialog(!!target);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
+  /** A milestone's list id, or "" for a custom category. */
+  const [rawProjectId, setProjectId] = useState("");
+  // A card whose milestone was deleted falls back to its custom category.
+  const projectId = milestones.some((l) => l._id === rawProjectId)
+    ? rawProjectId
+    : "";
   const [tags, setTags] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [column, setColumn] = useState<BoardColumnId>("pending");
@@ -71,6 +80,7 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
     const card = target.mode === "edit" ? target.card : null;
     setTitle(card?.title ?? "");
     setCategory(card?.category ?? "");
+    setProjectId(card?.taskListId ?? "");
     setTags(card?.tags.join(", ") ?? "");
     setDueDate(card?.dueDate ?? "");
     setNotes(card?.document ?? "");
@@ -97,9 +107,18 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
         ?.focus();
       return;
     }
+    const milestone = milestones.find((l) => l._id === projectId);
+    const previous = target?.mode === "edit" ? target.card : null;
     const draft = {
       title: trimmed,
-      category: category.trim(),
+      // A linked card shows its milestone's name as its category.
+      category: milestone ? milestone.title : category.trim(),
+      taskListId: milestone?._id,
+      // Moving the card to another milestone unlinks it from its subtask.
+      taskCardId:
+        previous?.taskListId === milestone?._id
+          ? previous?.taskCardId
+          : undefined,
       tags: parseTags(tags),
       dueDate,
       document: notes.trim(),
@@ -114,6 +133,7 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
       dispatch(
         updateBoardCard({ id: target.card.id, changes: draft, column })
       );
+      syncSubtask({ ...target.card, ...draft }, target.column, column);
     } else {
       dispatch(addBoardCard(draft, column));
     }
@@ -169,19 +189,39 @@ const CardDialog: React.FC<Props> = ({ target, onClose }) => {
           )}
         </label>
 
-        <label>
-          {t("controlPanel.fieldCategory")}
-          <StyledInput
-            value={category}
-            list="card-categories"
-            onChange={(e) => setCategory(e.target.value)}
-          />
-          <datalist id="card-categories">
-            {categories.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
-        </label>
+        <div className="field-stack">
+          <label>
+            {t("controlPanel.fieldProject")}
+            <StyledSelectWrapper>
+              <StyledSelect
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+              >
+                <option value="">{t("controlPanel.customCategory")}</option>
+                {milestones.map((l) => (
+                  <option key={l._id} value={l._id}>
+                    {l.title}
+                  </option>
+                ))}
+              </StyledSelect>
+            </StyledSelectWrapper>
+          </label>
+          {!projectId && (
+            <label>
+              {t("controlPanel.fieldCategory")}
+              <StyledInput
+                value={category}
+                list="card-categories"
+                onChange={(e) => setCategory(e.target.value)}
+              />
+              <datalist id="card-categories">
+                {categories.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+            </label>
+          )}
+        </div>
 
         <label>
           {t("controlPanel.fieldColumn")}

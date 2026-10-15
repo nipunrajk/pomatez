@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { useModalDialog } from "hooks/useModalDialog";
 import {
+  addMilestone,
   MILESTONE_STATUSES,
   MilestoneStatus,
   setTaskListDetails,
@@ -19,28 +20,42 @@ import {
   StyledSelectWrapper,
 } from "styles";
 
+export type MilestoneDialogTarget =
+  | { mode: "create" }
+  | { mode: "edit"; list: TaskList };
+
 type Props = {
-  list: TaskList | null;
+  target: MilestoneDialogTarget | null;
   onClose: () => void;
 };
 
-/** Edit a Task List list's milestone details: category, status, deadline. */
-const MilestoneDialog: React.FC<Props> = ({ list, onClose }) => {
+/**
+ * Create a milestone (a new Task List list) or edit one's details:
+ * category, status and deadline.
+ */
+const MilestoneDialog: React.FC<Props> = ({ target, onClose }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const lists = useAppSelector((state) => state.tasks.present);
-  const dialogRef = useModalDialog(!!list);
+  const dialogRef = useModalDialog(!!target);
+  const list = target?.mode === "edit" ? target.list : null;
+  const creating = target?.mode === "create";
 
+  const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState(false);
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState<MilestoneStatus>("ongoing");
   const [deadline, setDeadline] = useState("");
 
   useEffect(() => {
-    if (!list) return;
-    setCategory(list.category ?? "");
-    setStatus(list.status ?? "ongoing");
-    setDeadline(list.deadline ?? "");
-  }, [list]);
+    if (!target) return;
+    const current = target.mode === "edit" ? target.list : null;
+    setTitle("");
+    setTitleError(false);
+    setCategory(current?.category ?? "");
+    setStatus(current?.status ?? "ongoing");
+    setDeadline(current?.deadline ?? "");
+  }, [target]);
 
   const categories = Array.from(
     new Set(lists.map((l) => l.category).filter(Boolean))
@@ -48,15 +63,23 @@ const MilestoneDialog: React.FC<Props> = ({ list, onClose }) => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!list) return;
-    dispatch(
-      setTaskListDetails({
-        listId: list._id,
-        category: category.trim() || undefined,
-        status,
-        deadline: deadline || undefined,
-      })
-    );
+    const details = {
+      category: category.trim() || undefined,
+      status,
+      deadline: deadline || undefined,
+    };
+    if (creating) {
+      if (!title.trim()) {
+        setTitleError(true);
+        (e.currentTarget as HTMLFormElement)
+          .querySelector<HTMLInputElement>("#milestone-title")
+          ?.focus();
+        return;
+      }
+      dispatch(addMilestone({ title, ...details }));
+    } else if (list) {
+      dispatch(setTaskListDetails({ listId: list._id, ...details }));
+    }
     onClose();
   };
 
@@ -71,10 +94,36 @@ const MilestoneDialog: React.FC<Props> = ({ list, onClose }) => {
     >
       <StyledCardForm onSubmit={onSubmit} noValidate>
         <h2 id="milestone-dialog-title">
-          {t("controlPanel.milestoneDetailsFor", {
-            title: list?.title ?? "",
-          })}
+          {creating
+            ? t("controlPanel.newMilestone")
+            : t("controlPanel.milestoneDetailsFor", {
+                title: list?.title ?? "",
+              })}
         </h2>
+
+        {creating && (
+          <label className="wide">
+            {t("controlPanel.fieldTitle")}
+            <StyledInput
+              id="milestone-title"
+              value={title}
+              required
+              aria-invalid={titleError}
+              aria-describedby={
+                titleError ? "milestone-title-error" : undefined
+              }
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (titleError) setTitleError(false);
+              }}
+            />
+            {titleError && (
+              <span id="milestone-title-error" className="form-error">
+                {t("controlPanel.milestoneTitleRequired")}
+              </span>
+            )}
+          </label>
+        )}
 
         <label className="wide">
           {t("controlPanel.fieldCategory")}
@@ -123,7 +172,9 @@ const MilestoneDialog: React.FC<Props> = ({ list, onClose }) => {
               {t("controlPanel.cancel")}
             </StyledButtonNormal>
             <StyledButtonPrimary type="submit">
-              {t("controlPanel.save")}
+              {t(
+                creating ? "controlPanel.createMilestone" : "controlPanel.save"
+              )}
             </StyledButtonPrimary>
           </div>
         </div>

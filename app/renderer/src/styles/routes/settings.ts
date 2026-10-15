@@ -9,6 +9,7 @@ export const StyledSettings = styled.main`
 
   padding-left: 2rem;
   padding-right: 1.4rem;
+  padding-bottom: 3rem;
 
   flex: 1 1;
 
@@ -123,4 +124,207 @@ export const StyledSectionSticky = styled.div`
 
   padding-top: 2rem;
   padding-bottom: 2rem;
+`;
+
+/** Settings → Data: export / import a backup file. */
+export const StyledDataSection = styled.div`
+  display: grid;
+  gap: var(--space-3);
+
+  p {
+    ${typeStyle("meta")};
+    color: var(--color-text-secondary-readable);
+  }
+
+  .data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+
+    /* Pills are full-width by default; here they sit side by side. */
+    & > button {
+      width: auto;
+      padding: 0 var(--space-5);
+    }
+  }
+
+  .data-error {
+    ${typeStyle("meta")};
+    color: var(--color-status-danger-readable);
+  }
+
+  /* Confirmation before an import replaces everything. */
+  .data-confirm {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+
+    border-radius: var(--radius-md);
+    border: var(--border-width-hairline) solid
+      var(--color-border-strong);
+    background-color: var(--color-background-surface-sunken);
+
+    p {
+      color: var(--color-text-primary);
+    }
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+`;
+
+/** Settings → Obsidian: vault, folder, note templates and export. */
+export const StyledObsidianSection = styled(StyledDataSection)`
+  gap: var(--space-4);
+
+  .field {
+    display: grid;
+    gap: var(--space-2);
+
+    & > span:first-child,
+    & > legend {
+      ${typeStyle("body")};
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+  }
+
+  fieldset.field {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .vault {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+
+    code {
+      flex: 1 1 20rem;
+      min-width: 0;
+      padding: var(--space-2) var(--space-3);
+
+      font: 1.3rem / 1.4 var(--font-mono);
+      color: var(--color-text-primary);
+      overflow-wrap: anywhere;
+
+      border-radius: var(--radius-md);
+      background-color: var(--color-background-surface-sunken);
+    }
+
+    & > button {
+      width: auto;
+      padding: 0 var(--space-5);
+    }
+  }
+
+  .hint {
+    ${typeStyle("meta")};
+    color: var(--color-text-secondary-readable);
+
+    code {
+      font-family: var(--font-mono);
+    }
+  }
+
+  .warn {
+    ${typeStyle("meta")};
+    color: var(--color-warning-text-readable);
+  }
+
+  /* Milestone note / Day note switch. */
+  .template-kinds {
+    display: flex;
+    gap: var(--space-2);
+
+    & > button {
+      width: auto;
+      padding: 0 var(--space-4);
+    }
+
+    & > button[aria-pressed="true"] {
+      color: var(--component-button-primary-text);
+      border-color: transparent;
+      background-color: var(--component-button-primary-bg);
+    }
+  }
+
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+
+    @media (max-width: 900px) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  textarea,
+  pre {
+    height: 30rem;
+    margin: 0;
+    font: 1.25rem / 1.5 var(--font-mono);
+    tab-size: 2;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  pre {
+    padding: var(--space-3) var(--component-input-padding-x);
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    color: var(--color-text-primary);
+    border-radius: var(--component-input-radius);
+    border: var(--border-width-hairline) dashed
+      var(--color-border-strong);
+    ${StyledScrollbar};
+  }
+
+  .template-caption {
+    min-height: var(--component-button-height-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+
+    & > label,
+    & > span {
+      white-space: nowrap;
+    }
+
+    & > button {
+      width: auto;
+      height: var(--component-button-height-sm);
+      padding: 0;
+    }
+
+    ${typeStyle("meta")};
+    color: var(--color-text-secondary-readable);
+
+    code {
+      font-family: var(--font-mono);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .data-actions > button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .result {
+    ${typeStyle("meta")};
+    color: var(--color-text-primary);
+  }
+
+  .result[data-tone="error"] {
+    color: var(--color-status-danger-readable);
+  }
 `;

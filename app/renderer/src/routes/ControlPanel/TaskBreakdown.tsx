@@ -1,19 +1,20 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Checkbox, SVG } from "components";
-import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
+import { useAppSelector } from "hooks/storeHooks";
+import { useBoardMilestoneSync } from "hooks/useBoardMilestoneSync";
 import { useNow } from "hooks/useNow";
 import { useStartFocus } from "hooks/useStartFocus";
 import {
+  BOARD_COLUMNS,
   MilestoneStatus,
-  setTaskCardDone,
-  setTaskCardNotDone,
-  TaskList,
 } from "store";
 import { getDayKey } from "store/history/utils";
 import {
+  StyledButtonSecondary,
   StyledCardFocus,
+  StyledCPHeaderControls,
   StyledCPEmpty,
   StyledCPLink,
   StyledCPSection,
@@ -27,8 +28,9 @@ import {
   StyledStatusTag,
   StyledSubtask,
   StyledSubtaskList,
+  StyledToast,
 } from "styles";
-import MilestoneDialog from "./MilestoneDialog";
+import MilestoneDialog, { MilestoneDialogTarget } from "./MilestoneDialog";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -39,34 +41,69 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const TaskBreakdown: React.FC = () => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
-  const dispatch = useAppDispatch();
+  const board = useAppSelector((state) => state.board);
+  const { setSubtaskDone, sendToBoard, boardCardFor } =
+    useBoardMilestoneSync();
   const lists = useAppSelector((state) => state.tasks.present);
   const entries = useAppSelector((state) => state.entries.items);
   const activeId = useAppSelector((state) => state.entries.activeId);
   const playing = useAppSelector((state) => state.timer.playing);
   const startLinkedFocus = useStartFocus();
   const [openIds, setOpenIds] = useState<string[]>([]);
-  const [editing, setEditing] = useState<TaskList | null>(null);
-  const closeDialog = useCallback(() => setEditing(null), []);
+  const [dialog, setDialog] = useState<MilestoneDialogTarget | null>(
+    null
+  );
+  const closeDialog = useCallback(() => setDialog(null), []);
+  const [toast, setToast] = useState("");
+  const [justSent, setJustSent] = useState<string | null>(null);
+
+  // The send button becomes "On board": keep keyboard focus on it.
+  useEffect(() => {
+    if (!justSent) return;
+    document.getElementById(`on-board-${justSent}`)?.focus();
+    setJustSent(null);
+  }, [justSent]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timeout = setTimeout(() => setToast(""), 3000);
+    return () => clearTimeout(timeout);
+  }, [toast]);
+
+  const showOnBoard = (boardCardId: string) => {
+    const el = document.querySelector<HTMLElement>(
+      `[data-rbd-draggable-id="${CSS.escape(boardCardId)}"]`
+    );
+    el?.scrollIntoView({ block: "center", inline: "nearest" });
+    el?.focus();
+  };
 
   const linkedRunning = entries.some(
     (e) => e.taskListId && e.runningSince !== null
   );
   const now = useNow(linkedRunning);
 
+  // Focus time per milestone: entries started from one of its subtasks,
+  // or from a board card linked to it (even if linked afterwards).
   const loggedMs = useMemo(() => {
+    const cardList: Record<string, string> = {};
+    BOARD_COLUMNS.forEach((column) =>
+      board.columns[column].forEach((card) => {
+        if (card.taskListId) cardList[card.id] = card.taskListId;
+      })
+    );
     const byList: Record<string, number> = {};
     entries.forEach((e) => {
-      if (!e.taskListId) return;
+      const listId =
+        e.taskListId || (e.boardCardId && cardList[e.boardCardId]);
+      if (!listId) return;
       const running =
         e.runningSince !== null ? now - e.runningSince : 0;
-      byList[e.taskListId] =
-        (byList[e.taskListId] || 0) +
-        e.trackedMs +
-        Math.max(0, running);
+      byList[listId] =
+        (byList[listId] || 0) + e.trackedMs + Math.max(0, running);
     });
     return byList;
-  }, [entries, now]);
+  }, [entries, board, now]);
 
   const counts = lists.reduce(
     (acc, list) => {
@@ -112,7 +149,7 @@ const TaskBreakdown: React.FC = () => {
     });
 
   return (
-    <StyledCPSection aria-labelledby="task-breakdown-title">
+    <StyledCPSection $fill aria-labelledby="task-breakdown-title">
       <StyledCPSectionHeader>
         <div>
           <h3 id="task-breakdown-title">
@@ -127,10 +164,21 @@ const TaskBreakdown: React.FC = () => {
             )}
           </p>
         </div>
-        <StyledCPLink onClick={() => history.push("/task-list")}>
-          {t("controlPanel.seeEverything")}
-          <SVG name="arrow-up-right" />
-        </StyledCPLink>
+        <StyledCPHeaderControls>
+          <StyledButtonSecondary
+            onClick={(e) => {
+              e.currentTarget.focus();
+              setDialog({ mode: "create" });
+            }}
+          >
+            <SVG name="add" />
+            {t("controlPanel.newMilestone")}
+          </StyledButtonSecondary>
+          <StyledCPLink onClick={() => history.push("/task-list")}>
+            {t("controlPanel.seeEverything")}
+            <SVG name="arrow-up-right" />
+          </StyledCPLink>
+        </StyledCPHeaderControls>
       </StyledCPSectionHeader>
 
       {lists.length === 0 ? (
@@ -183,12 +231,13 @@ const TaskBreakdown: React.FC = () => {
                     onClick={(e) => {
                       // The dialog returns focus to its opener on close.
                       e.currentTarget.focus();
-                      setEditing(list);
+                      setDialog({ mode: "edit", list });
                     }}
                   >
                     <SVG name="pencil" />
                   </StyledRoundButton>
                   <StyledRoundButton
+                    size="sm"
                     aria-label={t("controlPanel.openInTaskList", {
                       title: list.title,
                     })}
@@ -251,6 +300,7 @@ const TaskBreakdown: React.FC = () => {
                           const entry = entries.find(
                             (e) => e.taskCardId === card._id
                           );
+                          const onBoard = boardCardFor(card._id);
                           return (
                             <StyledSubtask
                               key={card._id}
@@ -261,16 +311,49 @@ const TaskBreakdown: React.FC = () => {
                                 checked={card.done}
                                 label={card.text}
                                 onChange={() =>
-                                  dispatch(
-                                    (card.done
-                                      ? setTaskCardNotDone
-                                      : setTaskCardDone)({
-                                      listId: list._id,
-                                      cardId: card._id,
-                                    })
+                                  setSubtaskDone(
+                                    list._id,
+                                    card._id,
+                                    !card.done
                                   )
                                 }
                               />
+                              {onBoard ? (
+                                <button
+                                  type="button"
+                                  id={`on-board-${card._id}`}
+                                  className="on-board"
+                                  aria-label={t(
+                                    "controlPanel.onBoardLabel",
+                                    { title: card.text }
+                                  )}
+                                  onClick={() => showOnBoard(onBoard.card.id)}
+                                >
+                                  <SVG name="check" />
+                                  {t("controlPanel.onBoard")}
+                                </button>
+                              ) : (
+                                <StyledCardFocus
+                                  type="button"
+                                  className="send"
+                                  aria-label={t(
+                                    "controlPanel.sendToBoardLabel",
+                                    { title: card.text }
+                                  )}
+                                  title={t("controlPanel.sendToBoard")}
+                                  onClick={() => {
+                                    sendToBoard(list, card);
+                                    setJustSent(card._id);
+                                    setToast(
+                                      t("controlPanel.addedToBoard", {
+                                        title: card.text,
+                                      })
+                                    );
+                                  }}
+                                >
+                                  <SVG name="add" />
+                                </StyledCardFocus>
+                              )}
                               <StyledCardFocus
                                 type="button"
                                 aria-pressed={
@@ -316,7 +399,10 @@ const TaskBreakdown: React.FC = () => {
         </StyledMilestones>
       )}
 
-      <MilestoneDialog list={editing} onClose={closeDialog} />
+      <MilestoneDialog target={dialog} onClose={closeDialog} />
+      <StyledToast role="status" aria-live="polite" visible={!!toast}>
+        {toast}
+      </StyledToast>
     </StyledCPSection>
   );
 };

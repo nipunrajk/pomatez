@@ -11,6 +11,7 @@ import historyReducer from "./history";
 import entriesReducer from "./entries";
 import boardReducer from "./board";
 import calendarReducer from "./calendar";
+import integrationsReducer from "./integrations";
 
 export type AppStateTypes = ReturnType<typeof store.getState>;
 export type AppDispatchTypes = typeof store.dispatch;
@@ -26,16 +27,20 @@ const store = configureStore({
     entries: entriesReducer,
     board: boardReducer,
     calendar: calendarReducer,
+    integrations: integrationsReducer,
   },
 });
 
-const getPersistedState = () => ({
+/** What's saved to storage (and to a backup file). */
+export const getPersistedState = () => ({
   config: store.getState().config,
   settings: store.getState().settings,
   tasks: store.getState().tasks.present,
   history: store.getState().history,
   entries: store.getState().entries,
   board: store.getState().board,
+  // Templates and folder only; vault and export status come from main.
+  integrations: { obsidian: store.getState().integrations.obsidian },
 });
 
 const storedState = getFromStorage("state");

@@ -1,6 +1,5 @@
 export * from "./blockShortcutKeys";
 export * from "./globalShortcuts";
-export * from "./autoUpdater";
 export * from "./getTrayIcon";
 export * from "./isWindow";
 export * from "./isMacOS";
@@ -10,3 +9,4 @@ export * from "./contextMenu";
 export * from "./discordRPC";
 export * from "./isUserHaveSession";
 export * from "./activityTracking";
+export * from "./notchIsland";

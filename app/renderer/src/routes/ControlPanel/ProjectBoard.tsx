@@ -7,13 +7,13 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import { SVG } from "components";
-import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
+import { useAppSelector } from "hooks/storeHooks";
+import { useBoardMilestoneSync } from "hooks/useBoardMilestoneSync";
 import { useStartFocus } from "hooks/useStartFocus";
 import {
   BOARD_COLUMNS,
   BoardCard,
   BoardColumnId,
-  moveBoardCard,
   TimeEntry,
 } from "store";
 import { getDayKey } from "store/history/utils";
@@ -182,19 +182,27 @@ const CardBody: React.FC<CardProps> = ({
 
 const ProjectBoard: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const dispatch = useAppDispatch();
   const board = useAppSelector((state) => state.board);
+  const { moveCard } = useBoardMilestoneSync();
   const entries = useAppSelector((state) => state.entries.items);
   const activeId = useAppSelector((state) => state.entries.activeId);
   const playing = useAppSelector((state) => state.timer.playing);
   const startLinkedFocus = useStartFocus();
+  // Each card's focus entry: its own, or its milestone subtask's.
   const linked = useMemo(() => {
     const map: Record<string, TimeEntry> = {};
-    entries.forEach((e) => {
-      if (e.boardCardId) map[e.boardCardId] = e;
-    });
+    BOARD_COLUMNS.forEach((column) =>
+      board.columns[column].forEach((card) => {
+        const entry = entries.find(
+          (e) =>
+            e.boardCardId === card.id ||
+            (!!card.taskCardId && e.taskCardId === card.taskCardId)
+        );
+        if (entry) map[card.id] = entry;
+      })
+    );
     return map;
-  }, [entries]);
+  }, [entries, board]);
   const [dialog, setDialog] = useState<CardDialogTarget | null>(null);
   const closeDialog = useCallback(() => setDialog(null), []);
 
@@ -217,12 +225,10 @@ const ProjectBoard: React.FC = () => {
     ) {
       return;
     }
-    dispatch(
-      moveBoardCard({
-        id: draggableId,
-        toColumn: destination.droppableId as BoardColumnId,
-        toIndex: destination.index,
-      })
+    moveCard(
+      draggableId,
+      destination.droppableId as BoardColumnId,
+      destination.index
     );
   };
 
@@ -326,7 +332,11 @@ const ProjectBoard: React.FC = () => {
                                 }
                                 onFocus={() =>
                                   startLinkedFocus(
-                                    { boardCardId: card.id },
+                                    {
+                                      boardCardId: card.id,
+                                      taskCardId: card.taskCardId,
+                                      taskListId: card.taskListId,
+                                    },
                                     {
                                       title: card.title,
                                       tag: card.category,

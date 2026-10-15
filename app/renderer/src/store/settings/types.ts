@@ -15,6 +15,7 @@ export type SettingTypes = {
   closeToTray: boolean;
   minimizeToTray: boolean;
   showTimerInTrayBar: boolean;
+  showNotchIsland: boolean;
   enableUsageTracking: boolean;
   autoStartWorkTime: boolean;
   notificationType: NotificationTypes;

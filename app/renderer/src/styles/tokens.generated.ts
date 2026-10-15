@@ -405,8 +405,8 @@ export const modulaTokens = `
   --layout-compact-controls-secondary-size: 40px;
   --layout-compact-controls-border: var(--color-border-strong);
   --layout-dashboard-min-width: 1100px;
-  --layout-dashboard-sidebar-width: 290px;
-  --layout-dashboard-sidebar-collapsed-width: 72px;
+  --layout-dashboard-sidebar-width: 210px;
+  --layout-dashboard-sidebar-collapsed-width: 68px;
   --layout-dashboard-sidebar-bg: var(--color-background-sidebar);
   --layout-dashboard-sidebar-padding-x: 14px;
   --layout-dashboard-sidebar-brand-height: 88px;

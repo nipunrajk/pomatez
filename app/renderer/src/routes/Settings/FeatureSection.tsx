@@ -12,6 +12,7 @@ import {
   setMinimizeToTray,
   setCloseToTray,
   setShowTimerInTrayBar,
+  setShowNotchIsland,
   setEnableUsageTracking,
   setEnableVoiceAssistance,
   setOpenAtLogin,
@@ -129,6 +130,19 @@ const FeatureSection: React.FC = () => {
       onChange: useCallback(() => {
         dispatch(setShowTimerInTrayBar(!settings.showTimerInTrayBar));
       }, [dispatch, settings.showTimerInTrayBar]),
+      style: {
+        ...(detectOS() !== "MacOS" && {
+          display: "none",
+        }),
+      },
+    },
+    {
+      id: "show-notch-island",
+      label: t("settings.showNotchIsland"),
+      checked: settings.showNotchIsland,
+      onChange: useCallback(() => {
+        dispatch(setShowNotchIsland(!settings.showNotchIsland));
+      }, [dispatch, settings.showNotchIsland]),
       style: {
         ...(detectOS() !== "MacOS" && {
           display: "none",

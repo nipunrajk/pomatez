@@ -22,6 +22,7 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   closeToTray: true,
   minimizeToTray: false,
   showTimerInTrayBar: false,
+  showNotchIsland: false,
   enableUsageTracking: false,
   autoStartWorkTime: false,
   useNativeTitlebar: detectOS() === "Windows" ? false : true,

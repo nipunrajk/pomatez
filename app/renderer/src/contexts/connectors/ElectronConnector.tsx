@@ -18,6 +18,7 @@ import {
   SET_UI_THEME,
   TRAY_ICON_UPDATE,
   TRAY_TITLE_UPDATE,
+  NOTCH_ISLAND_UPDATE,
   SET_OPEN_AT_LOGIN,
   SET_RPC_ACTIVITY,
   SET_ENABLE_RPC,
@@ -26,6 +27,9 @@ import {
   GOOGLE_CALENDAR_EVENTS,
   GOOGLE_CALENDAR_STATUS,
   GOOGLE_CALENDAR_STATUS_REQUEST,
+  OBSIDIAN_STATUS,
+  OBSIDIAN_STATUS_REQUEST,
+  OBSIDIAN_EXPORT_RESULT,
 } from "@pomatez/shareables";
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
@@ -39,6 +43,8 @@ import {
   RecordActivitySamplePayload,
   setCalendarEvents,
   setCalendarStatus,
+  setObsidianExportResult,
+  setObsidianVault,
 } from "store";
 
 export const ElectronInvokeConnector: InvokeConnector = {
@@ -217,6 +223,27 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
   ]);
 
   useEffect(() => {
+    electron.send(NOTCH_ISLAND_UPDATE, {
+      enabled: settings.showNotchIsland,
+      playing: timer.playing,
+      timerType: timer.timerType,
+      time: `${Math.floor(count / 60)}:${padNum(count % 60)}`,
+      progress: duration > 0 ? (duration - count) / duration : 0,
+      round: timer.round,
+      sessionRounds: config.sessionRounds,
+    });
+  }, [
+    electron,
+    settings.showNotchIsland,
+    timer.playing,
+    timer.timerType,
+    timer.round,
+    config.sessionRounds,
+    count,
+    duration,
+  ]);
+
+  useEffect(() => {
     const enable =
       settings.enableUsageTracking &&
       timer.playing &&
@@ -253,6 +280,26 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
       }
     );
     electron.send(GOOGLE_CALENDAR_STATUS_REQUEST);
+  }, [electron, dispatch]);
+
+  useEffect(() => {
+    electron.receive(
+      OBSIDIAN_STATUS,
+      (status: { vaultPath: string | null; isVault: boolean }) => {
+        dispatch(setObsidianVault(status));
+      }
+    );
+    electron.receive(
+      OBSIDIAN_EXPORT_RESULT,
+      (
+        result:
+          | { ok: true; written: number; removed: number }
+          | { ok: false; error: string }
+      ) => {
+        dispatch(setObsidianExportResult({ ...result, at: Date.now() }));
+      }
+    );
+    electron.send(OBSIDIAN_STATUS_REQUEST);
   }, [electron, dispatch]);
 
   return (

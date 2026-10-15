@@ -11,7 +11,6 @@ import {
   safeStorage,
 } from "electron";
 import debounce from "lodash.debounce";
-import notifier from "node-notifier";
 import path from "path";
 import {
   SET_ALWAYS_ON_TOP,
@@ -21,7 +20,6 @@ import {
   SET_UI_THEME,
   SET_NATIVE_TITLEBAR,
   SHOW_WINDOW,
-  RELEASE_NOTES_LINK,
   TRAY_ICON_UPDATE,
   TRAY_TITLE_UPDATE,
   SET_LAYOUT,
@@ -35,10 +33,18 @@ import {
   GOOGLE_CALENDAR_STATUS_REQUEST,
   GOOGLE_CALENDAR_STATUS,
   GOOGLE_CALENDAR_EVENTS,
+  OBSIDIAN_STATUS_REQUEST,
+  OBSIDIAN_PICK_VAULT,
+  OBSIDIAN_FORGET_VAULT,
+  OBSIDIAN_EXPORT,
+  OBSIDIAN_STATUS,
+  OBSIDIAN_EXPORT_RESULT,
+  NOTCH_ISLAND_UPDATE,
+  NOTCH_ISLAND_CLICK,
+  NOTCH_ISLAND_HOVER,
 } from "@pomatez/shareables";
 import {
   activateGlobalShortcuts,
-  activateAutoUpdate,
   blockShortcutKeys,
   getIcon,
   getTrayIcon,
@@ -51,6 +57,8 @@ import {
   isUserHaveSession,
   initializeActivityTracking,
   uninitializeActivityTracking,
+  createNotchIsland,
+  NotchIslandState,
 } from "./helpers";
 import isDev from "electron-is-dev";
 import store, { AppLayoutName } from "./store";
@@ -60,15 +68,9 @@ import {
   setFullscreenBreakHandler,
 } from "./lifecycleEventHandlers/fullScreenBreak";
 import { createGoogleCalendar } from "./helpers/googleCalendar";
-import WindowsToaster from "node-notifier/notifiers/toaster";
-import NotificationCenter from "node-notifier/notifiers/notificationcenter";
+import { isObsidianVault, writeNotes } from "./helpers/obsidianVault";
 
 const onProduction = app.isPackaged;
-
-const notificationIcon = path.join(
-  __dirname,
-  "assets/notification-dark.png"
-);
 
 const trayIcon = getTrayIcon();
 
@@ -361,32 +363,6 @@ function createSystemTray() {
   });
 }
 
-type NotificationProps = {
-  title: string;
-  message: string;
-  actions: string[];
-  callback?: (err: Error | null, response: string) => void;
-};
-
-function notify(props: NotificationProps) {
-  // This is because it can take different types depending on the initialised OS.
-  // Just for some reason, whoever sorted the types out of this library only really considered JS rather than TS.
-  const notification: WindowsToaster.Notification &
-    NotificationCenter.Notification = {
-    icon: notificationIcon,
-    title: props.title,
-    message: props.message,
-    actions: props.actions,
-    appID: "com.roldanjr.pomatez",
-    sound: true,
-    wait: true,
-  };
-
-  notifier.notify(notification, (err, response) => {
-    if (props.callback) props.callback(err, response);
-  });
-}
-
 if (!onlySingleInstance) {
   app.quit();
 } else {
@@ -455,38 +431,6 @@ if (!onlySingleInstance) {
         },
       },
     ]);
-
-    const autoUpdater = activateAutoUpdate({
-      onUpdateAvailable: (info) => {
-        notify({
-          title: "NEW UPDATE IS AVAILABLE",
-          message: `App version ${info.version} ready to be downloaded.`,
-          actions: ["View Release Notes"],
-          callback: (err, response) => {
-            if (!err) {
-              if (response === "view release notes") {
-                shell.openExternal(RELEASE_NOTES_LINK);
-              }
-            }
-          },
-        });
-      },
-      onUpdateDownloaded: (info) => {
-        notify({
-          title: "READY TO BE INSTALLED",
-          message: "Update has been successfully downloaded.",
-          // Temporarily commented out due to an issue with snoretoast https://github.com/mikaelbr/node-notifier/issues/332
-          actions: ["Quit and Install" /*, "Install it Later"*/],
-          callback: (err, response) => {
-            if (!err) {
-              //if (response === "quit and install") {
-              autoUpdater.quitAndInstall();
-              //}
-            }
-          },
-        });
-      },
-    });
   });
 }
 
@@ -599,6 +543,34 @@ ipcMain.on(
   }
 );
 
+// Dynamic Island timer around the notch (macOS only). The renderer pushes
+// timer state; the overlay window shows/hides itself from it.
+const notchIsland =
+  process.platform === "darwin"
+    ? createNotchIsland({
+        preload: path.join(__dirname, "preload.js"),
+        pageUrl: `file://${path.join(
+          __dirname,
+          "assets",
+          "notchIsland.html"
+        )}`,
+        onClick: () => showOnCurrentWorkspace(win),
+      })
+    : null;
+
+ipcMain.on(NOTCH_ISLAND_UPDATE, (e, state: NotchIslandState) => {
+  if (e.sender !== win?.webContents || !state) return;
+  notchIsland?.update(state);
+});
+
+ipcMain.on(NOTCH_ISLAND_HOVER, (e, hovering: boolean) => {
+  notchIsland?.setHovering(!!hovering);
+});
+
+ipcMain.on(NOTCH_ISLAND_CLICK, () => {
+  notchIsland?.click();
+});
+
 ipcMain.on(TRAY_TITLE_UPDATE, (e, title) => {
   tray?.setTitle(title || "");
 });
@@ -659,6 +631,49 @@ ipcMain.on(
   }
 );
 
+// Obsidian export (one way). The renderer builds the notes; main keeps the
+// vault path (picked with the native dialog) and only writes inside it.
+const sendObsidianStatus = () => {
+  const vaultPath = store.safeGet("obsidianVault") || null;
+  win?.webContents.send(OBSIDIAN_STATUS, {
+    vaultPath,
+    isVault: vaultPath ? isObsidianVault(vaultPath) : false,
+  });
+};
+
+ipcMain.on(OBSIDIAN_STATUS_REQUEST, sendObsidianStatus);
+
+ipcMain.on(OBSIDIAN_PICK_VAULT, async () => {
+  if (!win) return;
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    title: "Choose your Obsidian vault",
+    buttonLabel: "Use this vault",
+    defaultPath: store.safeGet("obsidianVault"),
+    properties: ["openDirectory", "createDirectory"],
+  });
+  if (!canceled && filePaths[0]) {
+    store.safeSet("obsidianVault", filePaths[0]);
+  }
+  sendObsidianStatus();
+});
+
+ipcMain.on(OBSIDIAN_FORGET_VAULT, () => {
+  store.safeDelete("obsidianVault");
+  sendObsidianStatus();
+});
+
+ipcMain.on(
+  OBSIDIAN_EXPORT,
+  (e, { folder, files }: Record<string, unknown> = {}) => {
+    const result = writeNotes(
+      store.safeGet("obsidianVault"),
+      folder,
+      files
+    );
+    win?.webContents.send(OBSIDIAN_EXPORT_RESULT, result);
+  }
+);
+
 ipcMain.on(SET_ENABLE_ACTIVITY_TRACKING, (e, { enable }) => {
   if (enable) {
     if (win) initializeActivityTracking(win);
@@ -706,7 +721,8 @@ app.on("activate", () => {
 });
 
 app.on("will-quit", () => {
+  notchIsland?.destroy();
   globalShortcut.unregisterAll();
 });
 
-app.setAppUserModelId("com.roldanjr.pomatez");
+app.setAppUserModelId("com.nipunrajk.pomatez");

@@ -13,6 +13,8 @@ type StoreProps = {
   layout?: AppLayoutName;
   /** Google Calendar OAuth tokens, encrypted with safeStorage (base64). */
   googleCalendar?: string;
+  /** Obsidian vault folder chosen in Settings (main owns the path). */
+  obsidianVault?: string;
 };
 
 /**

@@ -126,6 +126,7 @@ export const zh = {
     minimizeToTray: "最小化到托盘",
     closeToTray: "关闭到托盘",
     showTimerInTrayBar: "在菜单栏显示计时器",
+    showNotchIsland: "在刘海区域显示计时器",
     enableUsageTracking: "跟踪应用与网站使用情况",
     voiceAssistance: "语音辅助",
     openAtLogin: "开机自启",

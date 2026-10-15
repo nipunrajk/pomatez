@@ -7,20 +7,30 @@ export const StyledControlPanel = styled.main`
   min-height: 0;
   width: 100%;
 
-  /* Top padding matches the compact right rail so both headers align. */
-  padding: var(--space-6) var(--layout-dashboard-content-padding-x)
-    var(--layout-dashboard-content-padding-y);
+  /* The page itself doesn't scroll: the board shrinks (and scrolls)
+     only when space runs out, and milestones fill the rest. Top padding
+     matches the compact right rail so both headers align. */
+  padding: var(--space-4) var(--space-5);
 
-  overflow: hidden auto;
-  ${StyledScrollbar};
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow: hidden;
 
   animation: 240ms ${themes.enterFromRight} ease;
 `;
 
-export const StyledCPSection = styled.section`
-  & + & {
-    margin-top: var(--layout-dashboard-content-section-gap);
-  }
+/** `$fill`: takes the height left over (Project Milestones). */
+export const StyledCPSection = styled.section<{ $fill?: boolean }>`
+  /* The board takes its natural height up to ~58% of the page and
+     scrolls inside beyond that; the $fill section (milestones) gets the
+     rest, so both stay on screen without the page scrolling. */
+  flex: ${(p) => (p.$fill ? "1 1 0" : "0 1 auto")};
+  min-height: ${(p) => (p.$fill ? "14rem" : "16rem")};
+  max-height: ${(p) => (p.$fill ? "none" : "58%")};
+
+  display: flex;
+  flex-direction: column;
 `;
 
 /**
@@ -35,9 +45,18 @@ export const StyledCPSectionHeader = styled.header`
   column-gap: var(--space-4);
   row-gap: var(--space-3);
 
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
   border-bottom: var(--component-section-header-divider-width) solid
     var(--component-section-header-divider);
+
+  /* The subtitle wraps before the actions do, so the header stays one
+     row tall at 1200px. */
+  & > div:first-child {
+    flex: 1 1 18rem;
+    min-width: 0;
+    /* Title stays level with the rail's when the actions stack taller. */
+    align-self: flex-start;
+  }
 
   /* The right-hand item stays right-aligned when it wraps. */
   & > :last-child:not(:first-child) {
@@ -46,6 +65,8 @@ export const StyledCPSectionHeader = styled.header`
 
   h3 {
     ${typeStyle("section-title")};
+    /* Compact: keeps the Workspace on one screen. */
+    font-size: 2.4rem;
     color: var(--color-text-heading);
   }
 
@@ -93,10 +114,11 @@ export const StyledCPHeaderControls = styled.div`
   justify-content: flex-end;
   gap: var(--space-2) var(--space-3);
 
-  /* Up to 140px; shrinks first when the column is narrow. */
+  /* 60–140px: wraps on its 60px basis, so it shrinks before the button
+     drops to a second row. */
   & > div:first-child {
-    flex: 0 1 14rem;
-    min-width: 6rem;
+    flex: 1 1 6rem;
+    max-width: 14rem;
   }
 
   & > span {
@@ -120,10 +142,13 @@ export const StyledBoard = styled.div`
 
   /* Room for the lifted card's tilt and shadow inside the scroller. */
   margin: 0 calc(var(--space-2) * -1);
-  padding: var(--space-6) var(--space-2) var(--space-8);
+  padding: var(--space-3) var(--space-2) var(--space-3);
 
-  overflow-x: auto;
-  overflow-y: hidden;
+  /* One scroll area for the whole board (the drag library supports a
+     single scroll parent per column). */
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: auto;
   ${StyledScrollbar};
 `;
 
@@ -144,6 +169,7 @@ export const StyledBoardColumnHeader = styled.div`
 
   h4 {
     ${typeStyle("body")};
+    font-size: 1.4rem;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
   }
@@ -239,7 +265,7 @@ export const StyledRoundButton = styled.button<{
  */
 export const StyledBoardCards = styled.div<{ isOver: boolean }>`
   flex: 1 1;
-  min-height: 12rem;
+  min-height: 8rem;
   padding: var(--space-1);
   margin: calc(var(--space-1) * -1);
 
@@ -252,15 +278,16 @@ export const StyledBoardCards = styled.div<{ isOver: boolean }>`
 
 /** components.card; while dragged it takes components.card.highlighted. */
 export const StyledBoardCard = styled.article<{ lifted?: boolean }>`
-  margin-bottom: var(--layout-dashboard-content-board-card-gap);
-  padding: var(--component-card-padding);
+  /* Compact density so the board fits beside the milestones. */
+  margin-bottom: var(--space-2);
+  padding: 1rem var(--space-3);
 
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 
   color: var(--color-text-primary);
-  border-radius: var(--component-card-radius);
+  border-radius: 1rem;
   background-color: var(--component-card-bg);
   box-shadow: var(--component-card-shadow);
   cursor: grab;
@@ -277,6 +304,8 @@ export const StyledBoardCard = styled.article<{ lifted?: boolean }>`
 
   h5 {
     ${typeStyle("body")};
+    font-size: 1.4rem;
+    line-height: 1.3;
     font-weight: var(--font-weight-semibold);
     color: inherit;
 
@@ -325,6 +354,7 @@ export const StyledBoardEyebrow = styled.div<{ lifted?: boolean }>`
   gap: var(--space-2);
 
   ${typeStyle("eyebrow")};
+  font-size: 1.1rem;
   color: ${(p) =>
     p.lifted
       ? "var(--component-card-highlighted-text)"
@@ -335,6 +365,11 @@ export const StyledTagRow = styled.div<{ lifted?: boolean }>`
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
+
+  & > span {
+    height: 2.2rem;
+    padding: 0 var(--space-2);
+  }
 
   ${(p) =>
     p.lifted &&
@@ -350,13 +385,14 @@ export const StyledBoardFooter = styled.div<{
   lifted?: boolean;
   warn?: boolean;
 }>`
-  min-height: var(--component-button-height-sm);
+  min-height: 2.8rem;
 
   display: flex;
   align-items: center;
   gap: var(--space-3);
 
   ${typeStyle("meta")};
+  font-size: 1.1rem;
   font-variant-numeric: tabular-nums;
   color: ${(p) =>
     p.lifted
@@ -420,8 +456,8 @@ export const StyledCardFocus = styled.button`
   flex-shrink: 0;
   margin-left: auto;
 
-  width: var(--component-button-height-sm);
-  height: var(--component-button-height-sm);
+  width: 2.8rem;
+  height: 2.8rem;
 
   display: flex;
   align-items: center;
@@ -537,6 +573,13 @@ export const StyledCardForm = styled.form`
     grid-column: 1 / -1;
   }
 
+  /* Two fields sharing one grid cell (Project, then its custom category). */
+  .field-stack {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
   .form-error {
     ${typeStyle("meta")};
     text-transform: none;
@@ -616,20 +659,27 @@ export const StyledDateInput = styled.input.attrs(() => ({
 
 /* ---------- Project Milestones ---------- */
 
+/** Scrolls on its own when there are more milestones than fit. */
 export const StyledMilestones = styled.ul`
-  margin-top: var(--space-5);
-  list-style: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: var(--space-2) calc(var(--space-1) * -1) 0;
+  padding: var(--space-1);
+  overflow-y: auto;
+  ${StyledScrollbar};
 
+  list-style: none;
   display: grid;
-  gap: var(--space-3);
+  align-content: start;
+  gap: var(--space-2);
 `;
 
 /** One milestone: title row, badges, progress + deadline, then subtasks. */
 export const StyledMilestoneRow = styled.li<{ open: boolean }>`
-  padding: var(--space-4) var(--space-5);
+  padding: 1rem 1.4rem;
 
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
 
   border-radius: var(--component-card-radius);
   background-color: var(--component-card-bg);
@@ -659,6 +709,11 @@ export const StyledMilestoneRow = styled.li<{ open: boolean }>`
     align-items: center;
     gap: var(--space-2);
 
+    & > button {
+      width: 2.8rem;
+      height: 2.8rem;
+    }
+
     h4 {
       flex: 1 1;
       min-width: 0;
@@ -668,7 +723,7 @@ export const StyledMilestoneRow = styled.li<{ open: boolean }>`
       padding: 0;
 
       ${typeStyle("body")};
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: var(--font-weight-semibold);
       text-align: left;
       color: var(--color-text-primary);
@@ -691,6 +746,7 @@ export const StyledMilestoneRow = styled.li<{ open: boolean }>`
     p {
       margin-left: auto;
       ${typeStyle("meta")};
+      font-size: 1.1rem;
       font-variant-numeric: tabular-nums;
       color: var(--color-text-secondary-readable);
     }
@@ -714,7 +770,7 @@ export const StyledMilestoneRow = styled.li<{ open: boolean }>`
   }
 
   .milestone-panel {
-    padding-top: var(--space-3);
+    padding-top: var(--space-2);
     border-top: var(--border-width-hairline) solid
       var(--color-border-soft);
     cursor: auto;
@@ -759,8 +815,8 @@ export const StyledStatusTag = styled.span<{
 }>`
   display: inline-flex;
   align-items: center;
-  height: var(--component-tag-height);
-  padding: 0 var(--component-tag-padding-x);
+  height: 2.2rem;
+  padding: 0 var(--space-2);
 
   ${typeStyle("tag")};
   border-radius: var(--component-tag-radius);
@@ -788,7 +844,7 @@ export const StyledSubtask = styled.li<{ done: boolean }>`
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-1) 0;
+  padding: 0.6rem 0;
 
   & + & {
     border-top: var(--border-width-hairline) solid
@@ -806,11 +862,65 @@ export const StyledSubtask = styled.li<{ done: boolean }>`
     overflow-wrap: anywhere;
   }
 
-  /* The focus button is always visible here (no card hover to reveal it). */
+  /* Row buttons are always visible here (no card hover to reveal them). */
   & > button {
     color: var(--color-brand-primary-readable);
     border-color: var(--color-border-strong);
   }
+
+  /* "On board": the subtask is on the Task Board; jumps to its card. */
+  & > .on-board {
+    flex-shrink: 0;
+    height: var(--component-button-height-sm);
+    padding: 0 var(--space-2);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+
+    ${typeStyle("tag")};
+    color: var(--color-status-completed-readable);
+    border: var(--border-width-hairline) solid currentColor;
+    border-radius: var(--radius-pill);
+    background: none;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-background-surface-sunken);
+    }
+
+    ${focusRing};
+
+    svg {
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+    }
+  }
+`;
+
+/** Brief confirmation ("Added to Task Board"), bottom-centre. */
+export const StyledToast = styled.div<{ visible: boolean }>`
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  z-index: 20;
+  transform: translate(-50%, ${(p) => (p.visible ? "0" : "var(--space-2)")});
+
+  padding: var(--space-2) var(--space-4);
+
+  ${typeStyle("body")};
+  color: var(--color-text-on-primary);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-brand-primary-dark);
+  box-shadow: var(--shadow-floating);
+  pointer-events: none;
+
+  opacity: ${(p) => (p.visible ? 1 : 0)};
+  visibility: ${(p) => (p.visible ? "visible" : "hidden")};
+  transition: opacity var(--motion-duration-base)
+      var(--motion-easing-standard),
+    transform var(--motion-duration-base) var(--motion-easing-standard),
+    visibility var(--motion-duration-base);
 `;
 
 export const StyledCPEmpty = styled.p`
@@ -1174,12 +1284,14 @@ export const StyledDialHeader = styled.header`
 
   /* Same metrics as StyledCPSectionHeader (title + eyebrow subtitle), so
      the two headers and their rules line up across the page. */
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
   border-bottom: var(--component-section-header-divider-width) solid
     var(--component-section-header-divider);
 
   h3 {
     ${typeStyle("section-title")};
+    /* Compact: keeps the Workspace on one screen. */
+    font-size: 2.4rem;
     color: var(--color-text-heading);
   }
 

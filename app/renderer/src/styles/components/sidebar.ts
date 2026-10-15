@@ -9,9 +9,19 @@ export const StyledDashboard = styled.div`
   display: flex;
 `;
 
-/** layout.dashboard.sidebar */
-export const StyledSidebar = styled.nav`
-  flex: 0 0 var(--layout-dashboard-sidebar-width);
+/** layout.dashboard.sidebar; `collapsed` is the icon-only rail. */
+export const StyledSidebar = styled.nav<{ collapsed?: boolean }>`
+  flex: 0 0
+    ${(p) =>
+      p.collapsed
+        ? "var(--layout-dashboard-sidebar-collapsed-width)"
+        : "var(--layout-dashboard-sidebar-width)"};
+  transition: flex-basis var(--motion-duration-base)
+    var(--motion-easing-standard);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   display: flex;
   flex-direction: column;
@@ -20,21 +30,63 @@ export const StyledSidebar = styled.nav`
   padding: 0 var(--layout-dashboard-sidebar-padding-x) var(--space-6);
 
   background-color: var(--layout-dashboard-sidebar-bg);
+  overflow-x: hidden;
   overflow-y: auto;
 `;
 
-export const StyledSidebarBrand = styled.div`
+export const StyledSidebarBrand = styled.div<{ collapsed?: boolean }>`
   flex: 0 0 var(--layout-dashboard-sidebar-brand-height);
 
   display: flex;
   align-items: center;
-  padding: 0 var(--space-4);
+  justify-content: ${(p) => (p.collapsed ? "center" : "space-between")};
+  gap: var(--space-2);
+  padding: 0 ${(p) => (p.collapsed ? "0" : "var(--space-2) 0 var(--space-4)")};
 
   ${typeStyle("brand")};
   color: var(--color-text-sidebar-active);
+
+  & > span {
+    overflow: hidden;
+    white-space: nowrap;
+  }
 `;
 
-export const StyledSidebarLink = styled(NavLink)`
+/** layout.dashboard.sidebar.collapseButton */
+export const StyledSidebarCollapse = styled.button`
+  flex-shrink: 0;
+  width: var(--layout-dashboard-sidebar-collapse-button-size);
+  height: var(--layout-dashboard-sidebar-collapse-button-size);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--layout-dashboard-sidebar-collapse-button-icon);
+  border: none;
+  border-radius: var(--layout-dashboard-sidebar-collapse-button-radius);
+  background-color: var(--layout-dashboard-sidebar-collapse-button-bg);
+  cursor: pointer;
+
+  transition: ${themes.transition};
+
+  &:hover {
+    background-color: var(--color-background-surface);
+  }
+
+  &:focus-visible {
+    outline: var(--border-width-thick) solid
+      var(--color-border-sidebar-active);
+    outline-offset: 2px;
+  }
+
+  & > svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
+`;
+
+export const StyledSidebarLink = styled(NavLink)<{ $collapsed?: boolean }>`
   position: relative;
 
   flex: 0 0 var(--layout-dashboard-sidebar-item-height);
@@ -84,6 +136,32 @@ export const StyledSidebarLink = styled(NavLink)`
       color: var(--color-icon-on-sidebar-active);
     }
   }
+
+  .label {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  ${(p) =>
+    p.$collapsed &&
+    css`
+      justify-content: center;
+      padding: 0;
+
+      /* Visually hidden, still the link's accessible name. */
+      .label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        clip-path: inset(50%);
+      }
+
+      ${StyledSidebarNotify} {
+        position: absolute;
+        top: var(--space-3);
+        right: var(--space-3);
+      }
+    `}
 `;
 
 export const StyledSidebarNotify = styled.span`
@@ -145,7 +223,8 @@ export const StyledRightRail = styled.aside<{ compact?: boolean }>`
     p.compact &&
     css`
       gap: var(--space-3);
-      padding: var(--space-6)
+      /* Top matches the Workspace content padding so headers align. */
+      padding: var(--space-4)
         var(--layout-dashboard-right-rail-padding-x) var(--space-4);
       overflow: hidden;
       border-left: none;

@@ -128,6 +128,7 @@ export const ja = {
     minimizeToTray: "トレイに最小化",
     closeToTray: "トレイに閉じる",
     showTimerInTrayBar: "メニューバーにタイマーを表示",
+    showNotchIsland: "ノッチにタイマーを表示",
     enableUsageTracking: "アプリとサイトの使用状況を記録",
     voiceAssistance: "音声アシスタント",
     openAtLogin: "ログイン時に起動",

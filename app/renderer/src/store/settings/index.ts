@@ -157,6 +157,13 @@ const settingsSlice = createSlice({
       state.showTimerInTrayBar = action.payload;
     },
 
+    setShowNotchIsland(
+      state,
+      action: SettingsPayload<"showNotchIsland">
+    ) {
+      state.showNotchIsland = action.payload;
+    },
+
     setEnableUsageTracking(
       state,
       action: SettingsPayload<"enableUsageTracking">
@@ -208,6 +215,7 @@ export const {
   setEnableRPC,
   setLanguage,
   setShowTimerInTrayBar,
+  setShowNotchIsland,
   setEnableUsageTracking,
   setUseNativeTitlebar,
   setTrayIconStyle,

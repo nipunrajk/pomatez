@@ -41,9 +41,10 @@
   },
   "build": {
     "productName": "Pomatez",
-    "appId": "com.roldanjr.pomatez",
+    "appId": "com.nipunrajk.pomatez",
     "copyright": "Copyright © 2020 ${author}",
     "afterSign": "./electron-builder/afterSign.js",
+    "publish": null,
     "files": [
       "build"
     ],
@@ -104,26 +105,22 @@
     "active-win": "^8.2.1",
     "discord-rpc": "^4.0.1",
     "electron-is-dev": "^2.0.0",
-    "electron-log": "^4.2.4",
     "electron-store": "^8.2.0",
-    "electron-updater": "^6.6.2",
     "lodash.debounce": "^4.0.8",
-    "node-notifier": "10.0.1",
     "uuid": "7.0.3"
   },
   "devDependencies": {
+    "@electron/notarize": "^2.5.0",
     "@jest-runner/electron": "^3.0.0",
     "@types/lodash.debounce": "^4.0.6",
-    "@types/node-notifier": "8.0.2",
     "@types/uuid": "7.0.3",
     "babel-core": "^6.26.3",
     "babel-jest": "^26.6.3",
-    "@electron/notarize": "^2.5.0",
-    "esbuild": "^0.25.0",
     "electron": "34.5.8",
-    "electron-builder": "^25.0.0",
+    "electron-builder": "26.15.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-reload": "^1.5.0",
+    "esbuild": "^0.25.0",
     "nodemon": "^3.1.0",
     "regenerator-runtime": "^0.13.11",
     "ts-jest": "^26.5.6"

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'"
+    />
+    <style>
+      :root {
+        --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+        --focus: #ff6b5e;
+        --break: #5ed39a;
+      }
+      * { box-sizing: border-box; margin: 0; }
+      html, body {
+        width: 100%; height: 100%;
+        background: transparent;
+        overflow: hidden;
+        font-family: -apple-system, "SF Pro Rounded", "SF Pro Text", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        user-select: none;
+      }
+      /* The pill hangs from the top-center of the window. */
+      #stage { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+      #island {
+        --w: 0px; --h: 0px;
+        position: relative;
+        width: var(--w); height: var(--h);
+        background: #000;
+        color: #fff;
+        border-radius: 0 0 22px 22px;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0;
+        transition:
+          width 0.45s var(--spring),
+          height 0.45s var(--spring),
+          border-radius 0.45s var(--spring),
+          opacity 0.2s ease;
+      }
+      #island.show { opacity: 1; }
+      /* No notch: a floating capsule slightly below the top edge. */
+      #island.capsule { margin-top: 6px; border-radius: 999px; }
+      #island.capsule.expanded { border-radius: 26px; }
+      #island.expanded { border-radius: 0 0 30px 30px; }
+
+      .row {
+        position: absolute; left: 0; right: 0; top: 0;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 16px;
+      }
+      .gap { flex: none; width: var(--notch, 0px); }
+      .left, .right { display: flex; align-items: center; gap: 7px; }
+      .dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse { 50% { opacity: 0.45; } }
+      .time {
+        font-size: 14px; font-weight: 600;
+        font-variant-numeric: tabular-nums; letter-spacing: 0.2px;
+      }
+      .phase { font-size: 12px; opacity: 0.7; font-weight: 500; }
+
+      .detail {
+        position: absolute; left: 20px; right: 20px; bottom: 14px;
+        opacity: 0; transform: translateY(6px);
+        transition: opacity 0.2s ease, transform 0.3s var(--spring);
+      }
+      #island.expanded .detail { opacity: 1; transform: none; transition-delay: 0.08s; }
+      .meta { display: flex; justify-content: space-between; font-size: 11px; opacity: 0.65; margin-bottom: 7px; }
+      .bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.16); overflow: hidden; }
+      .fill { height: 100%; width: 0; border-radius: 3px; background: var(--accent); transition: width 0.9s linear; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="island">
+        <div class="row" id="row">
+          <div class="left"><span class="dot"></span><span class="phase" id="phase"></span></div>
+          <div class="gap"></div>
+          <div class="right"><span class="time" id="time">0:00</span></div>
+        </div>
+        <div class="detail">
+          <div class="meta"><span id="round"></span><span id="pct"></span></div>
+          <div class="bar"><div class="fill" id="fill"></div></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const LABELS = {
+        STAY_FOCUS: "Focus",
+        SHORT_BREAK: "Break",
+        LONG_BREAK: "Long break",
+        SPECIAL_BREAK: "Break",
+      };
+      const island = document.getElementById("island");
+      const $ = (id) => document.getElementById(id);
+      const NOTCH_H = 37;
+      const send = (channel, ...a) => window.electron && window.electron.send(channel, ...a);
+
+      let notchWidth = 0;
+      let hovering = false;
+
+      function layout() {
+        const capsule = notchWidth === 0;
+        const compactH = capsule ? 32 : NOTCH_H;
+        // Wings on either side of the notch hold the phase and the time.
+        const compactW = capsule ? 150 : notchWidth + 2 * 78;
+        island.classList.toggle("capsule", capsule);
+        island.classList.toggle("expanded", hovering);
+        island.style.setProperty("--notch", notchWidth + "px");
+        island.style.setProperty("--w", (hovering ? Math.max(compactW, 300) : compactW) + "px");
+        island.style.setProperty("--h", (hovering ? 84 : compactH) + "px");
+        $("row").style.height = compactH + "px";
+      }
+
+      window.electron.receive("NOTCH_ISLAND_STATE", (s) => {
+        notchWidth = s.notchWidth || 0;
+        const isBreak = s.timerType !== "STAY_FOCUS";
+        island.style.setProperty("--accent", isBreak ? "var(--break)" : "var(--focus)");
+        $("phase").textContent = notchWidth ? LABELS[s.timerType] || "" : "";
+        $("time").textContent = s.time;
+        $("round").textContent = (LABELS[s.timerType] || "") + " · Round " + s.round + "/" + s.sessionRounds;
+        const pct = Math.max(0, Math.min(1, s.progress));
+        $("fill").style.width = pct * 100 + "%";
+        $("pct").textContent = Math.round(pct * 100) + "%";
+        if (!s.visible) hovering = false;
+        island.classList.toggle("show", !!s.visible);
+        if (!s.visible) {
+          island.style.setProperty("--w", "0px");
+          island.style.setProperty("--h", "0px");
+        } else {
+          layout();
+        }
+      });
+
+      // The window is click-through except while the pointer is on the pill.
+      island.addEventListener("mouseenter", () => {
+        hovering = true; send("NOTCH_ISLAND_HOVER", true); layout();
+      });
+      island.addEventListener("mouseleave", () => {
+        hovering = false; send("NOTCH_ISLAND_HOVER", false); layout();
+      });
+      island.addEventListener("click", () => send("NOTCH_ISLAND_CLICK"));
+    </script>
+  </body>
+</html>
