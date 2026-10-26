@@ -1,5 +1,6 @@
 import {
   BrowserWindow,
+  screen,
   app,
   ipcMain,
   globalShortcut,
@@ -23,6 +24,11 @@ import {
   TRAY_ICON_UPDATE,
   TRAY_TITLE_UPDATE,
   SET_LAYOUT,
+  WINDOW_SURFACE_REQUEST,
+  WINDOW_SURFACE_STATE,
+  WINDOW_SURFACE_READY,
+  HUD_PIN_SET,
+  HUD_DISMISS,
   SET_OPEN_AT_LOGIN,
   SET_ENABLE_RPC,
   SET_ENABLE_ACTIVITY_TRACKING,
@@ -62,6 +68,11 @@ import {
 } from "./helpers";
 import isDev from "electron-is-dev";
 import store, { AppLayoutName } from "./store";
+import { COMPACT_WIDTH, getCompactHeight } from "./helpers/compactSize";
+import {
+  clampBounds,
+  createWindowSurfaces,
+} from "./helpers/windowSurfaces";
 
 import {
   FullscreenState,
@@ -81,23 +92,14 @@ const applicationMenu = isMacOS()
   : null;
 Menu.setApplicationMenu(applicationMenu);
 
-// The classic window is a fixed-size single-purpose timer popup.
-const getFrameHeight = () => {
-  if (isWindow()) {
-    return 640;
-  } else {
-    if (store.safeGet("useNativeTitlebar")) {
-      return 626;
-    }
-    return 640;
-  }
-};
+const getFrameHeight = getCompactHeight;
 
 let tray: Tray | null = null;
 
 let win: BrowserWindow | null;
 
 let isRecreatingWindow = false;
+let mainWindowCreated = false;
 
 type WindowStateProps = {
   layout: AppLayoutName;
@@ -106,7 +108,9 @@ type WindowStateProps = {
 const windowState: WindowStateProps = {
   isFullscreen: false,
   layout:
-    store.safeGet("layout") === "dashboard" ? "dashboard" : "classic",
+    isMacOS() || store.safeGet("layout") === "dashboard"
+      ? "dashboard"
+      : "classic",
 };
 
 const DASHBOARD_SIZE = { width: 1200, height: 760 };
@@ -128,8 +132,9 @@ function applyLayoutSize(window: BrowserWindow) {
   } else {
     if (window.isMaximized()) window.unmaximize();
     window.setMaximizable(false);
-    window.setMinimumSize(340, getFrameHeight());
-    window.setSize(340, getFrameHeight());
+    window.setResizable(false);
+    window.setMinimumSize(COMPACT_WIDTH, getFrameHeight());
+    window.setSize(COMPACT_WIDTH, getFrameHeight());
   }
 }
 
@@ -170,6 +175,40 @@ function showOnCurrentWorkspace(window: BrowserWindow | null) {
   }, 300);
 }
 
+const surfaces = isMacOS()
+  ? createWindowSurfaces({
+      window: () => win,
+      screen,
+      compactHeight: getFrameHeight,
+      fullscreen: () => windowState.isFullscreen,
+      show: showOnCurrentWorkspace,
+      publish: (state) =>
+        win?.webContents.send(WINDOW_SURFACE_STATE, state),
+      layoutChanged: (layout) => {
+        windowState.layout = layout;
+      },
+      initialBounds: store.safeGet("workspaceBounds"),
+      saveBounds: (bounds) => store.safeSet("workspaceBounds", bounds),
+      initiallyHidden: app.getLoginItemSettings().wasOpenedAtLogin,
+    })
+  : null;
+
+function onSurfaceDisplayChange() {
+  surfaces?.displayChanged();
+}
+
+function hideMainWindow() {
+  if (surfaces && windowState.isFullscreen) return;
+  if (surfaces?.getState().layout === "classic") surfaces.dismiss();
+  else win?.hide();
+}
+
+function openWorkspace() {
+  if (!win || win.isDestroyed()) createMainWindow();
+  if (surfaces) surfaces.open("dashboard");
+  else showOnCurrentWorkspace(win);
+}
+
 function cancelPendingWorkspaceReset() {
   if (pendingWorkspaceReset) {
     clearTimeout(pendingWorkspaceReset);
@@ -178,15 +217,16 @@ function cancelPendingWorkspaceReset() {
 }
 
 function createMainWindow() {
+  mainWindowCreated = true;
   const dashboard = isDashboardLayout();
   win = new BrowserWindow({
-    width: dashboard ? DASHBOARD_SIZE.width : 340,
+    width: dashboard ? DASHBOARD_SIZE.width : COMPACT_WIDTH,
     height: dashboard ? DASHBOARD_SIZE.height : getFrameHeight(),
     ...(dashboard && {
       minWidth: DASHBOARD_MIN_SIZE.width,
       minHeight: DASHBOARD_MIN_SIZE.height,
     }),
-    resizable: true,
+    resizable: dashboard,
     maximizable: dashboard,
     show: false,
     frame: store.safeGet("useNativeTitlebar"),
@@ -216,9 +256,39 @@ function createMainWindow() {
       : `file://${path.join(__dirname, "index.html")}`
   );
 
+  const savedBounds = store.safeGet("workspaceBounds");
+  if (surfaces && dashboard) {
+    const area = screen.getDisplayMatching(
+      savedBounds || win.getBounds()
+    ).workArea;
+    win.setMinimumSize(
+      Math.min(DASHBOARD_MIN_SIZE.width, area.width),
+      Math.min(DASHBOARD_MIN_SIZE.height, area.height)
+    );
+    const bounds = savedBounds || win.getBounds();
+    win.setBounds(
+      clampBounds(
+        {
+          ...bounds,
+          width: Math.max(DASHBOARD_MIN_SIZE.width, bounds.width),
+          height: Math.max(DASHBOARD_MIN_SIZE.height, bounds.height),
+        },
+        area
+      )
+    );
+  }
+
   win.once("ready-to-show", () => {
-    win?.show();
+    if (!surfaces) win?.show();
   });
+  win.on("blur", () => surfaces?.blur());
+  const persistWorkspaceBounds = debounce(
+    () => surfaces?.saveWorkspace(),
+    150
+  );
+  win.on("resize", persistWorkspaceBounds);
+  win.on("move", persistWorkspaceBounds);
+  win.once("closed", () => persistWorkspaceBounds.cancel());
 
   win.on(
     "minimize",
@@ -229,7 +299,7 @@ function createMainWindow() {
             const data = await getFromStorage(win, "state");
             if (data.settings.minimizeToTray) {
               if (!windowState.isFullscreen) {
-                win?.hide();
+                hideMainWindow();
                 if (tray === null && data.settings.minimizeToTray) {
                   createSystemTray();
                 }
@@ -268,7 +338,8 @@ function createMainWindow() {
   win.on("leave-full-screen", () => {
     // The dashboard is freely resizable; macOS restores its previous size.
     if (isDashboardLayout()) return;
-    setSizeIfDiff(340, getFrameHeight());
+    setSizeIfDiff(COMPACT_WIDTH, getFrameHeight());
+    if (surfaces) win?.setResizable(false);
   });
 
   win.on(
@@ -283,7 +354,7 @@ function createMainWindow() {
               app.exit();
             } else {
               if (!windowState.isFullscreen) {
-                win?.hide();
+                hideMainWindow();
                 if (tray === null && data.settings.closeToTray) {
                   createSystemTray();
                 }
@@ -302,14 +373,14 @@ function createMainWindow() {
   createContextMenu(win);
 }
 
-const trayTooltip = "Just click to restore.";
+const trayTooltip = isMacOS()
+  ? "Click to toggle Compact HUD"
+  : "Just click to restore.";
 
 const contextMenu = Menu.buildFromTemplate([
   {
-    label: "Restore the app",
-    click: () => {
-      showOnCurrentWorkspace(win);
-    },
+    label: isMacOS() ? "Open Workspace" : "Restore the app",
+    click: openWorkspace,
   },
   {
     label: "Quit",
@@ -327,6 +398,7 @@ const contextMenu = Menu.buildFromTemplate([
 
       // https://www.electronjs.org/docs/latest/api/dialog#dialogshowmessageboxsyncwindow-options
       // First argument is optional; null will not throw
+      const resumeDismissal = surfaces?.suspendDismissal();
       const response = dialog.showMessageBoxSync(win!, {
         type: "question",
         title: "Confirm Exit",
@@ -337,6 +409,7 @@ const contextMenu = Menu.buildFromTemplate([
         icon: getIcon(),
       });
 
+      resumeDismissal?.();
       if (response === QuitConfirm.YES) {
         app.exit();
       }
@@ -350,7 +423,11 @@ function createSystemTray() {
   tray.setToolTip(trayTooltip);
   tray.setContextMenu(contextMenu);
 
-  tray?.on("click", () => {
+  tray?.on("click", (_event, bounds) => {
+    if (surfaces) {
+      surfaces.toggle("tray", bounds);
+      return;
+    }
     // Visible-but-unfocused usually means it's on another Space or behind
     // other apps, so bring it here rather than hiding it.
     if (win?.isVisible() && win.isFocused()) {
@@ -367,7 +444,9 @@ if (!onlySingleInstance) {
   app.quit();
 } else {
   app.on("second-instance", () => {
-    if (win) {
+    if (surfaces) {
+      openWorkspace();
+    } else if (win) {
       if (win.isMinimized()) {
         win.restore();
       } else {
@@ -394,6 +473,9 @@ if (!onlySingleInstance) {
     }
 
     createMainWindow();
+    if (surfaces && tray === null) createSystemTray();
+    screen.on("display-metrics-changed", onSurfaceDisplayChange);
+    screen.on("display-removed", onSurfaceDisplayChange);
     try {
       if (win) {
         const data = await getFromStorage(win, "state");
@@ -421,13 +503,14 @@ if (!onlySingleInstance) {
       {
         key: "Alt+Shift+H",
         callback: () => {
-          win?.hide();
+          hideMainWindow();
         },
       },
       {
         key: "Alt+Shift+S",
         callback: () => {
-          showOnCurrentWorkspace(win);
+          if (surfaces) openWorkspace();
+          else showOnCurrentWorkspace(win);
         },
       },
     ]);
@@ -435,7 +518,8 @@ if (!onlySingleInstance) {
 }
 
 ipcMain.on(SET_ALWAYS_ON_TOP, (e, { alwaysOnTop }) => {
-  win?.setAlwaysOnTop(alwaysOnTop);
+  if (surfaces) surfaces.setAlwaysOnTop(!!alwaysOnTop);
+  else win?.setAlwaysOnTop(alwaysOnTop);
 });
 
 ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
@@ -443,6 +527,8 @@ ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
   if (args.shouldFullscreen !== windowState.isFullscreen) {
     cancelPendingWorkspaceReset();
   }
+  const fullscreenChanged =
+    args.shouldFullscreen !== windowState.isFullscreen;
   windowState.isFullscreen = setFullscreenBreakHandler(args, {
     win,
     tray,
@@ -450,10 +536,20 @@ ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
     contextMenu,
     isFullscreen: windowState.isFullscreen,
   });
+  if (fullscreenChanged) surfaces?.fullscreenChanged();
+  surfaces?.setAlwaysOnTop(!!args.alwaysOnTop);
 });
 
 ipcMain.on(SET_LAYOUT, (e, { layout }: { layout: AppLayoutName }) => {
-  if (layout !== "classic" && layout !== "dashboard") return;
+  if (
+    e.sender !== win?.webContents ||
+    (layout !== "classic" && layout !== "dashboard")
+  )
+    return;
+  if (surfaces) {
+    surfaces.open(layout);
+    return;
+  }
   // Also sent on every launch; only resize on an actual change so a
   // user-resized dashboard window keeps its size.
   if (layout === windowState.layout) return;
@@ -467,7 +563,22 @@ ipcMain.on(SET_UI_THEME, (e, { isDarkMode }) => {
 });
 
 ipcMain.on(SHOW_WINDOW, () => {
-  showOnCurrentWorkspace(win);
+  if (surfaces) openWorkspace();
+  else showOnCurrentWorkspace(win);
+});
+
+ipcMain.on(WINDOW_SURFACE_REQUEST, (event) => {
+  if (event.sender === win?.webContents) surfaces?.sync();
+});
+ipcMain.on(WINDOW_SURFACE_READY, (event, revision) => {
+  if (event.sender === win?.webContents) surfaces?.ready(revision);
+});
+ipcMain.on(HUD_PIN_SET, (event, pinned) => {
+  if (event.sender === win?.webContents && typeof pinned === "boolean")
+    surfaces?.pin(pinned);
+});
+ipcMain.on(HUD_DISMISS, (event) => {
+  if (event.sender === win?.webContents) surfaces?.dismiss();
 });
 
 ipcMain.on(MINIMIZE_WINDOW, (e, { minimizeToTray }) => {
@@ -477,7 +588,7 @@ ipcMain.on(MINIMIZE_WINDOW, (e, { minimizeToTray }) => {
     if (tray === null) {
       createSystemTray();
     }
-    win?.hide();
+    hideMainWindow();
   }
 });
 
@@ -488,7 +599,7 @@ ipcMain.on(CLOSE_WINDOW, (e, { closeToTray }) => {
     if (tray === null) {
       createSystemTray();
     }
-    win?.hide();
+    hideMainWindow();
   }
 });
 
@@ -501,6 +612,7 @@ ipcMain.on(SET_NATIVE_TITLEBAR, (e, { useNativeTitlebar }) => {
       win?.destroy();
       win = null;
       createMainWindow();
+      surfaces?.windowRecreated();
       isRecreatingWindow = false;
       if (bounds) {
         // Set in createMainWindow but the ts compiler seems to see it as never
@@ -556,7 +668,10 @@ const notchIsland =
           "assets",
           "notchIsland.html"
         )}`,
-        onClick: () => showOnCurrentWorkspace(win),
+        onClick: () =>
+          surfaces
+            ? surfaces.toggle("notch")
+            : showOnCurrentWorkspace(win),
       })
     : null;
 
@@ -566,11 +681,11 @@ ipcMain.on(NOTCH_ISLAND_UPDATE, (e, state: NotchIslandState) => {
 });
 
 ipcMain.on(NOTCH_ISLAND_HOVER, (e, hovering: boolean) => {
-  notchIsland?.setHovering(!!hovering);
+  if (notchIsland?.owns(e.sender)) notchIsland.setHovering(!!hovering);
 });
 
-ipcMain.on(NOTCH_ISLAND_CLICK, () => {
-  notchIsland?.click();
+ipcMain.on(NOTCH_ISLAND_CLICK, (e) => {
+  if (notchIsland?.owns(e.sender)) notchIsland.click();
 });
 
 ipcMain.on(TRAY_TITLE_UPDATE, (e, title) => {
@@ -647,12 +762,15 @@ ipcMain.on(OBSIDIAN_STATUS_REQUEST, sendObsidianStatus);
 
 ipcMain.on(OBSIDIAN_PICK_VAULT, async () => {
   if (!win) return;
-  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
-    title: "Choose your Obsidian vault",
-    buttonLabel: "Use this vault",
-    defaultPath: store.safeGet("obsidianVault"),
-    properties: ["openDirectory", "createDirectory"],
-  });
+  const resumeDismissal = surfaces?.suspendDismissal();
+  const { canceled, filePaths } = await dialog
+    .showOpenDialog(win, {
+      title: "Choose your Obsidian vault",
+      buttonLabel: "Use this vault",
+      defaultPath: store.safeGet("obsidianVault"),
+      properties: ["openDirectory", "createDirectory"],
+    })
+    .finally(() => resumeDismissal?.());
   if (!canceled && filePaths[0]) {
     store.safeSet("obsidianVault", filePaths[0]);
   }
@@ -678,7 +796,10 @@ ipcMain.on(
 
 ipcMain.on(SET_ENABLE_ACTIVITY_TRACKING, (e, { enable }) => {
   if (enable) {
-    if (win) initializeActivityTracking(win);
+    if (win)
+      initializeActivityTracking(win, () =>
+        surfaces?.suspendDismissal()
+      );
   } else {
     uninitializeActivityTracking();
   }
@@ -713,12 +834,18 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow();
-  }
+  if (!mainWindowCreated) return;
+  if (surfaces) openWorkspace();
+  else if (!win || win.isDestroyed()) createMainWindow();
 });
 
 app.on("will-quit", () => {
+  screen.removeListener(
+    "display-metrics-changed",
+    onSurfaceDisplayChange
+  );
+  screen.removeListener("display-removed", onSurfaceDisplayChange);
+  surfaces?.destroy();
   notchIsland?.destroy();
   globalShortcut.unregisterAll();
 });

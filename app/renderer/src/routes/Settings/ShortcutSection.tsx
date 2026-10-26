@@ -1,5 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useContext } from "react";
+import { ConnnectorContext } from "contexts/ConnnectorContext";
 import { Shortcut } from "components";
 
 import SettingSection from "./SettingSection";
@@ -27,7 +29,22 @@ const ShortcutGroup: React.FC<{
 const ShortcutSection: React.FC = () => {
   const { t } = useTranslation();
 
+  const { onLayoutChange } = useContext(ConnnectorContext);
   const local: ShortcutDef[] = [
+    ...(onLayoutChange
+      ? [
+          {
+            id: "open-workspace",
+            name: t("timer.openWorkspace"),
+            shortcutKey: "⌘O",
+          },
+          {
+            id: "open-hud",
+            name: t("timer.collapseHud"),
+            shortcutKey: "⌘⇧M",
+          },
+        ]
+      : []),
     {
       id: "escape-form-popup",
       name: t("shortcuts.escapeFormPopup"),

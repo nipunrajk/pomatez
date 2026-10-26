@@ -11,11 +11,17 @@ import {
   StyledSidebarNotify,
 } from "styles";
 import SVG from "./SVG";
+import { useWindowSurface } from "hooks/useWindowSurface";
+import { AppLayout } from "store/settings/types";
+import { detectOS } from "utils";
 
 const COLLAPSED_KEY = "pomatez_sidebar_collapsed";
 
 const Sidebar: React.FC = () => {
   const { t } = useTranslation();
+  const changeSurface = useWindowSurface();
+  const hudLabel =
+    t("timer.collapseHud") + (detectOS() === "MacOS" ? " (⌘⇧M)" : "");
   const state = useAppSelector((state) => state);
   const items = dashboardRoutes(state);
   const [collapsed, setCollapsed] = useState<boolean>(
@@ -33,10 +39,14 @@ const Sidebar: React.FC = () => {
         {!collapsed && <span>{APP_NAME}</span>}
         <StyledSidebarCollapse
           type="button"
-          aria-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
+          aria-label={t(
+            collapsed ? "nav.expandSidebar" : "nav.collapseSidebar"
+          )}
           aria-controls="dashboard-sidebar"
           aria-expanded={!collapsed}
-          title={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
+          title={t(
+            collapsed ? "nav.expandSidebar" : "nav.collapseSidebar"
+          )}
           onClick={toggle}
         >
           <SVG name={collapsed ? "arrow-right" : "arrow-left"} />
@@ -58,6 +68,23 @@ const Sidebar: React.FC = () => {
           {notify && <StyledSidebarNotify />}
         </StyledSidebarLink>
       ))}
+      <StyledSidebarLink
+        as="button"
+        type="button"
+        $collapsed={collapsed}
+        style={{
+          marginTop: "auto",
+          background: "transparent",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
+        title={hudLabel}
+        aria-label={hudLabel}
+        onClick={() => changeSurface(AppLayout.CLASSIC)}
+      >
+        <SVG name="timer" />
+        <span className="label">{t("timer.collapseHud")}</span>
+      </StyledSidebarLink>
     </StyledSidebar>
   );
 };

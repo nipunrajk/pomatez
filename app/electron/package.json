@@ -37,7 +37,7 @@
     "build:snap": "electron-builder --linux snap",
     "release:mw": "electron-builder --publish always --mac --win",
     "release": "electron-builder --publish always",
-    "test": "jest --watchAll"
+    "test": "jest --runInBand"
   },
   "build": {
     "productName": "Pomatez",

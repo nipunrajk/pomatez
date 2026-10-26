@@ -10,6 +10,9 @@ import {
 } from "./connectors/TauriConnector";
 
 export type ConnectorProps = {
+  onLayoutChange?: (layout: "classic" | "dashboard") => void;
+  hudPinned?: boolean;
+  onHudPin?: (pinned: boolean) => void;
   onMinimizeCallback?: () => void;
   onExitCallback?: () => void;
   openExternalCallback?: () => void;

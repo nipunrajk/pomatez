@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
+  useState,
 } from "react";
 import { ConnnectorContext } from "../ConnnectorContext";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
@@ -11,6 +12,13 @@ import {
   SET_ALWAYS_ON_TOP,
   CLOSE_WINDOW,
   SET_LAYOUT,
+  WINDOW_SURFACE_REQUEST,
+  WINDOW_SURFACE_STATE,
+  WINDOW_SURFACE_READY,
+  HUD_PIN_SET,
+  HUD_DISMISS,
+  WindowSurfaceState,
+  getTimerPresentation,
   SET_FULLSCREEN_BREAK,
   MINIMIZE_WINDOW,
   SET_NATIVE_TITLEBAR,
@@ -33,13 +41,14 @@ import {
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { TimerStatus } from "store/timer/types";
-import { TrayIconStyle } from "store/settings/types";
-import { padNum } from "utils";
+import { AppLayout, TrayIconStyle } from "store/settings/types";
+import { detectOS } from "utils";
 import {
   CalendarEvent,
   CalendarStatus,
   recordActivitySample,
   RecordActivitySamplePayload,
+  setLayout,
   setCalendarEvents,
   setCalendarStatus,
   setObsidianExportResult,
@@ -64,8 +73,9 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
     settings: state.settings,
   }));
 
-  const { count, duration, shouldFullscreen } =
-    useContext(CounterContext);
+  const { count, duration, shouldFullscreen, active } = useContext(
+    CounterContext
+  );
 
   const onMinimizeCallback = useCallback(() => {
     electron.send(MINIMIZE_WINDOW, {
@@ -106,11 +116,89 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
     });
   }, [electron, settings.alwaysOnTop, shouldFullscreen]);
 
-  // Sent before compact mode so the main process knows the layout when it
-  // decides how to size the window.
+  const managedSurfaces = detectOS() === "MacOS";
+  const [surface, setSurface] = useState<WindowSurfaceState | null>(
+    null
+  );
+  const requestLayout = useCallback(
+    (layout: "classic" | "dashboard") => {
+      electron.send(SET_LAYOUT, { layout });
+    },
+    [electron]
+  );
+
   useEffect(() => {
-    electron.send(SET_LAYOUT, { layout: settings.layout });
-  }, [electron, settings.layout]);
+    if (!managedSurfaces) return;
+    const unsubscribe = electron.receive(
+      WINDOW_SURFACE_STATE,
+      (next: WindowSurfaceState) => {
+        if (next.layout !== "classic" && next.layout !== "dashboard")
+          return;
+        dispatch(setLayout(next.layout as AppLayout));
+        setSurface(next);
+      }
+    );
+    electron.send(WINDOW_SURFACE_REQUEST);
+    return unsubscribe;
+  }, [electron, dispatch, managedSurfaces]);
+
+  // Acknowledge after the layout commit and its route effects, before native show.
+  useEffect(() => {
+    if (!surface) return;
+    const frame = requestAnimationFrame(() =>
+      electron.send(WINDOW_SURFACE_READY, surface.revision)
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [electron, surface]);
+
+  useEffect(() => {
+    if (!managedSurfaces)
+      electron.send(SET_LAYOUT, { layout: settings.layout });
+  }, [electron, settings.layout, managedSurfaces]);
+
+  useEffect(() => {
+    if (!managedSurfaces) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || shouldFullscreen) return;
+      if (
+        event.metaKey &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.code === "KeyO"
+      ) {
+        event.preventDefault();
+        requestLayout("dashboard");
+      } else if (
+        event.metaKey &&
+        event.shiftKey &&
+        !event.altKey &&
+        event.code === "KeyM"
+      ) {
+        event.preventDefault();
+        requestLayout("classic");
+      } else if (
+        event.key === "Escape" &&
+        surface?.layout === "classic"
+      ) {
+        // Menus handle the first Escape in their own listeners.
+        if (
+          document.querySelector(
+            '[role="dialog"], [role="menu"], [data-hud-escape-boundary]'
+          )
+        )
+          return;
+        electron.send(HUD_DISMISS);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    electron,
+    managedSurfaces,
+    requestLayout,
+    shouldFullscreen,
+    surface,
+  ]);
 
   useEffect(() => {
     electron.send(SET_UI_THEME, {
@@ -196,14 +284,20 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
     settings.trayIconStyle === TrayIconStyle.TEXT_ONLY ||
     settings.trayIconStyle === TrayIconStyle.ICON_TEXT;
 
+  const presentation = getTimerPresentation({
+    count,
+    duration,
+    playing: timer.playing,
+    phaseStarted: !!active,
+  });
+  const { time, progress } = presentation;
+
   useEffect(() => {
     if (
       (settings.showTimerInTrayBar || isTextTrayStyle) &&
-      timer.playing
+      (active || isTextTrayStyle)
     ) {
-      const minutes = Math.floor(count / 60);
-      const seconds = count % 60;
-      electron.send(TRAY_TITLE_UPDATE, `${minutes}:${padNum(seconds)}`);
+      electron.send(TRAY_TITLE_UPDATE, time);
     } else {
       electron.send(TRAY_TITLE_UPDATE, "");
     }
@@ -211,29 +305,31 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
     electron,
     settings.showTimerInTrayBar,
     isTextTrayStyle,
-    timer.playing,
-    count,
+    active,
+    time,
   ]);
 
   useEffect(() => {
     electron.send(NOTCH_ISLAND_UPDATE, {
       enabled: settings.showNotchIsland,
       playing: timer.playing,
+      active,
       timerType: timer.timerType,
-      time: `${Math.floor(count / 60)}:${padNum(count % 60)}`,
-      progress: duration > 0 ? (duration - count) / duration : 0,
+      time,
+      progress,
       round: timer.round,
       sessionRounds: config.sessionRounds,
     });
   }, [
     electron,
     settings.showNotchIsland,
+    active,
     timer.playing,
     timer.timerType,
     timer.round,
     config.sessionRounds,
-    count,
-    duration,
+    time,
+    progress,
   ]);
 
   useEffect(() => {
@@ -289,7 +385,9 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
           | { ok: true; written: number; removed: number }
           | { ok: false; error: string }
       ) => {
-        dispatch(setObsidianExportResult({ ...result, at: Date.now() }));
+        dispatch(
+          setObsidianExportResult({ ...result, at: Date.now() })
+        );
       }
     );
     electron.send(OBSIDIAN_STATUS_REQUEST);
@@ -298,6 +396,11 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
   return (
     <ConnnectorContext.Provider
       value={{
+        onLayoutChange: managedSurfaces ? requestLayout : undefined,
+        hudPinned: surface?.pinned,
+        onHudPin: managedSurfaces
+          ? (pinned) => electron.send(HUD_PIN_SET, pinned)
+          : undefined,
         onMinimizeCallback,
         onExitCallback,
         openExternalCallback,

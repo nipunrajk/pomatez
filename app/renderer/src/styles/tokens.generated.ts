@@ -52,6 +52,15 @@ export const modulaTokens = `
   --color-timer-long-break: #C0846F;
   --color-timer-ring-track: #E5E5D7;
   --color-timer-gauge-ticks: #F4FCFD;
+  --color-cozy-dial-surface: #F0F5F2;
+  --color-cozy-dial-track: #DAE4DE;
+  --color-cozy-dial-tick: #8FABA3;
+  --color-cozy-dial-shadow: rgba(38, 62, 90, 0.16);
+  --color-cozy-play-icon: #FFFFFF;
+  --color-cozy-cat-fur: #E8C9A8;
+  --color-cozy-cat-outline: #745A48;
+  --color-cozy-cat-ear: #BE8C78;
+  --color-cozy-cat-shadow: rgba(116, 90, 72, 0.12);
   --color-calendar-weekday: #9C9C90;
   --color-calendar-day: #67665B;
   --color-calendar-selected-bg: #4673A6;
@@ -127,6 +136,13 @@ export const modulaTokens = `
   --color-timer-long-break-rgb: 192, 132, 111;
   --color-timer-ring-track-rgb: 229, 229, 215;
   --color-timer-gauge-ticks-rgb: 244, 252, 253;
+  --color-cozy-dial-surface-rgb: 240, 245, 242;
+  --color-cozy-dial-track-rgb: 218, 228, 222;
+  --color-cozy-dial-tick-rgb: 143, 171, 163;
+  --color-cozy-play-icon-rgb: 255, 255, 255;
+  --color-cozy-cat-fur-rgb: 232, 201, 168;
+  --color-cozy-cat-outline-rgb: 116, 90, 72;
+  --color-cozy-cat-ear-rgb: 190, 140, 120;
   --color-calendar-weekday-rgb: 156, 156, 144;
   --color-calendar-day-rgb: 103, 102, 91;
   --color-calendar-selected-bg-rgb: 70, 115, 166;
@@ -382,8 +398,8 @@ export const modulaTokens = `
   --component-calendar-day-size: 48px;
   --component-calendar-day-radius: var(--radius-circle);
   /* layout */
-  --layout-compact-window-width: 340px;
-  --layout-compact-window-height: 480px;
+  --layout-compact-window-width: 350px;
+  --layout-compact-window-height: 420px;
   --layout-compact-background: var(--color-background-window);
   --layout-compact-tab-bar-height: 56px;
   --layout-compact-tab-bar-bg: var(--color-background-window);

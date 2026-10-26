@@ -92,6 +92,16 @@ export const modulaTheme = css`
  * Non-color tokens (type, spacing, radius, motion) are shared with light.
  */
 export const darkTheme = css`
+  --color-cozy-dial-surface: #1c2a35;
+  --color-cozy-dial-track: #30444f;
+  --color-cozy-dial-tick: #7b969d;
+  --color-cozy-dial-shadow: rgba(100, 180, 230, 0.12);
+  --color-cozy-play-icon: #10212b;
+  --color-cozy-cat-fur: #be9f85;
+  --color-cozy-cat-outline: #e4d5c7;
+  --color-cozy-cat-ear: #8d5e56;
+  --color-cozy-cat-shadow: rgba(0, 0, 0, 0.25);
+
   --color-primary: #0098f7;
   --color-primary-rgb: 0, 152, 247;
 

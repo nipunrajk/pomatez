@@ -4,6 +4,7 @@
     "module": "commonjs",
     "allowJs": false,
     "noEmit": false,
+    "rootDir": "./src",
     "outDir": "./build",
     "removeComments": true
   },

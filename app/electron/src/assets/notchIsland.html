@@ -58,6 +58,12 @@
         box-shadow: 0 0 8px var(--accent);
         animation: pulse 2s ease-in-out infinite;
       }
+      #island.paused .dot {
+        animation: none; box-shadow: none; opacity: 0.55;
+        border-radius: 0; background: transparent;
+        border-left: 3px solid var(--accent); border-right: 3px solid var(--accent);
+      }
+      #island.paused .fill { transition: none; }
       @keyframes pulse { 50% { opacity: 0.45; } }
       .time {
         font-size: 14px; font-weight: 600;
@@ -123,6 +129,8 @@
         const isBreak = s.timerType !== "STAY_FOCUS";
         island.style.setProperty("--accent", isBreak ? "var(--break)" : "var(--focus)");
         $("phase").textContent = notchWidth ? LABELS[s.timerType] || "" : "";
+        island.classList.toggle("paused", !s.playing);
+        island.title = s.playing ? "Open Compact HUD" : "Paused · Open Compact HUD";
         $("time").textContent = s.time;
         $("round").textContent = (LABELS[s.timerType] || "") + " · Round " + s.round + "/" + s.sessionRounds;
         const pct = Math.max(0, Math.min(1, s.progress));

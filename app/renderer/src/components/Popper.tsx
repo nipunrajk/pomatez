@@ -76,6 +76,7 @@ export const Popper: React.FC<Props> = ({
       {showContent && (
         <Portal id="option-portal">
           <StyledPopperContent
+            data-hud-escape-boundary
             ref={contentRef}
             style={{
               top: popperStyles.bottom + 4 + window.scrollY,

@@ -28,6 +28,7 @@ export const useTargetOutside = ({ ref, eventType }: TargetOutside) => {
 
     function closeOnEscape(e: KeyboardEvent) {
       if (e.code === "Escape") {
+        e.preventDefault();
         setState(false);
       }
     }

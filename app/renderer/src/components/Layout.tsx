@@ -55,11 +55,14 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
   // in that layout: the dashboard opens on Control Panel, classic only has
   // "/" (it's a single-purpose timer popup with no tabs).
   const appliedLayout = useRef<AppLayout | null>(null);
+  const workspaceRoute = useRef(controlPanelRoute.path);
+  if (isDashboard && location.pathname !== "/")
+    workspaceRoute.current = location.pathname;
   useEffect(() => {
     if (appliedLayout.current === settings.layout) return;
     appliedLayout.current = settings.layout;
     if (isDashboard && location.pathname === "/") {
-      history.replace(controlPanelRoute.path);
+      history.replace(workspaceRoute.current);
     } else if (!isDashboard && location.pathname !== "/") {
       history.replace("/");
     }

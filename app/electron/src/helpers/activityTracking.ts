@@ -54,11 +54,15 @@ async function pollActiveWindow(win: BrowserWindow): Promise<void> {
   }
 }
 
-export function initializeActivityTracking(win: BrowserWindow): void {
+export function initializeActivityTracking(
+  win: BrowserWindow,
+  suspendDismissal?: () => (() => void) | undefined
+): void {
   if (intervalId) return;
 
   // Triggers the system prompt the first time; later calls are a silent
   // check, since macOS only ever prompts once per app.
+  const resumeDismissal = suspendDismissal?.();
   if (!hasAccessibilityPermission(true)) {
     dialog
       .showMessageBox(win, {
@@ -77,7 +81,10 @@ export function initializeActivityTracking(win: BrowserWindow): void {
         if (response === 0) {
           shell.openExternal(ACCESSIBILITY_SETTINGS_URL);
         }
-      });
+      })
+      .finally(() => resumeDismissal?.());
+  } else {
+    resumeDismissal?.();
   }
 
   pollActiveWindow(win);

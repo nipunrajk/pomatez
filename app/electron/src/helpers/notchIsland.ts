@@ -4,6 +4,7 @@ import { NOTCH_ISLAND_STATE } from "@pomatez/shareables";
 export type NotchIslandState = {
   enabled: boolean;
   playing: boolean;
+  active: boolean;
   timerType: string;
   time: string;
   progress: number;
@@ -58,7 +59,7 @@ export function createNotchIsland({
   const push = () => {
     if (!win || win.isDestroyed() || !pageReady || !lastState) return;
     const notch = hasNotch(screen.getPrimaryDisplay());
-    const visible = lastState.enabled && lastState.playing;
+    const visible = lastState.enabled && lastState.active;
     win.webContents.send(NOTCH_ISLAND_STATE, {
       ...lastState,
       visible,
@@ -136,7 +137,7 @@ export function createNotchIsland({
   return {
     update(state: NotchIslandState) {
       lastState = state;
-      const visible = state.enabled && state.playing;
+      const visible = state.enabled && state.active;
 
       if (hideTimer) {
         clearTimeout(hideTimer);
@@ -161,6 +162,7 @@ export function createNotchIsland({
       win?.setIgnoreMouseEvents(!hovering, { forward: true });
     },
 
+    owns: (sender: Electron.WebContents) => sender === win?.webContents,
     click: onClick,
 
     destroy() {

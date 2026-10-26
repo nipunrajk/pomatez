@@ -44,10 +44,13 @@ pub fn run() {
     let app = builder
         .register_pomatez_commands()
         .on_window_event(|window, event| {
+            if matches!(event, WindowEvent::Resized(_)) && window.label() == "main" {
+                if let Some(webview) = window.app_handle().get_webview_window("main") {
+                    commands::restore_compact_after_fullscreen(&webview);
+                }
+            }
             if let WindowEvent::CloseRequested { api, .. } = event {
-                if window.label() == "main"
-                    && *commands::CLOSE_TO_TRAY.lock().unwrap()
-                {
+                if window.label() == "main" && *commands::CLOSE_TO_TRAY.lock().unwrap() {
                     api.prevent_close();
                     let _ = window.hide();
                 }

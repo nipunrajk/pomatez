@@ -23,6 +23,7 @@ import {
   MessageSquare,
   Minus,
   Pause,
+  Pin,
   Pencil,
   Play,
   Plus,
@@ -53,6 +54,7 @@ export type SVGTypes = {
     | "config"
     | "option-x"
     | "option-y"
+    | "pin"
     | "pause"
     | "play"
     | "progress"
@@ -100,6 +102,7 @@ const ICONS: Record<
   "option-x": Ellipsis,
   "option-y": EllipsisVertical,
   pause: Pause,
+  pin: Pin,
   play: Play,
   reset: RotateCw,
   settings: Settings,

@@ -12,6 +12,7 @@ type StoreProps = {
   enableRPC?: boolean;
   /** Mirrors the renderer's layout so the window opens at the right size. */
   layout?: AppLayoutName;
+  workspaceBounds?: Electron.Rectangle;
   /** Google Calendar OAuth tokens, encrypted with safeStorage (base64). */
   googleCalendar?: string;
   /** Obsidian vault folder chosen in Settings (main owns the path). */

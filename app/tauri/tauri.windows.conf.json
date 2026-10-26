@@ -1,0 +1,16 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "pomatez",
+        "width": 340,
+        "height": 360,
+        "minWidth": 340,
+        "minHeight": 360,
+        "fullscreen": false,
+        "resizable": false
+      }
+    ]
+  }
+}

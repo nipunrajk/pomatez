@@ -23,6 +23,7 @@ import { TimerStatus } from "store/timer/types";
 type CounterProps = {
   count: number;
   duration: number;
+  active: boolean;
   timerType?: TimerStatus;
   resetTimerAction?: () => void;
   shouldFullscreen?: boolean;
@@ -31,6 +32,7 @@ type CounterProps = {
 const CounterContext = React.createContext<CounterProps>({
   count: 0,
   duration: 0,
+  active: false,
 });
 
 const CounterProvider: React.FC = ({ children }) => {
@@ -55,17 +57,27 @@ const CounterProvider: React.FC = ({ children }) => {
 
   const [shouldFullscreen, setShouldFullscreen] = useState(false);
 
+  const [phaseStarted, setPhaseStarted] = useState(false);
+  const playingRef = React.useRef(timer.playing);
+  playingRef.current = timer.playing;
+  useEffect(() => {
+    if (timer.playing) setPhaseStarted(true);
+  }, [timer.playing]);
+
   const [count, setCount] = useState(config.stayFocus * 60);
   const [lastCountTime, setLastCountTime] = useState(Date.now());
-  const [hasNotified30Seconds, setHasNotified30Seconds] =
-    useState(false);
-  const [hasNotified60Seconds, setHasNotified60Seconds] =
-    useState(false);
+  const [hasNotified30Seconds, setHasNotified30Seconds] = useState(
+    false
+  );
+  const [hasNotified60Seconds, setHasNotified60Seconds] = useState(
+    false
+  );
   const [hasNotifiedBreak, setHasNotifiedBreak] = useState(false);
 
   const [duration, setDuration] = useState(config.stayFocus * 60);
 
   const setTimerDuration = useCallback((time: number) => {
+    setPhaseStarted(playingRef.current);
     setDuration(time * 60);
     setCount(time * 60);
     setLastCountTime(Date.now());
@@ -126,8 +138,12 @@ const CounterProvider: React.FC = ({ children }) => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    const { firstBreak, secondBreak, thirdBreak, fourthBreak } =
-      config.specialBreaks;
+    const {
+      firstBreak,
+      secondBreak,
+      thirdBreak,
+      fourthBreak,
+    } = config.specialBreaks;
 
     if (timer.playing) {
       interval = setInterval(() => {
@@ -450,6 +466,7 @@ const CounterProvider: React.FC = ({ children }) => {
       value={{
         count: Math.ceil(count),
         duration,
+        active: timer.playing || phaseStarted,
         resetTimerAction,
         shouldFullscreen,
         timerType: timer.timerType,

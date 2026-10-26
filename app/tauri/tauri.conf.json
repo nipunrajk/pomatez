@@ -16,9 +16,11 @@
         "label": "main",
         "title": "pomatez",
         "width": 340,
-        "height": 640,
+        "height": 350,
+        "minWidth": 340,
+        "minHeight": 350,
         "fullscreen": false,
-        "resizable": true
+        "resizable": false
       }
     ],
     "security": {

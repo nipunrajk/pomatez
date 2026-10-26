@@ -1,3 +1,15 @@
+export { getTimerPresentation } from "./timerPresentation";
+export type WindowSurfaceState = {
+  layout: "classic" | "dashboard";
+  pinned: boolean;
+  revision: number;
+};
+export const WINDOW_SURFACE_REQUEST = "WINDOW_SURFACE_REQUEST";
+export const WINDOW_SURFACE_STATE = "WINDOW_SURFACE_STATE";
+export const WINDOW_SURFACE_READY = "WINDOW_SURFACE_READY";
+export const HUD_PIN_SET = "HUD_PIN_SET";
+export const HUD_DISMISS = "HUD_DISMISS";
+
 export const CHECK_FOR_UPDATES = "CHECK_FOR_UPDATES";
 export const SET_ALWAYS_ON_TOP = "SET_ALWAYS_ON_TOP";
 export const SET_FULLSCREEN_BREAK = "SET_FULLSCREEN_BREAK";
@@ -41,6 +53,10 @@ export const NOTCH_ISLAND_CLICK = "NOTCH_ISLAND_CLICK";
 export const NOTCH_ISLAND_HOVER = "NOTCH_ISLAND_HOVER";
 
 export const TO_MAIN: string[] = [
+  WINDOW_SURFACE_REQUEST,
+  WINDOW_SURFACE_READY,
+  HUD_PIN_SET,
+  HUD_DISMISS,
   SET_OPEN_AT_LOGIN,
   NOTCH_ISLAND_UPDATE,
   NOTCH_ISLAND_CLICK,
@@ -72,6 +88,7 @@ export const TO_MAIN: string[] = [
 ];
 
 export const FROM_MAIN: string[] = [
+  WINDOW_SURFACE_STATE,
   NOTCH_ISLAND_STATE,
   UPDATE_AVAILABLE,
   ACTIVITY_SAMPLE,

@@ -11,12 +11,12 @@ contextBridge.exposeInMainWorld("electron", {
   },
   receive: (channel: string, response: (...args: any[]) => void) => {
     if (FROM_MAIN.includes(channel)) {
-      ipcRenderer.on(
-        channel,
-        (event: Electron.IpcRendererEvent, ...args) => {
-          return response(...args);
-        }
-      );
+      const listener = (
+        _event: Electron.IpcRendererEvent,
+        ...args: any[]
+      ) => response(...args);
+      ipcRenderer.on(channel, listener);
+      return () => ipcRenderer.removeListener(channel, listener);
     }
   },
   openExternal: (

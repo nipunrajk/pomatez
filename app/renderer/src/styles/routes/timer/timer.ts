@@ -34,9 +34,13 @@ export const StyledTimerHeaderPad = styled.div`
   padding: 0 1.6rem;
 `;
 
-/** Wraps the header's overflow-menu button so its popper can anchor to it. */
+/** Direct actions for the compact timer surface. */
 export const StyledTimerHeaderMenu = styled.div`
-  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  button[aria-pressed="true"] {
+    color: var(--color-brand-primary-readable);
+  }
 `;
 
 export const StyledTimerMenuItem = styled.li`

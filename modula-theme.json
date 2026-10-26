@@ -71,6 +71,17 @@
       "ringTrack": "#E5E5D7",
       "gaugeTicks": "#F4FCFD"
     },
+    "cozy": {
+      "dialSurface": "#F0F5F2",
+      "dialTrack": "#DAE4DE",
+      "dialTick": "#8FABA3",
+      "dialShadow": "rgba(38, 62, 90, 0.16)",
+      "playIcon": "#FFFFFF",
+      "catFur": "#E8C9A8",
+      "catOutline": "#745A48",
+      "catEar": "#BE8C78",
+      "catShadow": "rgba(116, 90, 72, 0.12)"
+    },
     "calendar": {
       "weekday": "#9C9C90",
       "day": "#67665B",
@@ -247,8 +258,8 @@
 
   "layout": {
     "compact": {
-      "windowWidth": "340px",
-      "windowHeight": "480px",
+      "windowWidth": "350px",
+      "windowHeight": "420px",
       "background": "background.window",
       "tabBar": {
         "height": "56px",

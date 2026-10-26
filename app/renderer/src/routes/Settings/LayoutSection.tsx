@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
-import { setLayout } from "store";
+import { useAppSelector } from "hooks/storeHooks";
+import { useWindowSurface } from "hooks/useWindowSurface";
 import { AppLayout } from "store/settings/types";
 import { StyledLayoutOption, StyledLayoutPicker } from "styles";
 
@@ -11,24 +11,33 @@ import SettingSection from "./SettingSection";
 const ClassicPreview = () => (
   <svg viewBox="0 0 160 90" aria-hidden>
     <rect
-      x="58"
+      x="63"
+      y="1"
+      width="34"
+      height="5"
+      rx="2.5"
+      fill="var(--color-border-strong)"
+    />
+    <path d="M80 7v3" stroke="var(--color-border-strong)" />
+    <rect
+      x="48"
       y="10"
-      width="44"
-      height="70"
+      width="64"
+      height="76"
       rx="6"
       fill="var(--component-card-bg)"
       stroke="var(--color-border-strong)"
     />
     <circle
       cx="80"
-      cy="40"
-      r="13"
+      cy="43"
+      r="23"
       fill="none"
       stroke="var(--color-border-soft)"
       strokeWidth="4"
     />
     <path
-      d="M80 27 a13 13 0 0 1 12.4 17"
+      d="M80 20 a23 23 0 0 1 21.9 30"
       fill="none"
       stroke="var(--color-brand-primary)"
       strokeWidth="4"
@@ -36,7 +45,7 @@ const ClassicPreview = () => (
     />
     <rect
       x="70"
-      y="64"
+      y="73"
       width="20"
       height="5"
       rx="2.5"
@@ -121,25 +130,31 @@ const OPTIONS = [
 
 const LayoutSection: React.FC = () => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const changeSurface = useWindowSurface();
   const layout = useAppSelector((state) => state.settings.layout);
   const groupRef = useRef<HTMLDivElement>(null);
 
   const select = useCallback(
-    (value: AppLayout) => dispatch(setLayout(value)),
-    [dispatch]
+    (value: AppLayout) => changeSurface(value),
+    [changeSurface]
   );
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key))
+      if (
+        !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(
+          e.key
+        )
+      )
         return;
       e.preventDefault();
       const next = OPTIONS.find((option) => option.value !== layout);
       if (!next) return;
       select(next.value);
       groupRef.current
-        ?.querySelector<HTMLButtonElement>(`[data-value="${next.value}"]`)
+        ?.querySelector<HTMLButtonElement>(
+          `[data-value="${next.value}"]`
+        )
         ?.focus();
     },
     [layout, select]
@@ -177,7 +192,9 @@ const LayoutSection: React.FC = () => {
             >
               <Preview />
               <span className="title">{t(`settings.${titleKey}`)}</span>
-              <span className="subtitle">{t(`settings.${descKey}`)}</span>
+              <span className="subtitle">
+                {t(`settings.${descKey}`)}
+              </span>
             </StyledLayoutOption>
           );
         })}

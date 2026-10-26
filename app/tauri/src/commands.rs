@@ -1,7 +1,10 @@
 // Originally was only meant to have the commands, though due to the global mutex values adding a few extra for convenience for now
 // Will tidy up in the future
 
-use std::sync::Mutex;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Mutex,
+};
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use tauri::{Builder, LogicalSize, Runtime, Wry};
 
@@ -17,7 +20,11 @@ impl WindowSize {
     // The classic window is a fixed-size single-purpose timer popup.
     pub const MIN: LogicalSize<u32> = LogicalSize {
         width: 340,
-        height: 690,
+        height: if cfg!(target_os = "windows") {
+            360
+        } else {
+            350
+        },
     };
     pub const DASHBOARD: LogicalSize<u32> = LogicalSize {
         width: 1200,
@@ -59,10 +66,22 @@ fn set_layout<R: Runtime>(layout: String, window: tauri::WebviewWindow<R>) {
         // Lower the minimum first, or the OS clamps the shrink to it.
         try_set_min_size(Some(WindowSize::MIN), &window);
         try_set_size(WindowSize::MIN, &window);
+        try_set_resizeable(false, &window);
     }
 }
 
 static HAS_DECORATIONS: Mutex<bool> = Mutex::new(true);
+static RESTORE_COMPACT: AtomicBool = AtomicBool::new(false);
+
+pub fn restore_compact_after_fullscreen<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    if !window.is_fullscreen().unwrap_or(false) && RESTORE_COMPACT.swap(false, Ordering::SeqCst) {
+        if !*IS_DASHBOARD.lock().unwrap() {
+            try_set_min_size(Some(WindowSize::MIN), window);
+            try_set_size(WindowSize::MIN, window);
+            try_set_resizeable(false, window);
+        }
+    }
+}
 
 // Mirrors the renderer's `closeToTray` setting (default matches
 // `defaultSettings.ts`). Kept in sync via `set_close_to_tray` so the
@@ -127,7 +146,14 @@ fn set_fullscreen_break<R: Runtime>(
         try_set_native_titlebar(decorations, &window);
     }
 
+    if should_fullscreen {
+        try_set_resizeable(true, &window);
+    }
+    if !should_fullscreen && window.is_fullscreen().unwrap_or(false) {
+        RESTORE_COMPACT.store(true, Ordering::SeqCst);
+    }
     try_set_fullscreen(should_fullscreen, &window);
+    restore_compact_after_fullscreen(&window);
 }
 
 fn try_set_fullscreen<R: Runtime>(fullscreen: bool, window: &tauri::WebviewWindow<R>) {
@@ -169,7 +195,10 @@ fn try_set_resizeable<R: Runtime>(resizeable: bool, window: &tauri::WebviewWindo
 }
 
 #[tauri::command]
-fn set_ui_theme<R: Runtime>(is_dark_mode: bool, window: tauri::WebviewWindow<R>) -> Result<(), String> {
+fn set_ui_theme<R: Runtime>(
+    is_dark_mode: bool,
+    window: tauri::WebviewWindow<R>,
+) -> Result<(), String> {
     let theme = if is_dark_mode {
         tauri::Theme::Dark
     } else {
@@ -194,7 +223,10 @@ fn set_native_titlebar<R: Runtime>(use_native_titlebar: bool, window: tauri::Web
     try_set_native_titlebar(use_native_titlebar, &window);
 }
 
-pub fn try_set_native_titlebar<R: Runtime>(use_native_titlebar: bool, window: &tauri::WebviewWindow<R>) {
+pub fn try_set_native_titlebar<R: Runtime>(
+    use_native_titlebar: bool,
+    window: &tauri::WebviewWindow<R>,
+) {
     match window.set_decorations(use_native_titlebar) {
         Ok(_) => (),
         Err(e) => println!(
