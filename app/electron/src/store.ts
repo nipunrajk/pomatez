@@ -9,6 +9,7 @@ type StoreProps = {
   isDarkMode?: boolean;
   useNativeTitlebar?: boolean;
   openAtLogin?: boolean;
+  enableRPC?: boolean;
   /** Mirrors the renderer's layout so the window opens at the right size. */
   layout?: AppLayoutName;
   /** Google Calendar OAuth tokens, encrypted with safeStorage (base64). */

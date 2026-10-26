@@ -96,8 +96,8 @@ fn close_window<R: Runtime>(close_to_tray: bool, window: tauri::Window<R>) {
 }
 
 #[tauri::command]
-fn show_window<R: Runtime>(_window: tauri::Window<R>) {
-    println!("set_show!");
+fn show_window<R: Runtime>(window: tauri::WebviewWindow<R>) {
+    system_tray::show_on_current_workspace(&window);
 }
 
 #[tauri::command]
@@ -168,10 +168,16 @@ fn try_set_resizeable<R: Runtime>(resizeable: bool, window: &tauri::WebviewWindo
     }
 }
 
-// TODO - This is doing nothing - Remove or fix
 #[tauri::command]
-fn set_ui_theme<R: Runtime>(is_dark_mode: bool, _window: tauri::WebviewWindow<R>) {
-    println!("set_ui_theme! {}", is_dark_mode);
+fn set_ui_theme<R: Runtime>(is_dark_mode: bool, window: tauri::WebviewWindow<R>) -> Result<(), String> {
+    let theme = if is_dark_mode {
+        tauri::Theme::Dark
+    } else {
+        tauri::Theme::Light
+    };
+    window
+        .set_theme(Some(theme))
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]

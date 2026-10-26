@@ -229,7 +229,7 @@ export const en = {
     pressEsc: "Press Esc",
   },
   data: {
-    heading: "Data",
+    heading: "Backup & Restore",
     description:
       "Save your tasks, milestones, board, time entries, stats and settings to a JSON file, or restore them from one.",
     export: "Export data",
@@ -293,7 +293,7 @@ export const en = {
   },
   settings: {
     title: "Settings",
-    restoreDefault: "Restore Default",
+    restoreDefault: "Restore Defaults",
     restored: "Restored Successfully",
     appFeatures: "App Features",
     language: "Language",
@@ -304,35 +304,100 @@ export const en = {
     alertHeading: "Hi 👋,",
     alertBody:
       "If you liked this app, please consider starring this project on GitHub to show your ❤️ and support.",
-    alwaysOnTop: "Always On Top",
-    fullscreenBreak: "Fullscreen Break",
+    alwaysOnTop: "Float on Top",
+    fullscreenBreak: "Fullscreen Break Overlay",
     strictMode: "Strict Mode",
     darkTheme: "Dark Theme",
     followSystemTheme: "Follow System Theme",
-    nativeTitlebar: "Native Titlebar",
-    progressAnimation: "Progress Animation",
-    autoStartWorkTime: "Auto-start Work Time",
-    minimizeToTray: "Minimize To Tray",
-    closeToTray: "Close To Tray",
-    showTimerInTrayBar: "Show Timer in Menu Bar",
-    showNotchIsland: "Show Timer in Notch",
+    nativeTitlebar: "Native Window Frame",
+    progressAnimation: "Smooth Progress Dial",
+    autoStartWorkTime: "Auto-start Focus Rounds",
+    minimizeToTray: "Minimize to Background",
+    closeToTray: "Close to Tray",
+    showTimerInTrayBar: "Menu Bar Countdown",
+    showNotchIsland: "Dynamic Notch Island",
     enableUsageTracking: "Track App & Website Usage",
     voiceAssistance: "Voice Assistance",
-    openAtLogin: "Open At Login",
-    enableRichPresence: "Enable Rich Presence",
-    notificationTypes: "Notification Types",
-    notificationNone: "none",
-    notificationNormal: "normal",
-    notificationExtra: "extra",
-    trayIconStyle: "Tray Icon Style",
-    layout: "Layout",
-    layoutClassic: "Classic (compact Pomodoro)",
-    layoutDashboard: "Dashboard (time tracking)",
+    openAtLogin: "Launch at Startup",
+    enableRichPresence: "Discord Rich Presence",
+    notificationTypes: "Notifications",
+    notificationNone: "None",
+    notificationNormal: "Normal",
+    notificationExtra: "Extra",
+    trayIconStyle: "Tray Icon Appearance",
+    layout: "Workspace Layout",
+    layoutClassic: "Classic (Compact Pomodoro)",
+    layoutDashboard: "Workspace (Time Tracking & Kanban)",
     trayIconStyleClassic: "Classic",
     trayIconStyleMinimal: "Minimal",
     trayIconStyleTextOnly: "Text Only",
     trayIconStyleIconText: "Icon + Text",
     macOSOnly: "macOS only",
+    layoutClassicDesc:
+      "Lightweight 340px floating timer focused purely on intervals.",
+    layoutDashboardDesc:
+      "Comprehensive multi-view dashboard with Kanban board, daily log, and calendar agenda.",
+    groupFocus: "Focus & Discipline",
+    groupHardware: "Hardware & Menu Bar",
+    groupSystem: "Window & System",
+    groupAppearance: "Appearance & Language",
+    groupData: "Data & Vault Integrations",
+    groupKeyboard: "Keyboard Shortcuts",
+    groupAbout: "About & Community",
+    searchPlaceholder: "Search settings…",
+    noMatches: "No settings match “{{query}}”.",
+    pillAll: "All",
+    pillFocus: "Focus",
+    pillHardware: "Hardware",
+    pillSystem: "System",
+    pillAppearance: "Appearance",
+    pillData: "Data",
+    pillKeys: "Keys",
+    strictModeDesc:
+      "Disables pausing, skipping and resetting while the timer is running.",
+    fullscreenBreakDesc:
+      "Takes over the primary display during breaks to enforce rest away from the screen.",
+    autoStartWorkTimeDesc:
+      "Automatically begins the next focus interval immediately after a break ends.",
+    voiceAssistanceDesc:
+      "Speaks countdown warnings and phase changes out loud.",
+    notificationTypesDesc:
+      "How much Pomatez notifies you when a phase is about to end or ends.",
+    showNotchIslandDesc:
+      "Displays an interactive timer capsule hugging your MacBook display notch.",
+    showTimerInTrayBarDesc:
+      "Shows remaining focus time directly in the OS menu bar / status area.",
+    trayIconStyleDesc:
+      "Visual representation of the app in the system tray.",
+    nativeTitlebarDesc:
+      "Uses the operating system's default title bar instead of custom frameless chrome.",
+    progressAnimationDesc:
+      "Animates the timer circular dial countdown continuously.",
+    openAtLoginDesc:
+      "Automatically open Pomatez when logging into your computer.",
+    alwaysOnTopDesc:
+      "Keeps the Pomatez window floating above all other open applications.",
+    minimizeToTrayDesc:
+      "Hides the app to the system notification tray when clicking minimize.",
+    closeToTrayDesc:
+      "Keeps Pomatez running in the background when the main window is closed.",
+    enableUsageTrackingDesc:
+      "Records which apps and websites you use during focus sessions, for Stats.",
+    enableRichPresenceDesc:
+      "Shows your current session as your Discord status.",
+    colorTheme: "Color Theme",
+    colorThemeDesc:
+      "Choose between Light, Dark, or automatically match your OS appearance.",
+    themeSystem: "System",
+    themeLight: "Light",
+    themeDark: "Dark",
+    languageDesc: "Interface language and localized date formats.",
+    aboutTagline: "Open Source Focus Tracker",
+    aboutDocs: "Documentation",
+    aboutReleaseNotes: "Release Notes",
+    aboutReportIssue: "Report Issue",
+    aboutGithub: "GitHub ★",
+    aboutDiscord: "Discord Community 💬",
   },
   units: {
     min: "min",

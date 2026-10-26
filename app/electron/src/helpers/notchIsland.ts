@@ -83,6 +83,8 @@ export function createNotchIsland({
       maximizable: false,
       fullscreenable: false,
       skipTaskbar: true,
+      // This is a system-style overlay, not an app window to arrange in Mission Control.
+      hiddenInMissionControl: true,
       focusable: false,
       // Without this macOS pushes the window below the menu bar instead of
       // letting it cover the notch.

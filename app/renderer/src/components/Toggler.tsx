@@ -8,6 +8,8 @@ import {
 export type TogglerProps = {
   id: string;
   label: string;
+  /** Helper text under the label. */
+  description?: string;
   checked: boolean;
   disabled?: boolean;
   onChange?:
@@ -19,6 +21,7 @@ export type TogglerProps = {
 const Toggler: React.FC<TogglerProps> = ({
   id,
   label,
+  description,
   checked,
   disabled,
   onChange,
@@ -26,7 +29,10 @@ const Toggler: React.FC<TogglerProps> = ({
 }) => {
   return (
     <StyledTogglerWrapper style={style}>
-      <StyledTogglerLabel htmlFor={id}>{label}</StyledTogglerLabel>
+      <StyledTogglerLabel htmlFor={id}>
+        {label}
+        {description && <small>{description}</small>}
+      </StyledTogglerLabel>
       <StyledTogglerSwitch
         type="checkbox"
         id={id}

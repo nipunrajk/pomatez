@@ -12,8 +12,8 @@ import {
   StyledButtonDanger,
   StyledButtonNormal,
   StyledDataSection,
+  StyledSettingsSubsection,
 } from "styles";
-import SettingSection from "./SettingSection";
 import Json from "../../../package.json";
 
 /** Kept by an import, in case the backup wasn't the one you meant. */
@@ -91,7 +91,8 @@ const DataSection: React.FC = () => {
     : "";
 
   return (
-    <SettingSection heading={t("data.heading")}>
+    <StyledSettingsSubsection>
+      <h5>{t("data.heading")}</h5>
       <StyledDataSection>
         <p>{t("data.description")}</p>
         <div className="data-actions">
@@ -152,7 +153,7 @@ const DataSection: React.FC = () => {
           </p>
         )}
       </StyledDataSection>
-    </SettingSection>
+    </StyledSettingsSubsection>
   );
 };
 

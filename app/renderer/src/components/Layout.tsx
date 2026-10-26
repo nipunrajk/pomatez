@@ -22,7 +22,7 @@ import { ThemeContext } from "contexts";
 import { TimerStatus } from "store/timer/types";
 import { AppLayout } from "store/settings/types";
 import { useAppSelector } from "hooks/storeHooks";
-import { controlPanelRoute } from "config";
+import { controlPanelRoute, SETTINGS_PATH } from "config";
 
 type Props = {} & RouteComponentProps;
 
@@ -106,7 +106,8 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
               <StyledDashboardContent>
                 {children}
               </StyledDashboardContent>
-              <RightRail />
+              {/* Settings gets the full width; no timer rail. */}
+              {location.pathname !== SETTINGS_PATH && <RightRail />}
             </StyledDashboardBody>
           </StyledDashboardMain>
         </StyledDashboard>

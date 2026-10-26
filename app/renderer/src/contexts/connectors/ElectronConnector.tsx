@@ -14,7 +14,6 @@ import {
   SET_FULLSCREEN_BREAK,
   MINIMIZE_WINDOW,
   SET_NATIVE_TITLEBAR,
-  SHOW_WINDOW,
   SET_UI_THEME,
   TRAY_ICON_UPDATE,
   TRAY_TITLE_UPDATE,
@@ -93,12 +92,6 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
       }
     });
   }, [electron]);
-
-  useEffect(() => {
-    if (!settings.enableFullscreenBreak) {
-      electron.send(SHOW_WINDOW);
-    }
-  }, [electron, timer.timerType, settings.enableFullscreenBreak]);
 
   useEffect(() => {
     electron.send(SET_ALWAYS_ON_TOP, {

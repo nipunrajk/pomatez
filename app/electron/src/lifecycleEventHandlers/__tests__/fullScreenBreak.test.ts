@@ -1,144 +1,82 @@
+import { BrowserWindow, Menu, Tray } from "electron";
 import { setFullscreenBreakHandler } from "../fullScreenBreak";
 import {
-  BrowserWindow,
-  Menu,
-  globalShortcut,
-  Tray,
-  app,
-} from "electron";
-import path from "path";
+  activateFullScreenShortcuts,
+  deactivateFullScreenShortcuts,
+} from "../../helpers";
 
-describe("Fullscreen break", () => {
-  const getWindowSpies = (window: BrowserWindow) => {
-    return {
-      show: jest.spyOn(window, "show"),
-      focus: jest.spyOn(window, "focus"),
-      setAlwaysOnTop: jest.spyOn(window, "setAlwaysOnTop"),
-      setSkipTaskbar: jest.spyOn(window, "setSkipTaskbar"),
-      setFullScreen: jest.spyOn(window, "setFullScreen"),
-      setResizable: jest.spyOn(window, "setResizable"),
-      setVisibleOnAllWorkspaces: jest.spyOn(
-        window,
-        "setVisibleOnAllWorkspaces"
-      ),
+jest.mock("electron", () => ({
+  Menu: { buildFromTemplate: jest.fn(() => ({})) },
+}));
+jest.mock("../../helpers", () => ({
+  activateFullScreenShortcuts: jest.fn(),
+  deactivateFullScreenShortcuts: jest.fn(),
+}));
+
+describe("Fullscreen break window behavior", () => {
+  const setup = (isFullscreen = false) => {
+    const win = {
+      isDestroyed: jest.fn(() => false),
+      show: jest.fn(),
+      focus: jest.fn(),
+      setAlwaysOnTop: jest.fn(),
+      setFullScreen: jest.fn(),
+      setFullScreenable: jest.fn(),
+      setResizable: jest.fn(),
+      setVisibleOnAllWorkspaces: jest.fn(),
     };
+    const tray = { setToolTip: jest.fn(), setContextMenu: jest.fn() };
+    const args = {
+      win: win as unknown as BrowserWindow,
+      tray: tray as unknown as Tray,
+      contextMenu: {} as Menu,
+      trayTooltip: "Restore Pomatez",
+      isFullscreen,
+    };
+    return { win, tray, args };
   };
 
-  it("should enter full screen on break", () => {
-    const window = new BrowserWindow();
-    const tray = new Tray(
-      path.join(__dirname, "../../assets/tray-dark.png")
-    );
-    const trayTooltip = "Mock tray tool tip";
-    const fullscreenState = { isFullscreen: false };
+  beforeEach(() => jest.clearAllMocks());
 
-    // Set spies
-    const windowSpies = getWindowSpies(window);
-    const traySpies = {
-      setToolTip: jest.spyOn(tray, "setToolTip"),
-      setContextMenu: jest.spyOn(tray, "setContextMenu"),
-    };
-    expect(globalShortcut.isRegistered("Esc")).toBe(false);
-    expect(globalShortcut.isRegistered("CommandOrControl+W")).toBe(
-      false
-    );
-
-    setFullscreenBreakHandler(
-      { shouldFullscreen: true, alwaysOnTop: true },
-      {
-        win: window,
-        contextMenu: Menu.buildFromTemplate([{ label: "Mock Label" }]),
-        isFullscreen: fullscreenState.isFullscreen,
-        trayTooltip,
-        tray,
-      }
-    );
-
-    // Verify that window has been setup to fullscreen
-    expect(windowSpies.show).toHaveBeenCalledTimes(1);
-    expect(windowSpies.focus).toHaveBeenCalledTimes(1);
-    expect(windowSpies.setAlwaysOnTop).toHaveBeenCalledWith(
-      true,
-      "screen-saver"
-    );
-    expect(windowSpies.setSkipTaskbar).toHaveBeenCalledWith(true);
-    expect(windowSpies.setFullScreen).toHaveBeenCalledWith(true);
-    expect(windowSpies.setResizable).toHaveBeenCalledWith(true);
-    expect(windowSpies.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(
-      true
-    );
-    expect(fullscreenState.isFullscreen).toEqual(true);
-
-    // Verify that shortcuts have been set
-    expect(globalShortcut.isRegistered("Esc")).toBe(true);
-    expect(globalShortcut.isRegistered("CommandOrControl+W")).toBe(
-      true
-    );
-
-    // Verify that tray has been updated
-    expect(traySpies.setToolTip).toHaveBeenCalledTimes(1);
-    expect(traySpies.setContextMenu).toHaveBeenCalledTimes(1);
+  it("does not steal focus or change Spaces on startup or ordinary setting updates", () => {
+    const { win, tray, args } = setup();
+    for (const alwaysOnTop of [false, true, false]) {
+      expect(setFullscreenBreakHandler({ shouldFullscreen: false, alwaysOnTop }, args)).toBe(false);
+      expect(win.setAlwaysOnTop).toHaveBeenLastCalledWith(alwaysOnTop, "floating");
+    }
+    expect(win.show).not.toHaveBeenCalled();
+    expect(win.focus).not.toHaveBeenCalled();
+    expect(win.setFullScreen).not.toHaveBeenCalled();
+    expect(win.setVisibleOnAllWorkspaces).not.toHaveBeenCalled();
+    expect(tray.setContextMenu).not.toHaveBeenCalled();
   });
 
-  it("should exit full screen on break", () => {
-    const window = new BrowserWindow();
-    const tray = new Tray(
-      path.join(__dirname, "../../assets/tray-dark.png")
-    );
-    const trayTooltip = "Mock tray tool tip";
-    const fullscreenState = { isFullscreen: true };
-
-    // Set spies
-    const windowSpies = getWindowSpies(window);
-    const traySpies = {
-      setToolTip: jest.spyOn(tray, "setToolTip"),
-      setContextMenu: jest.spyOn(tray, "setContextMenu"),
-    };
-    globalShortcut.registerAll(["Esc", "CommandOrControl+W"], () => {});
-    expect(globalShortcut.isRegistered("Esc")).toBe(true);
-    expect(globalShortcut.isRegistered("CommandOrControl+W")).toBe(
-      true
-    );
-
-    setFullscreenBreakHandler(
-      { shouldFullscreen: false, alwaysOnTop: true },
-      {
-        win: window,
-        contextMenu: Menu.buildFromTemplate([{ label: "Mock Label" }]),
-        isFullscreen: fullscreenState.isFullscreen,
-        trayTooltip,
-        tray,
-      }
-    );
-
-    // Verify that window has been setup to fullscreen
-    expect(windowSpies.show).toHaveBeenCalledTimes(1);
-    expect(windowSpies.focus).toHaveBeenCalledTimes(1);
-    expect(windowSpies.setAlwaysOnTop).toHaveBeenCalledWith(
-      true,
-      "screen-saver"
-    );
-    expect(windowSpies.setSkipTaskbar).toHaveBeenCalledWith(false);
-    expect(windowSpies.setFullScreen).toHaveBeenCalledWith(false);
-    expect(windowSpies.setResizable).toHaveBeenCalledWith(false);
-    expect(windowSpies.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(
-      false
-    );
-    expect(fullscreenState.isFullscreen).toEqual(false);
-
-    // Verify that shortcuts have been set
-    expect(globalShortcut.isRegistered("Esc")).toBe(false);
-    expect(globalShortcut.isRegistered("CommandOrControl+W")).toBe(
-      false
-    );
-
-    // Verify that tray has been updated
-    expect(traySpies.setToolTip).toHaveBeenCalledTimes(1);
-    expect(traySpies.setContextMenu).toHaveBeenCalledTimes(1);
+  it("focuses only when entering a fullscreen break, including after repeated messages", () => {
+    const { win, args } = setup();
+    const request = { shouldFullscreen: true, alwaysOnTop: true };
+    args.isFullscreen = setFullscreenBreakHandler(request, args);
+    args.isFullscreen = setFullscreenBreakHandler(request, args);
+    expect(args.isFullscreen).toBe(true);
+    expect(win.show).toHaveBeenCalledTimes(1);
+    expect(win.focus).toHaveBeenCalledTimes(1);
+    expect(win.setFullScreen).toHaveBeenCalledTimes(1);
+    expect(win.setFullScreen).toHaveBeenCalledWith(true);
+    expect(win.setAlwaysOnTop).toHaveBeenLastCalledWith(true, "screen-saver");
+    expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(true);
+    expect(activateFullScreenShortcuts).toHaveBeenCalledTimes(1);
   });
 
-  afterEach(() => {
-    globalShortcut.unregisterAll();
-    app.quit();
+  it.each([false, true])("restores ordinary window priority on exit with pinning %s", (alwaysOnTop) => {
+    const { win, tray, args } = setup(true);
+    args.isFullscreen = setFullscreenBreakHandler({ shouldFullscreen: false, alwaysOnTop }, args);
+    expect(args.isFullscreen).toBe(false);
+    expect(win.setFullScreen).toHaveBeenCalledWith(false);
+    expect(win.setAlwaysOnTop).toHaveBeenCalledWith(alwaysOnTop, "floating");
+    expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(false);
+    expect(win.show).not.toHaveBeenCalled();
+    expect(win.focus).not.toHaveBeenCalled();
+    expect(deactivateFullScreenShortcuts).toHaveBeenCalledTimes(1);
+    expect(tray.setToolTip).toHaveBeenCalledWith(args.trayTooltip);
+    expect(tray.setContextMenu).toHaveBeenCalledWith(args.contextMenu);
   });
 });

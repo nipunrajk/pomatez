@@ -29,9 +29,9 @@ import {
   StyledButtonPrimary,
   StyledInput,
   StyledObsidianSection,
+  StyledSettingsSubsection,
   StyledTextArea,
 } from "styles";
-import SettingSection from "./SettingSection";
 
 const KINDS: NoteKind[] = ["milestone", "day"];
 
@@ -116,7 +116,8 @@ const ObsidianSection: React.FC = () => {
   const result = status.result;
 
   return (
-    <SettingSection heading={t("obsidian.heading")}>
+    <StyledSettingsSubsection>
+      <h5>{t("obsidian.heading")}</h5>
       <StyledObsidianSection>
         <p>{t("obsidian.description")}</p>
 
@@ -271,7 +272,7 @@ const ObsidianSection: React.FC = () => {
               : t(`obsidian.error_${result.error}`))}
         </p>
       </StyledObsidianSection>
-    </SettingSection>
+    </StyledSettingsSubsection>
   );
 };
 

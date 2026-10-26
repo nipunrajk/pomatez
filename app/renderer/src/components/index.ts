@@ -19,6 +19,8 @@ export { default as Dimmer } from "./Dimmer";
 
 export { default as Checkbox } from "./Checkbox";
 export { default as Radio } from "./Radio";
+export * from "./SegmentedControl";
+export { default as SegmentedControl } from "./SegmentedControl";
 
 export { default as Collapse } from "./Collapse";
 

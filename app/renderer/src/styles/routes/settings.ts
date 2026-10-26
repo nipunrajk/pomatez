@@ -1,15 +1,13 @@
 import styled from "styled-components/macro";
 import { themes } from "styles/themes";
-import { StyledScrollbar, typeStyle } from "styles/mixins";
-import { StyledButtonSecondary } from "styles";
+import { StyledScrollbar, focusRing, typeStyle } from "styles/mixins";
+import { StyledTogglerWrapper } from "styles/components/toggler";
+import { StyledShortcutWrapper } from "styles/components/shortcuts";
+import { StyledHelpWrapper } from "styles/components/help";
 
 export const StyledSettings = styled.main`
   width: 100%;
   height: 100%;
-
-  padding-left: 2rem;
-  padding-right: 1.4rem;
-  padding-bottom: 3rem;
 
   flex: 1 1;
 
@@ -20,110 +18,287 @@ export const StyledSettings = styled.main`
   ${StyledScrollbar};
 `;
 
+/** Centered reading column; the scroll container above stays full width. */
+export const StyledSettingsColumn = styled.div`
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0 var(--space-4) var(--space-8);
+
+  /* Shown when the search hides every card. */
+  & > .settings-empty {
+    padding: var(--space-8) 0;
+    text-align: center;
+    ${typeStyle("body")};
+    color: var(--color-text-secondary-readable);
+  }
+`;
+
+/** Header + filter bar, stuck together to the top of the scroll area. */
+export const StyledSettingsTop = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 3;
+
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+
+  background-color: var(--layout-dashboard-header-bg);
+  border-bottom: var(--border-width-hairline) solid
+    var(--layout-dashboard-header-border-bottom);
+
+  & > header {
+    position: static;
+    margin: 0;
+    border-bottom: none;
+  }
+`;
+
+export const StyledSettingsFilterBar = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+
+  & > input {
+    flex: 1 1 18rem;
+    max-width: 28rem;
+    height: var(--component-button-height-sm);
+  }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .pills > button {
+    height: var(--component-button-height-sm);
+    padding: 0 var(--space-3);
+
+    ${typeStyle("tag")};
+    color: var(--color-text-secondary-readable);
+    border: var(--border-width-hairline) solid transparent;
+    border-radius: var(--radius-pill);
+    background-color: transparent;
+    cursor: pointer;
+
+    transition: ${themes.transition};
+
+    &:hover {
+      color: var(--color-text-primary);
+      background-color: var(--color-background-surface-sunken);
+    }
+
+    &[aria-current="true"] {
+      color: var(--color-text-primary);
+      border-color: var(--component-card-border);
+      background-color: var(--component-card-bg);
+    }
+
+    ${focusRing};
+  }
+`;
+
+/** One group: eyebrow heading above a surfaced card. */
 export const StyledSettingSection = styled.section`
   width: 100%;
-  height: max-content;
-
-  display: grid;
-  align-items: center;
-
-  row-gap: var(--space-2);
-  margin-top: var(--space-2);
-
-  /* Sections are split by a hairline rule, not boxed. */
-  &:not(:first-of-type) {
-    margin-top: var(--space-5);
-    padding-top: var(--space-5);
-    border-top: var(--component-section-header-divider-width) solid
-      var(--component-section-header-divider);
-  }
-
-  &:last-of-type {
-    margin-bottom: var(--space-1);
-  }
+  margin-bottom: var(--space-5);
 `;
 
 export const StyledSectionHeading = styled.h4`
   ${typeStyle("eyebrow")};
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-text-secondary-readable);
+
+  margin-bottom: var(--space-2);
+  padding-left: var(--space-1);
 `;
 
-/**
- * Layout/Language/Tray Icon Style as cards, side by side. It's the first
- * block after the header (so a small top margin, no top rule, like any
- * first StyledSettingSection would get), and carries its own bottom rule
- * to separate it from FeatureSection below — which, now that Layout/
- * Language/TrayIcon's sections live one level deeper in this row, is
- * itself `:first-of-type` among StyledSettings' direct section children
- * and would otherwise render with no separating rule of its own.
- * Each tile's own divider styling is overridden (via !important) since
- * here they're cards in a row, not items in a vertical list.
- */
-export const StyledSettingsTileRow = styled.div`
-  width: 100%;
+export const StyledSettingsCard = styled.div<{ padded?: boolean }>`
+  overflow: hidden;
 
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  border-radius: var(--component-card-radius);
+  border: var(--border-width-hairline) solid var(--component-card-border);
+  background-color: var(--component-card-bg);
+  box-shadow: var(--component-card-shadow);
+
+  ${(p) => p.padded && `padding: var(--space-4);`}
+
+  /* Rows: equal height, hairline between, none after the last. */
+  & > ${StyledTogglerWrapper},
+  & > ${StyledShortcutWrapper},
+  & > ${StyledHelpWrapper},
+  & > .setting-row {
+    min-height: 5.6rem;
+    height: auto;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-width-hairline) solid
+      var(--color-border-soft);
+
+    &::after {
+      display: none;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  /* Small heading between row groups (Keyboard: local / global). */
+  & > .setting-subhead {
+    padding: var(--space-3) var(--space-4) var(--space-1);
+    ${typeStyle("meta")};
+    font-weight: 600;
+    color: var(--color-text-secondary-readable);
+  }
+`;
+
+/** A titled block inside a padded card (Data & Vault). */
+export const StyledSettingsSubsection = styled.div`
+  & > h5 {
+    margin-bottom: var(--space-2);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  & + & {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: var(--border-width-hairline) solid var(--color-border-soft);
+  }
+`;
+
+/** Label + helper text on the left, any control on the right. */
+export const StyledSettingRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
 
-  margin-top: var(--space-2);
-  margin-bottom: var(--space-5);
-  padding-bottom: var(--space-5);
-  border-bottom: var(--component-section-header-divider-width) solid
-    var(--component-section-header-divider);
+  .control {
+    flex-shrink: 0;
+    max-width: 60%;
+  }
 
-  & > section {
-    margin-top: 0 !important;
-    padding: var(--space-3) !important;
-    border-top: none !important;
+  @media (max-width: 720px) {
+    flex-wrap: wrap;
 
-    border-radius: var(--component-card-radius);
-    background-color: var(--component-card-bg);
-    box-shadow: var(--component-card-shadow);
+    .control {
+      max-width: none;
+      width: 100%;
+    }
   }
 `;
 
-/** Toggle rows split into two columns once there's room for it. */
-export const StyledFeatureToggleGrid = styled.div`
-  width: 100%;
-
+export const StyledSettingText = styled.div`
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  column-gap: var(--space-4);
-  row-gap: var(--space-2);
-`;
 
-export const StyledStarButton = styled(StyledButtonSecondary)`
-  width: auto;
-  flex: 1 1 auto;
+  .label {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
 
-  & > svg {
-    margin-left: -1rem;
+  .description {
+    margin-top: 2px;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary-readable);
   }
 `;
 
-export const StyledSectionSticky = styled.div`
-  width: 100%;
-  min-height: 7.5rem;
+/** Workspace Layout: two selectable preview cards. */
+export const StyledLayoutPicker = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
 
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  @media (max-width: 720px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
 
-  gap: 1rem;
+export const StyledLayoutOption = styled.button`
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
 
-  background-color: var(--color-background-window);
-  border-top: var(--border-width-hairline) solid
-    var(--color-border-strong);
+  text-align: left;
+  color: var(--color-text-primary);
+  cursor: pointer;
 
-  display: flex;
-  flex-wrap: wrap;
-  grid-template-columns: 1fr;
-  align-items: start;
+  border-radius: var(--radius-lg);
+  border: var(--border-width-thick) solid var(--color-border-soft);
+  background-color: transparent;
 
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  transition: ${themes.transition};
+
+  &:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  &[aria-checked="true"] {
+    border-color: var(--color-brand-primary);
+    background-color: var(--color-brand-primary-muted);
+  }
+
+  ${focusRing};
+
+  svg {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    background-color: var(--color-background-surface-sunken);
+  }
+
+  .title {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary-readable);
+  }
+`;
+
+/** Settings → About: version line and community links. */
+export const StyledAboutCard = styled.div`
+  display: grid;
+  gap: var(--space-2);
+
+  .version {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    ${typeStyle("meta")};
+    color: var(--color-text-secondary-readable);
+  }
+
+  .links a {
+    color: var(--color-text-secondary-readable);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-brand-primary-readable);
+    }
+
+    ${focusRing};
+  }
 `;
 
 /** Settings → Data: export / import a backup file. */

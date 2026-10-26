@@ -14,6 +14,8 @@ import { DefaultRootState } from "react-redux";
 
 export const APP_NAME = "Pomatez";
 
+export const SETTINGS_PATH = "/settings";
+
 export type NavItemTypes = {
   name: string;
   icon: SVGTypes["name"];
@@ -62,7 +64,7 @@ export const routes: (state?: AppStateTypes) => NavItemTypes[] = (
     icon: "settings",
     name: "nav.settings",
     exact: true,
-    path: "/settings",
+    path: SETTINGS_PATH,
     component: Settings,
     notify: !!state?.update?.updateBody,
   },

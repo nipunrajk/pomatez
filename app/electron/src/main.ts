@@ -440,8 +440,10 @@ ipcMain.on(SET_ALWAYS_ON_TOP, (e, { alwaysOnTop }) => {
 
 ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
   // The break sets its own all-Spaces state; don't let a pending reset undo it.
-  cancelPendingWorkspaceReset();
-  setFullscreenBreakHandler(args, {
+  if (args.shouldFullscreen !== windowState.isFullscreen) {
+    cancelPendingWorkspaceReset();
+  }
+  windowState.isFullscreen = setFullscreenBreakHandler(args, {
     win,
     tray,
     trayTooltip,
@@ -696,15 +698,11 @@ ipcMain.on(SET_OPEN_AT_LOGIN, (e, { openAtLogin }) => {
 });
 
 ipcMain.on(SET_ENABLE_RPC, (e, { enableRPC }) => {
-  const enableRPCAtLogin = store.safeGet("openAtLogin");
-
-  if (enableRPCAtLogin !== enableRPC) {
-    store.safeSet("openAtLogin", enableRPC);
-    if (enableRPC) {
-      initializeRPC();
-    } else {
-      uninitializeRPC();
-    }
+  store.safeSet("enableRPC", enableRPC);
+  if (enableRPC) {
+    initializeRPC();
+  } else {
+    uninitializeRPC();
   }
 });
 

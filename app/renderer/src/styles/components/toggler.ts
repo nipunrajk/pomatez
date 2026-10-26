@@ -34,7 +34,18 @@ export const StyledTogglerLabel = styled.label`
   color: var(--color-text-primary);
 
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  cursor: pointer;
+
+  small {
+    margin-top: 2px;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary-readable);
+  }
 `;
 
 const KNOB_INSET = "4px";

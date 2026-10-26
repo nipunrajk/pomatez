@@ -24,20 +24,19 @@ type AppArgs = {
 const setFullScreen = (
   flag: boolean,
   alwaysOnTop: boolean,
-  win: BrowserWindow | null,
-  isFullscreen: FullscreenState["isFullscreen"]
+  win: BrowserWindow | null
 ) => {
   if (flag) {
     win?.setResizable(true);
   }
   win?.setFullScreenable(true);
-  win?.setAlwaysOnTop(alwaysOnTop, "screen-saver");
+  win?.setAlwaysOnTop(alwaysOnTop, flag ? "screen-saver" : "floating");
   win?.setFullScreen(flag);
   win?.setVisibleOnAllWorkspaces(flag);
-  win?.show();
-  win?.focus();
-
-  isFullscreen = flag;
+  if (flag) {
+    win?.show();
+    win?.focus();
+  }
 };
 
 /**
@@ -53,8 +52,17 @@ export const setFullscreenBreakHandler = (
   const { shouldFullscreen, alwaysOnTop } = fullscreenArgs;
   const { tray, trayTooltip, win, contextMenu, isFullscreen } = appArgs;
 
+  if (!win || win.isDestroyed()) return isFullscreen;
+
+  // Settings are sent on startup and whenever pinning changes. Only an
+  // actual break transition should change Spaces, fullscreen, or focus.
+  if (shouldFullscreen === isFullscreen) {
+    win.setAlwaysOnTop(alwaysOnTop, isFullscreen ? "screen-saver" : "floating");
+    return isFullscreen;
+  }
+
   if (shouldFullscreen) {
-    setFullScreen(true, alwaysOnTop, win, isFullscreen);
+    setFullScreen(true, alwaysOnTop, win);
 
     activateFullScreenShortcuts(() => {});
 
@@ -67,10 +75,11 @@ export const setFullscreenBreakHandler = (
       ])
     );
   } else {
-    setFullScreen(false, alwaysOnTop, win, isFullscreen);
+    setFullScreen(false, alwaysOnTop, win);
 
     deactivateFullScreenShortcuts();
     tray?.setToolTip(trayTooltip);
     tray?.setContextMenu(contextMenu);
   }
+  return shouldFullscreen;
 };

@@ -19,3 +19,4 @@ export * from "./loaders";
 export * from "./collapse";
 export * from "./alert";
 export * from "./topbar";
+export * from "./segmentedControl";
