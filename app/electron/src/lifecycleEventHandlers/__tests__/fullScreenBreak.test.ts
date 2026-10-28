@@ -27,8 +27,8 @@ describe("Fullscreen break window behavior", () => {
     };
     const tray = { setToolTip: jest.fn(), setContextMenu: jest.fn() };
     const args = {
-      win: win as unknown as BrowserWindow,
-      tray: tray as unknown as Tray,
+      win: (win as unknown) as BrowserWindow,
+      tray: (tray as unknown) as Tray,
       contextMenu: {} as Menu,
       trayTooltip: "Restore Pomatez",
       isFullscreen,
@@ -41,8 +41,16 @@ describe("Fullscreen break window behavior", () => {
   it("does not steal focus or change Spaces on startup or ordinary setting updates", () => {
     const { win, tray, args } = setup();
     for (const alwaysOnTop of [false, true, false]) {
-      expect(setFullscreenBreakHandler({ shouldFullscreen: false, alwaysOnTop }, args)).toBe(false);
-      expect(win.setAlwaysOnTop).toHaveBeenLastCalledWith(alwaysOnTop, "floating");
+      expect(
+        setFullscreenBreakHandler(
+          { shouldFullscreen: false, alwaysOnTop },
+          args
+        )
+      ).toBe(false);
+      expect(win.setAlwaysOnTop).toHaveBeenLastCalledWith(
+        alwaysOnTop,
+        "floating"
+      );
     }
     expect(win.show).not.toHaveBeenCalled();
     expect(win.focus).not.toHaveBeenCalled();
@@ -61,22 +69,55 @@ describe("Fullscreen break window behavior", () => {
     expect(win.focus).toHaveBeenCalledTimes(1);
     expect(win.setFullScreen).toHaveBeenCalledTimes(1);
     expect(win.setFullScreen).toHaveBeenCalledWith(true);
-    expect(win.setAlwaysOnTop).toHaveBeenLastCalledWith(true, "screen-saver");
+    expect(win.setAlwaysOnTop).toHaveBeenLastCalledWith(
+      true,
+      "screen-saver"
+    );
     expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(true);
     expect(activateFullScreenShortcuts).toHaveBeenCalledTimes(1);
   });
 
-  it.each([false, true])("restores ordinary window priority on exit with pinning %s", (alwaysOnTop) => {
-    const { win, tray, args } = setup(true);
-    args.isFullscreen = setFullscreenBreakHandler({ shouldFullscreen: false, alwaysOnTop }, args);
-    expect(args.isFullscreen).toBe(false);
-    expect(win.setFullScreen).toHaveBeenCalledWith(false);
-    expect(win.setAlwaysOnTop).toHaveBeenCalledWith(alwaysOnTop, "floating");
-    expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(false);
-    expect(win.show).not.toHaveBeenCalled();
-    expect(win.focus).not.toHaveBeenCalled();
-    expect(deactivateFullScreenShortcuts).toHaveBeenCalledTimes(1);
-    expect(tray.setToolTip).toHaveBeenCalledWith(args.trayTooltip);
-    expect(tray.setContextMenu).toHaveBeenCalledWith(args.contextMenu);
+  it("updates the macOS popup menu without attaching it to the tray", () => {
+    const { tray, args } = setup();
+    const setTrayContextMenu = jest.fn();
+    const options = { ...args, setTrayContextMenu };
+    options.isFullscreen = setFullscreenBreakHandler(
+      { shouldFullscreen: true, alwaysOnTop: false },
+      options
+    );
+    expect(setTrayContextMenu).toHaveBeenCalledTimes(1);
+    options.isFullscreen = setFullscreenBreakHandler(
+      { shouldFullscreen: false, alwaysOnTop: false },
+      options
+    );
+    expect(setTrayContextMenu).toHaveBeenLastCalledWith(
+      args.contextMenu
+    );
+    expect(tray.setContextMenu).not.toHaveBeenCalled();
   });
+
+  it.each([false, true])(
+    "restores ordinary window priority on exit with pinning %s",
+    (alwaysOnTop) => {
+      const { win, tray, args } = setup(true);
+      args.isFullscreen = setFullscreenBreakHandler(
+        { shouldFullscreen: false, alwaysOnTop },
+        args
+      );
+      expect(args.isFullscreen).toBe(false);
+      expect(win.setFullScreen).toHaveBeenCalledWith(false);
+      expect(win.setAlwaysOnTop).toHaveBeenCalledWith(
+        alwaysOnTop,
+        "floating"
+      );
+      expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(false);
+      expect(win.show).not.toHaveBeenCalled();
+      expect(win.focus).not.toHaveBeenCalled();
+      expect(deactivateFullScreenShortcuts).toHaveBeenCalledTimes(1);
+      expect(tray.setToolTip).toHaveBeenCalledWith(args.trayTooltip);
+      expect(tray.setContextMenu).toHaveBeenCalledWith(
+        args.contextMenu
+      );
+    }
+  );
 });

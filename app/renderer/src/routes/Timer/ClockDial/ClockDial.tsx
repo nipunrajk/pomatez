@@ -14,7 +14,7 @@ import { timerColor } from "styles/mixins";
 import { StyledClockDial } from "styles/routes/timer/clockDial";
 import { getTimerPhaseLabelKey } from "../timerPhaseLabel";
 
-const RADIUS = 100;
+const RADIUS = 106;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const ClockDial: React.FC = () => {
@@ -63,7 +63,7 @@ const ClockDial: React.FC = () => {
       $animate={interpolate && playing && animate}
     >
       <div className="clock-face">
-        <svg viewBox="0 0 232 232" aria-hidden="true" focusable="false">
+        <svg viewBox="0 0 244 244" aria-hidden="true" focusable="false">
           <defs>
             <linearGradient
               id="orbit-beam-gradient"
@@ -80,21 +80,21 @@ const ClockDial: React.FC = () => {
           {/* Recessed track groove */}
           <circle
             className="orbit-track"
-            cx="116"
-            cy="116"
+            cx="122"
+            cy="122"
             r={RADIUS}
           />
 
           {/* Luminous progress arc */}
           <circle
             className="orbit-progress"
-            cx="116"
-            cy="116"
+            cx="122"
+            cy="122"
             r={RADIUS}
             stroke="url(#orbit-beam-gradient)"
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={CIRCUMFERENCE * (1 - remaining)}
-            transform="rotate(-90 116 116)"
+            transform="rotate(-90 122 122)"
           />
 
           {/* Leading luminous bead */}
@@ -102,7 +102,7 @@ const ClockDial: React.FC = () => {
             className="orbit-bead"
             style={{ transform: `rotate(${360 * remaining - 90}deg)` }}
           >
-            <circle cx={116 + RADIUS} cy="116" r="5.5" />
+            <circle cx={122 + RADIUS} cy="122" r="5.5" />
           </g>
         </svg>
 

@@ -15,10 +15,10 @@
       {
         "label": "main",
         "title": "pomatez",
-        "width": 340,
-        "height": 350,
-        "minWidth": 340,
-        "minHeight": 350,
+        "width": 280,
+        "height": 340,
+        "minWidth": 280,
+        "minHeight": 340,
         "fullscreen": false,
         "resizable": false
       }

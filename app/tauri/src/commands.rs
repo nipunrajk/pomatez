@@ -19,11 +19,11 @@ impl WindowSize {
     // Not sure why, if its due to UI scaling or what though these values seem to size smaller than the same values on electron
     // The classic window is a fixed-size single-purpose timer popup.
     pub const MIN: LogicalSize<u32> = LogicalSize {
-        width: 340,
+        width: 280,
         height: if cfg!(target_os = "windows") {
-            360
-        } else {
             350
+        } else {
+            340
         },
     };
     pub const DASHBOARD: LogicalSize<u32> = LogicalSize {

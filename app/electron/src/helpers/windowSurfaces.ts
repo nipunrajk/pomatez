@@ -66,6 +66,14 @@ export function createWindowSurfaces(options: {
         .window()
         ?.setAlwaysOnTop(alwaysOnTop || state.pinned, "floating");
   };
+  const refreshChrome = () => {
+    const win = options.window();
+    if (win && !win.isDestroyed()) {
+      win.setWindowButtonVisibility(
+        state.layout === "dashboard" && !options.fullscreen()
+      );
+    }
+  };
   const publish = () => options.publish({ ...state });
   const saveWorkspace = () => {
     const win = options.window();
@@ -77,11 +85,12 @@ export function createWindowSurfaces(options: {
       : win.getBounds();
     options.saveBounds(workspaceBounds);
   };
-  const dismiss = () => {
+  const dismiss = (reason: "explicit" | "escape" = "explicit") => {
     if (
       state.layout !== "classic" ||
       options.fullscreen() ||
-      dialogDepth
+      dialogDepth ||
+      (reason === "escape" && state.pinned)
     )
       return;
     cancelBlur();
@@ -89,6 +98,9 @@ export function createWindowSurfaces(options: {
     state = { ...state, pinned: false, revision: state.revision + 1 };
     priority();
     options.window()?.hide();
+    // Native hide can synchronously emit blur before visibility updates.
+    // That blur belongs to this dismissal, not the next tray gesture.
+    cancelBlur();
     publish();
   };
 
@@ -179,6 +191,7 @@ export function createWindowSurfaces(options: {
       );
       if (workspaceMaximized) win.maximize();
     }
+    refreshChrome();
     priority();
     pendingShow = true;
     publish();
@@ -187,6 +200,7 @@ export function createWindowSurfaces(options: {
   return {
     open,
     dismiss,
+    refreshChrome,
     saveWorkspace,
     windowRecreated() {
       const pinned = state.pinned;
@@ -201,6 +215,7 @@ export function createWindowSurfaces(options: {
     getState: () => ({ ...state }),
     sync() {
       rendererReady = false;
+      refreshChrome();
       publish();
     },
     ready(revision: number) {
@@ -226,13 +241,14 @@ export function createWindowSurfaces(options: {
     },
     blur() {
       const win = options.window();
-      const devToolsOpen = !!win?.webContents?.isDevToolsOpened?.();
       if (
+        !win ||
+        win.isDestroyed() ||
+        !win.isVisible() ||
         state.layout !== "classic" ||
         pendingShow ||
         options.fullscreen() ||
-        dialogDepth ||
-        devToolsOpen
+        dialogDepth
       )
         return;
       cancelBlur();
@@ -268,6 +284,7 @@ export function createWindowSurfaces(options: {
     fullscreenChanged() {
       cancelBlur();
       pendingShow = false;
+      refreshChrome();
       priority();
     },
     displayChanged() {

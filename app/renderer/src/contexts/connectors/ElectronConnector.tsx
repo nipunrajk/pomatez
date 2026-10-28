@@ -16,7 +16,6 @@ import {
   WINDOW_SURFACE_STATE,
   WINDOW_SURFACE_READY,
   HUD_PIN_SET,
-  HUD_DISMISS,
   WindowSurfaceState,
   getTimerPresentation,
   SET_FULLSCREEN_BREAK,
@@ -40,6 +39,7 @@ import {
 } from "@pomatez/shareables";
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
+import { useWindowSurfaceKeys } from "hooks/useWindowSurfaceKeys";
 import { TimerStatus } from "store/timer/types";
 import { AppLayout, TrayIconStyle } from "store/settings/types";
 import { detectOS } from "utils";
@@ -156,49 +156,13 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
       electron.send(SET_LAYOUT, { layout: settings.layout });
   }, [electron, settings.layout, managedSurfaces]);
 
-  useEffect(() => {
-    if (!managedSurfaces) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || shouldFullscreen) return;
-      if (
-        event.metaKey &&
-        !event.altKey &&
-        !event.shiftKey &&
-        event.code === "KeyO"
-      ) {
-        event.preventDefault();
-        requestLayout("dashboard");
-      } else if (
-        event.metaKey &&
-        event.shiftKey &&
-        !event.altKey &&
-        event.code === "KeyM"
-      ) {
-        event.preventDefault();
-        requestLayout("classic");
-      } else if (
-        event.key === "Escape" &&
-        surface?.layout === "classic"
-      ) {
-        // Menus handle the first Escape in their own listeners.
-        if (
-          document.querySelector(
-            '[role="dialog"], [role="menu"], [data-hud-escape-boundary]'
-          )
-        )
-          return;
-        electron.send(HUD_DISMISS);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [
-    electron,
-    managedSurfaces,
-    requestLayout,
-    shouldFullscreen,
+  useWindowSurfaceKeys({
+    enabled: managedSurfaces,
     surface,
-  ]);
+    shouldFullscreen,
+    requestLayout,
+    send: electron.send,
+  });
 
   useEffect(() => {
     electron.send(SET_UI_THEME, {

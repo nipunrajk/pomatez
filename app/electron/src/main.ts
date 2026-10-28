@@ -69,6 +69,7 @@ import {
 import isDev from "electron-is-dev";
 import store, { AppLayoutName } from "./store";
 import { COMPACT_WIDTH, getCompactHeight } from "./helpers/compactSize";
+import { bindTrayInteractions } from "./helpers/trayInteractions";
 import {
   clampBounds,
   createWindowSurfaces,
@@ -95,6 +96,7 @@ Menu.setApplicationMenu(applicationMenu);
 const getFrameHeight = getCompactHeight;
 
 let tray: Tray | null = null;
+let trayContextMenu: Menu | null = null;
 
 let win: BrowserWindow | null;
 
@@ -229,7 +231,13 @@ function createMainWindow() {
     resizable: dashboard,
     maximizable: dashboard,
     show: false,
-    frame: store.safeGet("useNativeTitlebar"),
+    frame: isMacOS() || store.safeGet("useNativeTitlebar"),
+    ...(isMacOS() && {
+      titleBarStyle: "hidden" as const,
+      trafficLightPosition: { x: 16, y: 16 },
+      roundedCorners: true,
+      hasShadow: true,
+    }),
     icon: getIcon(),
     // Painted before the renderer loads: Modula window cream, or dark.
     backgroundColor: store.safeGet("isDarkMode")
@@ -337,6 +345,7 @@ function createMainWindow() {
 
   win.on("leave-full-screen", () => {
     // The dashboard is freely resizable; macOS restores its previous size.
+    surfaces?.refreshChrome();
     if (isDashboardLayout()) return;
     setSizeIfDiff(COMPACT_WIDTH, getFrameHeight());
     if (surfaces) win?.setResizable(false);
@@ -419,24 +428,19 @@ const contextMenu = Menu.buildFromTemplate([
 
 function createSystemTray() {
   tray = new Tray(trayIcon);
-
   tray.setToolTip(trayTooltip);
-  tray.setContextMenu(contextMenu);
-
-  tray?.on("click", (_event, bounds) => {
-    if (surfaces) {
-      surfaces.toggle("tray", bounds);
-      return;
-    }
-    // Visible-but-unfocused usually means it's on another Space or behind
-    // other apps, so bring it here rather than hiding it.
-    if (win?.isVisible() && win.isFocused()) {
-      if (!win.isFullScreen()) {
-        win.hide();
-      }
-    } else {
-      showOnCurrentWorkspace(win);
-    }
+  bindTrayInteractions(tray, {
+    macOS: isMacOS(),
+    menu: () => trayContextMenu || contextMenu,
+    toggleHud: (bounds) => surfaces?.toggle("tray", bounds),
+    restore: () => {
+      // A visible window on another Space should be brought here.
+      if (win?.isVisible() && win.isFocused()) {
+        if (!win.isFullScreen()) win.hide();
+      } else showOnCurrentWorkspace(win);
+    },
+    suspendDismissal: () => surfaces?.suspendDismissal(),
+    menuClosed: () => surfaces?.blur(),
   });
 }
 
@@ -535,6 +539,10 @@ ipcMain.on(SET_FULLSCREEN_BREAK, (e, args) => {
     trayTooltip,
     contextMenu,
     isFullscreen: windowState.isFullscreen,
+    setTrayContextMenu: (menu) => {
+      trayContextMenu = menu;
+      if (!isMacOS()) tray?.setContextMenu(menu);
+    },
   });
   if (fullscreenChanged) surfaces?.fullscreenChanged();
   surfaces?.setAlwaysOnTop(!!args.alwaysOnTop);
@@ -578,7 +586,7 @@ ipcMain.on(HUD_PIN_SET, (event, pinned) => {
     surfaces?.pin(pinned);
 });
 ipcMain.on(HUD_DISMISS, (event) => {
-  if (event.sender === win?.webContents) surfaces?.dismiss();
+  if (event.sender === win?.webContents) surfaces?.dismiss("escape");
 });
 
 ipcMain.on(MINIMIZE_WINDOW, (e, { minimizeToTray }) => {
@@ -606,13 +614,14 @@ ipcMain.on(CLOSE_WINDOW, (e, { closeToTray }) => {
 ipcMain.on(SET_NATIVE_TITLEBAR, (e, { useNativeTitlebar }) => {
   if (store.safeGet("useNativeTitlebar") !== useNativeTitlebar) {
     store.safeSet("useNativeTitlebar", useNativeTitlebar);
+    // macOS surface chrome changes in place; recreating would reset the timer.
+    if (surfaces) return;
     const bounds = win?.getBounds();
     setTimeout(() => {
       isRecreatingWindow = true;
       win?.destroy();
       win = null;
       createMainWindow();
-      surfaces?.windowRecreated();
       isRecreatingWindow = false;
       if (bounds) {
         // Set in createMainWindow but the ts compiler seems to see it as never

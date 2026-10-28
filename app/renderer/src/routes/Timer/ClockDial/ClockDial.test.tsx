@@ -19,7 +19,7 @@ import "i18n";
 
 jest.mock("use-stay-awake", () => jest.fn());
 
-const RADIUS = 100;
+const RADIUS = 106;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 if (!window.matchMedia) {

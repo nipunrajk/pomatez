@@ -19,6 +19,7 @@ function setup(initiallyHidden = false, initialBounds?: Rectangle) {
   let minimized = false;
   let secondaryPresent = true;
   let devToolsOpened = false;
+  let blurDuringHide = false;
   const win = {
     isDestroyed: () => false,
     webContents: {
@@ -44,6 +45,7 @@ function setup(initiallyHidden = false, initialBounds?: Rectangle) {
       bounds = next;
     }),
     hide: jest.fn(() => {
+      if (blurDuringHide) controller.blur();
       visible = false;
       focused = false;
     }),
@@ -51,6 +53,7 @@ function setup(initiallyHidden = false, initialBounds?: Rectangle) {
     setMinimumSize: jest.fn(),
     setResizable: jest.fn(),
     setMaximizable: jest.fn(),
+    setWindowButtonVisibility: jest.fn(),
   };
   const show = jest.fn(() => {
     visible = true;
@@ -82,6 +85,9 @@ function setup(initiallyHidden = false, initialBounds?: Rectangle) {
     publish,
     saveBounds,
     ack,
+    enableNativeHideBlur: () => {
+      blurDuringHide = true;
+    },
     blur: () => {
       focused = false;
       controller.blur();
@@ -121,6 +127,79 @@ describe("macOS window surfaces", () => {
     expect(show).toHaveBeenCalledTimes(1);
   });
 
+  it("switches native traffic lights with the surface and restores them on expansion", () => {
+    const { controller, win, ack } = setup();
+    controller.sync();
+    expect(win.setWindowButtonVisibility).toHaveBeenLastCalledWith(
+      true
+    );
+    controller.open("classic");
+    ack();
+    expect(win.setWindowButtonVisibility).toHaveBeenLastCalledWith(
+      false
+    );
+    controller.open("dashboard");
+    ack();
+    expect(win.setWindowButtonVisibility).toHaveBeenLastCalledWith(
+      true
+    );
+  });
+
+  it("keeps traffic lights hidden when recreating a pinned HUD or entering a fullscreen break", () => {
+    const { controller, win, ack, fullscreen } = setup();
+    controller.open("classic");
+    ack();
+    controller.pin(true);
+    controller.windowRecreated();
+    expect(win.setWindowButtonVisibility).toHaveBeenLastCalledWith(
+      false
+    );
+    expect(controller.getState().pinned).toBe(true);
+    controller.open("dashboard");
+    ack();
+    fullscreen();
+    controller.fullscreenChanged();
+    expect(win.setWindowButtonVisibility).toHaveBeenLastCalledWith(
+      false
+    );
+  });
+
+  it("ignores Escape while pinned, then dismisses after unpinning", () => {
+    const { controller, win, ack, blur } = setup();
+    controller.open("classic");
+    ack();
+    controller.pin(true);
+    win.hide.mockClear();
+    blur();
+    controller.dismiss("escape");
+    jest.advanceTimersByTime(200);
+    expect(win.hide).not.toHaveBeenCalled();
+    expect(controller.getState().pinned).toBe(true);
+    controller.pin(false);
+    controller.dismiss("escape");
+    expect(win.hide).toHaveBeenCalledTimes(1);
+  });
+
+  it("reopens on the next tray click after native hide emits a blur", () => {
+    const {
+      controller,
+      win,
+      ack,
+      show,
+      enableNativeHideBlur,
+    } = setup();
+    controller.open("classic");
+    ack();
+    enableNativeHideBlur();
+    show.mockClear();
+    controller.dismiss("escape");
+    expect(win.isVisible()).toBe(false);
+    controller.toggle("tray");
+    ack();
+    expect(show).toHaveBeenCalledTimes(1);
+    expect(win.isVisible()).toBe(true);
+  });
+
   it("keeps login startup hidden until an explicit open request", () => {
     const { controller, show, ack } = setup(true);
     controller.sync();
@@ -138,9 +217,9 @@ describe("macOS window surfaces", () => {
     controller.toggle("tray", { x: -35, y: 0, width: 25, height: 24 });
     expect(controller.getState().layout).toBe("classic");
     expect(win.setBounds).toHaveBeenLastCalledWith({
-      x: -340,
+      x: -280,
       y: 32,
-      width: 340,
+      width: 280,
       height: 420,
     });
     expect(win.setResizable).toHaveBeenLastCalledWith(false);
@@ -153,9 +232,9 @@ describe("macOS window surfaces", () => {
     const { controller, win } = setup();
     controller.toggle("notch");
     expect(win.setBounds).toHaveBeenLastCalledWith({
-      x: 586,
+      x: 616,
       y: 92,
-      width: 340,
+      width: 280,
       height: 420,
     });
   });
@@ -277,7 +356,7 @@ describe("macOS window surfaces", () => {
     expect(win.setBounds).toHaveBeenLastCalledWith({
       x: 0,
       y: 37,
-      width: 340,
+      width: 280,
       height: 420,
     });
   });

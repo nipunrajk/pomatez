@@ -19,6 +19,7 @@ type AppArgs = {
   win: BrowserWindow | null;
   contextMenu: Menu;
   isFullscreen: FullscreenState["isFullscreen"];
+  setTrayContextMenu?: (menu: Menu) => void;
 };
 
 const setFullScreen = (
@@ -51,13 +52,19 @@ export const setFullscreenBreakHandler = (
 ) => {
   const { shouldFullscreen, alwaysOnTop } = fullscreenArgs;
   const { tray, trayTooltip, win, contextMenu, isFullscreen } = appArgs;
+  const setTrayMenu =
+    appArgs.setTrayContextMenu ||
+    ((menu: Menu) => tray?.setContextMenu(menu));
 
   if (!win || win.isDestroyed()) return isFullscreen;
 
   // Settings are sent on startup and whenever pinning changes. Only an
   // actual break transition should change Spaces, fullscreen, or focus.
   if (shouldFullscreen === isFullscreen) {
-    win.setAlwaysOnTop(alwaysOnTop, isFullscreen ? "screen-saver" : "floating");
+    win.setAlwaysOnTop(
+      alwaysOnTop,
+      isFullscreen ? "screen-saver" : "floating"
+    );
     return isFullscreen;
   }
 
@@ -67,7 +74,7 @@ export const setFullscreenBreakHandler = (
     activateFullScreenShortcuts(() => {});
 
     tray?.setToolTip("");
-    tray?.setContextMenu(
+    setTrayMenu(
       Menu.buildFromTemplate([
         {
           label: "Please wait for your break to end.",
@@ -79,7 +86,7 @@ export const setFullscreenBreakHandler = (
 
     deactivateFullScreenShortcuts();
     tray?.setToolTip(trayTooltip);
-    tray?.setContextMenu(contextMenu);
+    setTrayMenu(contextMenu);
   }
   return shouldFullscreen;
 };

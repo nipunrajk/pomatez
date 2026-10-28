@@ -18,7 +18,8 @@ import Titlebar from "./Titlebar";
 import Sidebar from "./Sidebar";
 import RightRail from "./RightRail";
 import DashboardTopBar from "./DashboardTopBar";
-import { ThemeContext } from "contexts";
+import { ThemeContext, CounterContext } from "contexts";
+import { isMacElectron } from "utils/isMacElectron";
 import { TimerStatus } from "store/timer/types";
 import { AppLayout } from "store/settings/types";
 import { useAppSelector } from "hooks/storeHooks";
@@ -36,6 +37,8 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
   const [noTransition, setNoTransition] = useState(false);
 
   const isDashboard = settings.layout === AppLayout.DASHBOARD;
+  const nativeMacChrome = isMacElectron();
+  const { shouldFullscreen } = useContext(CounterContext);
 
   const registerKey = useCallback(
     (e: KeyboardEvent) => {
@@ -91,8 +94,14 @@ const Layout: React.FC<Props> = ({ history, location, children }) => {
   ]);
 
   return (
-    <StyledLayout noTransition={noTransition}>
-      {!settings.useNativeTitlebar && (
+    <StyledLayout
+      noTransition={noTransition}
+      $macPopover={nativeMacChrome && !isDashboard && !shouldFullscreen}
+    >
+      {nativeMacChrome && isDashboard && !shouldFullscreen && (
+        <div className="native-workspace-titlebar" aria-hidden="true" />
+      )}
+      {!nativeMacChrome && !settings.useNativeTitlebar && (
         <Titlebar
           darkMode={settings.enableDarkTheme}
           timerType={timer.timerType}

@@ -14,6 +14,7 @@ import {
   TRAY_ICON_RENDERERS,
 } from "components";
 import { detectOS } from "utils";
+import { isMacElectron } from "utils/isMacElectron";
 import { TrayIconStyle } from "store/settings/types";
 
 import SettingSection from "./SettingSection";
@@ -67,9 +68,10 @@ const HardwareSection: React.FC = () => {
     },
   ];
 
-  const windowToggles: TogglerProps[] = [
+  const windowToggles: (TogglerProps & { hidden?: boolean })[] = [
     {
       id: "native-titlebar",
+      hidden: isMacElectron(),
       label: t("settings.nativeTitlebar"),
       description: t("settings.nativeTitlebarDesc"),
       checked: settings.useNativeTitlebar,
@@ -90,6 +92,9 @@ const HardwareSection: React.FC = () => {
     },
   ];
 
+  const visibleWindowToggles = windowToggles.filter(
+    (toggle) => !toggle.hidden
+  );
   const trayStyle = {
     label: t("settings.trayIconStyle"),
     description: t("settings.trayIconStyleDesc"),
@@ -111,7 +116,7 @@ const HardwareSection: React.FC = () => {
       searchText={rowSearchText([
         ...visibleMenuBarToggles,
         trayStyle,
-        ...windowToggles,
+        ...visibleWindowToggles,
       ])}
     >
       {visibleMenuBarToggles.map(({ hidden, ...toggle }) => (
@@ -143,7 +148,7 @@ const HardwareSection: React.FC = () => {
           })}
         />
       </SettingRow>
-      {windowToggles.map((toggle) => (
+      {visibleWindowToggles.map(({ hidden, ...toggle }) => (
         <SettingToggle key={toggle.id} {...toggle} />
       ))}
     </SettingSection>

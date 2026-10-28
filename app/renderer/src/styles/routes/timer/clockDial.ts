@@ -9,17 +9,19 @@ export const StyledCozyTimer = styled.main`
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 18px 12px;
+  /* Slender 280px layout with balanced vertical breathing room */
+  padding: 8px 14px 10px;
 
   header {
     margin: 0 !important;
     padding: 0;
-    min-height: 26px;
-    flex: 0 0 26px;
+    width: 100%;
+    min-height: 24px;
+    flex: 0 0 24px;
   }
 
   header h3 {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 24px;
     letter-spacing: -0.3px;
     margin: 0;
@@ -34,7 +36,7 @@ export const StyledClockDial = styled.section<{
   --clock-accent: ${(p) => p.$accent};
   --clock-accent-readable: ${(p) => p.$accentReadable};
 
-  flex: 0 0 232px;
+  flex: 0 0 244px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -44,8 +46,8 @@ export const StyledClockDial = styled.section<{
 
   .clock-face {
     position: relative;
-    width: 232px;
-    height: 232px;
+    width: 244px;
+    height: 244px;
   }
 
   .clock-face > svg {
@@ -73,7 +75,7 @@ export const StyledClockDial = styled.section<{
 
   /* Luminous comet-head bead leading the arc */
   .orbit-bead {
-    transform-origin: 116px 116px;
+    transform-origin: 122px 122px;
   }
 
   .orbit-bead circle {
@@ -83,12 +85,12 @@ export const StyledClockDial = styled.section<{
     filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 6px var(--clock-accent));
   }
 
-  /* Centered countdown display */
+  /* Centered countdown display - commanding 48px hero typography */
   .dial-readout {
     position: absolute;
     top: 52px;
-    left: 16px;
-    right: 16px;
+    left: 14px;
+    right: 14px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -98,10 +100,10 @@ export const StyledClockDial = styled.section<{
 
   .countdown {
     margin: 0;
-    font-size: 44px;
-    line-height: 48px;
+    font-size: 48px;
+    line-height: 50px;
     font-weight: 600;
-    letter-spacing: -1.6px;
+    letter-spacing: -1.8px;
     font-variant-numeric: tabular-nums lining-nums;
     color: var(--color-text-primary);
   }
@@ -109,9 +111,9 @@ export const StyledClockDial = styled.section<{
   /* Playback controls centered in the lower arc */
   .clock-controls {
     position: absolute;
-    top: 132px;
-    left: 40px;
-    right: 40px;
+    top: 138px;
+    left: 42px;
+    right: 42px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -175,7 +177,7 @@ export const StyledClockDial = styled.section<{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: 310px;
+    max-width: 250px;
     font-size: 10px;
     line-height: 16px;
     color: var(--color-warning-text-readable);

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { isPreferredDark } from "utils";
+import { isMacElectron } from "utils/isMacElectron";
 import { GlobalStyles } from "styles";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { setEnableDarkTheme } from "store";
@@ -48,7 +49,7 @@ const ThemeProvider: React.FC = ({ children }) => {
     >
       <GlobalStyles
         isDarkMode={settings.enableDarkTheme}
-        useNativeTitlebar={useNativeTitlebar.current}
+        useNativeTitlebar={isMacElectron() || useNativeTitlebar.current}
       />
       {children}
     </ThemeContext.Provider>
