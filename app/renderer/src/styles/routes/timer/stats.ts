@@ -5,7 +5,7 @@ export const StyledTimerStatsGrid = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
 
   padding: 0 1.6rem;
@@ -50,4 +50,12 @@ export const StyledTimerStatSub = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+/** Activity names are text, rather than large numeric metrics. */
+export const StyledTimerActivityValue = styled.p`
+  ${typeStyle("meta")};
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-heading);
+  overflow-wrap: anywhere;
 `;

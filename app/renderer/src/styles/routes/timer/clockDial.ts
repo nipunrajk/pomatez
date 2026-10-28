@@ -1,10 +1,11 @@
 import styled, { css } from "styled-components/macro";
-import { focusRing } from "styles/mixins";
+import { focusRing, typeStyle } from "styles/mixins";
 
 export const StyledCozyTimer = styled.main`
   width: 100%;
   flex: 1 1 0;
   min-height: 0;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,14 +17,28 @@ export const StyledCozyTimer = styled.main`
     margin: 0 !important;
     padding: 0;
     width: 100%;
-    min-height: 24px;
-    flex: 0 0 24px;
+    min-height: 2.4rem;
+    flex: 0 0 auto;
+  }
+
+  @media (max-width: 260px), (max-height: 300px) {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 8px;
+
+    header {
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    header h3 {
+      overflow-wrap: anywhere;
+    }
   }
 
   header h3 {
-    font-size: 15px;
-    line-height: 24px;
-    letter-spacing: -0.3px;
+    ${typeStyle("hud-title")};
     margin: 0;
   }
 `;
@@ -36,7 +51,8 @@ export const StyledClockDial = styled.section<{
   --clock-accent: ${(p) => p.$accent};
   --clock-accent-readable: ${(p) => p.$accentReadable};
 
-  flex: 0 0 244px;
+  flex: 0 0 auto;
+  min-height: 244px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -45,6 +61,7 @@ export const StyledClockDial = styled.section<{
   padding: 0;
 
   .clock-face {
+    flex: 0 0 auto;
     position: relative;
     width: 244px;
     height: 244px;
@@ -100,10 +117,7 @@ export const StyledClockDial = styled.section<{
 
   .countdown {
     margin: 0;
-    font-size: 48px;
-    line-height: 50px;
-    font-weight: 600;
-    letter-spacing: -1.8px;
+    ${typeStyle("hud-timer")};
     font-variant-numeric: tabular-nums lining-nums;
     color: var(--color-text-primary);
   }
@@ -174,12 +188,10 @@ export const StyledClockDial = styled.section<{
   }
 
   .clock-status {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 250px;
-    font-size: 10px;
-    line-height: 16px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    ${typeStyle("hud-meta")};
     color: var(--color-warning-text-readable);
     text-align: center;
     margin-top: 4px;
@@ -200,6 +212,43 @@ export const StyledClockDial = styled.section<{
       }
     `}
 
+  /* At high zoom keep text and controls at readable sizes in normal flow.
+     The parent scrolls instead of cropping a fixed-size dial. */
+  @media (max-width: 260px), (max-height: 300px) {
+    flex: 0 0 auto;
+    min-height: 0;
+    width: 100%;
+
+    .clock-face {
+      width: 100%;
+      height: auto;
+    }
+
+    .clock-face > svg {
+      display: none;
+    }
+
+    .dial-readout, .clock-controls {
+      position: static;
+    }
+
+    .countdown {
+      ${typeStyle("hud-timer-compact")};
+    }
+
+    .clock-controls {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 12px;
+    }
+
+    button {
+      width: 32px;
+      height: 36px;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .orbit-progress,
     .orbit-bead {
@@ -211,7 +260,8 @@ export const StyledClockDial = styled.section<{
 export const StyledCozyFooter = styled.footer`
   position: relative;
   width: 100%;
-  flex: 0 0 18px;
+  flex: 0 0 auto;
+  min-height: 1.8rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -220,9 +270,7 @@ export const StyledCozyFooter = styled.footer`
 
   .cozy-round {
     color: var(--color-text-secondary-readable);
-    font-size: 11px;
-    line-height: 16px;
-    letter-spacing: 0.3px;
+    ${typeStyle("hud-meta")};
     font-variant-numeric: tabular-nums;
   }
 `;

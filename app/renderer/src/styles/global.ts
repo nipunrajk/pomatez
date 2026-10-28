@@ -21,7 +21,6 @@ export const GlobalStyles = createGlobalStyle<GlobalTypes>`
     padding:0;
     box-sizing: border-box;
     outline: none;
-    user-select: none;
     font-family: inherit;
     font-size: inherit;
     color: currentColor;
@@ -31,9 +30,13 @@ export const GlobalStyles = createGlobalStyle<GlobalTypes>`
     width: 100%;
     height: 100%;
 
+    /* 1rem = 10px at a 16px default; keep user text preferences scalable. */
     font-size: 62.5%;
     font-family: var(--font-body);
     font-weight: normal;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
     display: flex;
     align-items: center;
@@ -56,7 +59,6 @@ export const GlobalStyles = createGlobalStyle<GlobalTypes>`
     font-size: var(--type-body-size);
     font-weight: var(--type-body-weight);
     line-height: var(--type-body-line-height);
-    -webkit-font-smoothing: antialiased;
     color: var(--color-body-text);
 
     width: 100%;
@@ -89,7 +91,7 @@ export const GlobalStyles = createGlobalStyle<GlobalTypes>`
     color: var(--color-heading-text);
   }
 
-  /* Titles use the display serif; h4-h6 are small labels in this app. */
+  /* One UI family; semantic roles carry the heading hierarchy. */
   h1, h2, h3 {
     font-family: var(--font-display);
   }

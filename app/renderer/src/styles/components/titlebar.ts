@@ -27,6 +27,7 @@ export const StyledTitlebar = styled.div`
   align-content: center;
 
   -webkit-app-region: drag;
+  user-select: none;
   cursor: pointer;
 `;
 

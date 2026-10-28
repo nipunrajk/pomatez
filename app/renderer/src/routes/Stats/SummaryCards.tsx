@@ -5,6 +5,7 @@ import {
   StyledStatsCard,
   StyledStatsCardLabel,
   StyledStatsCardValue,
+  StyledStatsActivityValue,
   StyledStatsCardSub,
 } from "styles";
 import { RangeMode } from "hooks/useStats";
@@ -66,9 +67,9 @@ const SummaryCards: React.FC<Props> = ({
         <StyledStatsCardLabel>
           {t("stats.topActivity")}
         </StyledStatsCardLabel>
-        <StyledStatsCardValue>
+        <StyledStatsActivityValue>
           {topActivity ?? t("stats.none")}
-        </StyledStatsCardValue>
+        </StyledStatsActivityValue>
       </StyledStatsCard>
     </StyledStatsCardGrid>
   );

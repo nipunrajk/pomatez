@@ -7,6 +7,10 @@ export const StyledDashboard = styled.div`
   flex: 1 1;
   min-height: 0;
   display: flex;
+
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex-direction: column;
+  }
 `;
 
 /** layout.dashboard.sidebar; `collapsed` is the icon-only rail. */
@@ -32,6 +36,31 @@ export const StyledSidebar = styled.nav<{ collapsed?: boolean }>`
   background-color: var(--layout-dashboard-sidebar-bg);
   overflow-x: hidden;
   overflow-y: auto;
+
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 4px;
+    padding: 4px;
+    overflow: auto;
+
+    > div:first-child { display: none; }
+
+    > a, > button {
+      flex: 0 0 auto;
+      padding: 8px;
+      gap: 8px;
+      margin-top: 0 !important;
+    }
+
+    .label {
+      position: static;
+      width: auto;
+      height: auto;
+      clip-path: none;
+      overflow: visible;
+    }
+  }
 `;
 
 export const StyledSidebarBrand = styled.div<{ collapsed?: boolean }>`
@@ -175,6 +204,11 @@ export const StyledSidebarNotify = styled.span`
 
 /** Everything right of the sidebar: optional top bar over content + rail. */
 export const StyledDashboardMain = styled.div`
+  min-height: 0;
+
+  @media (max-width: 1000px), (max-height: 500px) {
+    overflow: auto;
+  }
   flex: 1 1;
   min-width: 0;
 
@@ -187,6 +221,11 @@ export const StyledDashboardBody = styled.div`
   min-height: 0;
 
   display: flex;
+
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex: 0 0 auto;
+    flex-direction: column;
+  }
 `;
 
 export const StyledDashboardContent = styled.div`
@@ -196,6 +235,16 @@ export const StyledDashboardContent = styled.div`
   display: flex;
   flex-direction: column;
   background-color: var(--layout-dashboard-content-bg);
+
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex: 0 0 auto;
+
+    > main {
+      height: auto;
+      flex: 0 0 auto;
+      overflow: visible;
+    }
+  }
 `;
 
 /**
@@ -229,6 +278,14 @@ export const StyledRightRail = styled.aside<{ compact?: boolean }>`
       overflow: hidden;
       border-left: none;
     `}
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex: 0 0 auto;
+    min-width: 0;
+    overflow: visible;
+    border-left: none;
+
+    > main { height: auto; flex: 0 0 auto; }
+  }
 `;
 
 export const StyledRightRailHeading = styled.h3`

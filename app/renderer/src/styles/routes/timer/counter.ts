@@ -53,6 +53,11 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
 
   position: relative;
 
+  @media (max-width: 1000px), (max-height: 500px) {
+    min-height: calc(var(--layout-compact-timer-ring-size) + 4rem);
+    flex: 0 0 auto;
+  }
+
   ${(p) =>
     p.fullscreen &&
     css`
@@ -116,7 +121,7 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
    * ring's inner space. Same role, scaled to fit with the icon and label.
    */
   font-size: 4.8rem;
-  /* Playfair defaults to old-style figures; keep digits even and steady. */
+  /* Use the UI face's tabular figures for a stable countdown. */
   font-variant-numeric: lining-nums tabular-nums;
   color: ${(p) => timerColor(p.type, true)};
 

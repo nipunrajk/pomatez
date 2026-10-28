@@ -28,12 +28,18 @@ export const StyledScrollbar = css`
 `;
 
 export type TypeRole =
+  | "hud-title"
+  | "hud-timer"
+  | "hud-timer-compact"
+  | "hud-meta"
   | "timer-display"
   | "timer-unit"
   | "page-title"
   | "section-title"
   | "card-title"
   | "list-title"
+  | "board-title"
+  | "settings-heading"
   | "brand"
   | "body"
   | "nav-item"

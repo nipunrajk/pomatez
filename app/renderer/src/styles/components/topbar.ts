@@ -17,6 +17,13 @@ export const StyledTopBar = styled.header`
   border-bottom: var(--border-width-hairline) solid
     var(--layout-dashboard-header-border-bottom);
 
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 12px;
+  }
+
   h2 {
     flex-shrink: 0;
     ${typeStyle("card-title")};

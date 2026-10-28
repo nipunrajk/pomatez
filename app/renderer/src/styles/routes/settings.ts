@@ -107,11 +107,7 @@ export const StyledSettingSection = styled.section`
 `;
 
 export const StyledSectionHeading = styled.h4`
-  ${typeStyle("eyebrow")};
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  ${typeStyle("settings-heading")};
   color: var(--color-text-secondary-readable);
 
   margin-bottom: var(--space-2);

@@ -29,6 +29,12 @@ export const StyledCPSection = styled.section<{ $fill?: boolean }>`
   min-height: ${(p) => (p.$fill ? "14rem" : "16rem")};
   max-height: ${(p) => (p.$fill ? "none" : "58%")};
 
+  @media (max-width: 1000px), (max-height: 500px) {
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: none;
+  }
+
   display: flex;
   flex-direction: column;
 `;
@@ -303,10 +309,7 @@ export const StyledBoardCard = styled.article<{ lifted?: boolean }>`
   ${focusRing};
 
   h5 {
-    ${typeStyle("body")};
-    font-size: 1.4rem;
-    line-height: 1.3;
-    font-weight: var(--font-weight-semibold);
+    ${typeStyle("board-title")};
     color: inherit;
 
     display: -webkit-box;
@@ -354,7 +357,7 @@ export const StyledBoardEyebrow = styled.div<{ lifted?: boolean }>`
   gap: var(--space-2);
 
   ${typeStyle("eyebrow")};
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: ${(p) =>
     p.lifted
       ? "var(--component-card-highlighted-text)"
@@ -392,7 +395,7 @@ export const StyledBoardFooter = styled.div<{
   gap: var(--space-3);
 
   ${typeStyle("meta")};
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-variant-numeric: tabular-nums;
   color: ${(p) =>
     p.lifted
@@ -746,7 +749,7 @@ export const StyledMilestoneRow = styled.li<{ open: boolean }>`
     p {
       margin-left: auto;
       ${typeStyle("meta")};
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       font-variant-numeric: tabular-nums;
       color: var(--color-text-secondary-readable);
     }

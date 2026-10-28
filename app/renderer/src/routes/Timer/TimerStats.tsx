@@ -6,6 +6,7 @@ import {
   StyledTimerStatCard,
   StyledTimerStatLabel,
   StyledTimerStatValue,
+  StyledTimerActivityValue,
   StyledTimerStatSub,
 } from "styles";
 import { formatMinutes } from "../Stats/formatMinutes";
@@ -38,9 +39,9 @@ const TimerStats: React.FC = () => {
         <StyledTimerStatLabel>
           {t("stats.topActivity")}
         </StyledTimerStatLabel>
-        <StyledTimerStatValue>
+        <StyledTimerActivityValue>
           {topActivity ?? t("stats.none")}
-        </StyledTimerStatValue>
+        </StyledTimerActivityValue>
       </StyledTimerStatCard>
     </StyledTimerStatsGrid>
   );

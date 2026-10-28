@@ -23,10 +23,14 @@ export const StyledBreakdownColumns = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
 
   align-items: start;
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 `;
 
 export const StyledStatsSubheading = styled.p`
@@ -117,13 +121,14 @@ export const StyledStatsCardGrid = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
 
   margin-bottom: 1.6rem;
 `;
 
 const Card = css`
+  min-width: 0;
   padding: var(--space-3);
 
   border-radius: var(--component-card-radius);
@@ -151,6 +156,13 @@ export const StyledStatsCardValue = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+export const StyledStatsActivityValue = styled.p`
+  ${typeStyle("body")};
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-heading);
+  overflow-wrap: anywhere;
 `;
 
 export const StyledStatsCardSub = styled.p`
@@ -273,12 +285,10 @@ export const StyledBreakdownRowTop = styled.div`
 `;
 
 export const StyledBreakdownName = styled.span`
-  font-size: 1.3rem;
+  min-width: 0;
+  ${typeStyle("meta")};
   color: var(--color-text-primary);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 `;
 
 export const StyledBreakdownMinutes = styled.span`
