@@ -105,6 +105,8 @@ export const ja = {
     joinDiscord: "Discord に参加！",
   },
   settings: {
+    menuBarCountdownDedupNote:
+      "Dynamic Notch Island にタイマーが表示されている間、メニューバーはアイコンのみになり、スペースを節約します。「テキストのみ」では常に残り時間が表示されます。",
     title: "設定",
     restoreDefault: "デフォルトに戻す",
     restored: "復元しました",

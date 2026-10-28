@@ -10,6 +10,7 @@ export type TogglerProps = {
   label: string;
   /** Helper text under the label. */
   description?: string;
+  note?: string;
   checked: boolean;
   disabled?: boolean;
   onChange?:
@@ -22,6 +23,7 @@ const Toggler: React.FC<TogglerProps> = ({
   id,
   label,
   description,
+  note,
   checked,
   disabled,
   onChange,
@@ -32,6 +34,7 @@ const Toggler: React.FC<TogglerProps> = ({
       <StyledTogglerLabel htmlFor={id}>
         {label}
         {description && <small>{description}</small>}
+        {note && <small>{note}</small>}
       </StyledTogglerLabel>
       <StyledTogglerSwitch
         type="checkbox"

@@ -106,6 +106,8 @@ export const es = {
     joinDiscord: "Únete a Discord!",
   },
   settings: {
+    menuBarCountdownDedupNote:
+      "Cuando Dynamic Notch Island muestra el temporizador, la barra de menús muestra solo el icono para ahorrar espacio. El modo Solo texto siempre conserva la cuenta atrás.",
     title: "Configuración",
     restoreDefault: "Restaurar valores",
     restored: "Restaurado correctamente",

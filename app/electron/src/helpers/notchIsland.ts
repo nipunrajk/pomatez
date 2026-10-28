@@ -36,15 +36,37 @@ export function createNotchIsland({
   preload,
   pageUrl,
   onClick,
+  onVisibilityChange,
 }: {
   preload: string;
   pageUrl: string;
   onClick: () => void;
+  onVisibilityChange?: (visible: boolean) => void;
 }) {
   let win: BrowserWindow | null = null;
   let lastState: NotchIslandState | null = null;
   let hideTimer: NodeJS.Timeout | null = null;
   let pageReady = false;
+  let reportedVisible = false;
+  let destroyed = false;
+
+  const isVisible = () =>
+    Boolean(
+      !destroyed &&
+        lastState?.enabled &&
+        lastState.active &&
+        pageReady &&
+        win &&
+        !win.isDestroyed() &&
+        win.isVisible() &&
+        hasNotch(screen.getPrimaryDisplay())
+    );
+  const notifyVisibility = () => {
+    const visible = isVisible();
+    if (visible === reportedVisible) return;
+    reportedVisible = visible;
+    onVisibilityChange?.(visible);
+  };
 
   const place = () => {
     if (!win || win.isDestroyed()) return;
@@ -59,7 +81,7 @@ export function createNotchIsland({
   const push = () => {
     if (!win || win.isDestroyed() || !pageReady || !lastState) return;
     const notch = hasNotch(screen.getPrimaryDisplay());
-    const visible = lastState.enabled && lastState.active;
+    const visible = lastState.enabled && lastState.active && notch;
     win.webContents.send(NOTCH_ISLAND_STATE, {
       ...lastState,
       visible,
@@ -111,18 +133,25 @@ export function createNotchIsland({
     win.webContents.once("did-finish-load", () => {
       pageReady = true;
       push();
+      notifyVisibility();
     });
+    win.webContents.on("render-process-gone", () => {
+      pageReady = false;
+      notifyVisibility();
+    });
+    win.on("show", notifyVisibility);
+    win.on("hide", notifyVisibility);
     win.on("closed", () => {
       win = null;
       pageReady = false;
+      notifyVisibility();
     });
     win.loadURL(pageUrl);
     return win;
   };
 
   const onDisplayChange = () => {
-    place();
-    push();
+    reconcile();
   };
   let listening = false;
   // `screen` can't be touched before the app is ready, so subscribe lazily.
@@ -134,28 +163,40 @@ export function createNotchIsland({
     screen.on("display-removed", onDisplayChange);
   };
 
-  return {
-    update(state: NotchIslandState) {
-      lastState = state;
-      const visible = state.enabled && state.active;
-
-      if (hideTimer) {
-        clearTimeout(hideTimer);
+  const reconcile = () => {
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+    const visible =
+      lastState?.enabled &&
+      lastState.active &&
+      hasNotch(screen.getPrimaryDisplay());
+    if (visible) {
+      const w = ensureWindow();
+      place();
+      if (!w.isVisible()) w.showInactive();
+      push();
+    } else if (win && !win.isDestroyed()) {
+      push();
+      hideTimer = setTimeout(() => {
         hideTimer = null;
-      }
+        if (win && !win.isDestroyed()) win.hide();
+        notifyVisibility();
+      }, HIDE_DELAY_MS);
+    }
+    notifyVisibility();
+  };
 
-      if (visible) {
-        const w = ensureWindow();
-        place();
-        if (!w.isVisible()) w.showInactive();
-        push();
-      } else if (win && !win.isDestroyed()) {
-        push();
-        hideTimer = setTimeout(() => {
-          hideTimer = null;
-          if (win && !win.isDestroyed()) win.hide();
-        }, HIDE_DELAY_MS);
-      }
+  return {
+    isVisible,
+    update(state: NotchIslandState) {
+      if (destroyed) return;
+      lastState = state;
+      // Listen even without an overlay so hotplugging a notched primary
+      // display can reveal an already-running timer.
+      listenToDisplays();
+      reconcile();
     },
 
     setHovering(hovering: boolean) {
@@ -166,6 +207,8 @@ export function createNotchIsland({
     click: onClick,
 
     destroy() {
+      destroyed = true;
+      notifyVisibility();
       if (listening) {
         screen.off("display-metrics-changed", onDisplayChange);
         screen.off("display-added", onDisplayChange);

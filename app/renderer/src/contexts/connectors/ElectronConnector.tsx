@@ -23,7 +23,6 @@ import {
   SET_NATIVE_TITLEBAR,
   SET_UI_THEME,
   TRAY_ICON_UPDATE,
-  TRAY_TITLE_UPDATE,
   NOTCH_ISLAND_UPDATE,
   SET_OPEN_AT_LOGIN,
   SET_RPC_ACTIVITY,
@@ -39,9 +38,10 @@ import {
 } from "@pomatez/shareables";
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
+import { useTrayTitleUpdates } from "hooks/useTrayTitleUpdates";
 import { useWindowSurfaceKeys } from "hooks/useWindowSurfaceKeys";
 import { TimerStatus } from "store/timer/types";
-import { AppLayout, TrayIconStyle } from "store/settings/types";
+import { AppLayout } from "store/settings/types";
 import { detectOS } from "utils";
 import {
   CalendarEvent,
@@ -244,10 +244,6 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
     electron.send(TRAY_ICON_UPDATE, { dataUrl, isTemplate });
   });
 
-  const isTextTrayStyle =
-    settings.trayIconStyle === TrayIconStyle.TEXT_ONLY ||
-    settings.trayIconStyle === TrayIconStyle.ICON_TEXT;
-
   const presentation = getTimerPresentation({
     count,
     duration,
@@ -256,22 +252,13 @@ export const ElectronConnectorProvider: React.FC = ({ children }) => {
   });
   const { time, progress } = presentation;
 
-  useEffect(() => {
-    if (
-      (settings.showTimerInTrayBar || isTextTrayStyle) &&
-      (active || isTextTrayStyle)
-    ) {
-      electron.send(TRAY_TITLE_UPDATE, time);
-    } else {
-      electron.send(TRAY_TITLE_UPDATE, "");
-    }
-  }, [
-    electron,
-    settings.showTimerInTrayBar,
-    isTextTrayStyle,
-    active,
+  useTrayTitleUpdates({
+    send: electron.send,
+    style: settings.trayIconStyle,
+    showTimer: settings.showTimerInTrayBar,
+    active: !!active,
     time,
-  ]);
+  });
 
   useEffect(() => {
     electron.send(NOTCH_ISLAND_UPDATE, {

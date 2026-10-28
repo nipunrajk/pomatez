@@ -45,3 +45,38 @@ export function bindTrayInteractions(
   });
   tray.on("right-click", showMenu);
 }
+
+/** Cache the renderer title so hiding the island restores it immediately. */
+export function createTrayTitleCoordinator(options: {
+  tray: () => Pick<Tray, "setTitle"> | null;
+  macOS: boolean;
+  islandVisible: () => boolean;
+}) {
+  let title = "";
+  let textOnly = false;
+  let iconAvailable = true;
+  const refresh = () => {
+    const iconless = textOnly || !iconAvailable;
+    const deduplicate =
+      options.macOS && !iconless && options.islandVisible();
+    options
+      .tray()
+      ?.setTitle(
+        deduplicate ? "" : title || (iconless ? "Pomatez" : "")
+      );
+  };
+  return {
+    refresh,
+    setTitle(next: string, nextTextOnly = false) {
+      title = next;
+      textOnly = nextTextOnly;
+      refresh();
+    },
+    // Icon and title IPCs arrive separately. Keep an icon-less status item
+    // clickable even between style updates or with an older renderer.
+    setIconAvailable(available: boolean) {
+      iconAvailable = available;
+      refresh();
+    },
+  };
+}

@@ -305,6 +305,8 @@ export const en = {
     joinDiscord: "Join us on Discord!",
   },
   settings: {
+    menuBarCountdownDedupNote:
+      "When Dynamic Notch Island is displaying the timer, the menu bar shows only the icon to save space. Text Only mode always keeps the countdown.",
     title: "Settings",
     restoreDefault: "Restore Defaults",
     restored: "Restored Successfully",

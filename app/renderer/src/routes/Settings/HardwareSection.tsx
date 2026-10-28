@@ -60,6 +60,7 @@ const HardwareSection: React.FC = () => {
       id: "show-timer-in-tray-bar",
       label: t("settings.showTimerInTrayBar"),
       description: t("settings.showTimerInTrayBarDesc"),
+      note: t("settings.menuBarCountdownDedupNote"),
       checked: settings.showTimerInTrayBar,
       hidden: !isMacOS,
       onChange: useCallback(() => {

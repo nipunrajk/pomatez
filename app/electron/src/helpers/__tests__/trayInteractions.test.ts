@@ -1,6 +1,9 @@
 import { EventEmitter } from "events";
 import { Menu, Tray } from "electron";
-import { bindTrayInteractions } from "../trayInteractions";
+import {
+  bindTrayInteractions,
+  createTrayTitleCoordinator,
+} from "../trayInteractions";
 
 function setup(macOS = true) {
   const tray = Object.assign(new EventEmitter(), {
@@ -101,5 +104,62 @@ describe("status-item gestures", () => {
     expect(restore).toHaveBeenCalledTimes(1);
     expect(toggleHud).not.toHaveBeenCalled();
     expect(tray.listenerCount("right-click")).toBe(0);
+  });
+});
+
+describe("tray countdown deduplication", () => {
+  function titleSetup(macOS = true) {
+    const tray = { setTitle: jest.fn() };
+    let visible = false;
+    const manager = createTrayTitleCoordinator({
+      tray: () => tray,
+      macOS,
+      islandVisible: () => visible,
+    });
+    return {
+      tray,
+      manager,
+      visibility(next: boolean) {
+        visible = next;
+        manager.refresh();
+      },
+    };
+  }
+  it("suppresses only while visible and restores the latest cached countdown immediately", () => {
+    const { tray, manager, visibility } = titleSetup();
+    manager.setTitle("24:59");
+    expect(tray.setTitle).toHaveBeenLastCalledWith("24:59");
+    visibility(true);
+    expect(tray.setTitle).toHaveBeenLastCalledWith("");
+    manager.setTitle("24:58");
+    expect(tray.setTitle).toHaveBeenLastCalledWith("");
+    visibility(false);
+    expect(tray.setTitle).toHaveBeenLastCalledWith("24:58");
+  });
+  it("never suppresses Text Only and supports switching back to icon styles", () => {
+    const { tray, manager, visibility } = titleSetup();
+    visibility(true);
+    manager.setTitle("24:59", true);
+    expect(tray.setTitle).toHaveBeenLastCalledWith("24:59");
+    manager.setTitle("24:59", false);
+    expect(tray.setTitle).toHaveBeenLastCalledWith("");
+  });
+  it("keeps an icon-less tray clickable between separate icon and title updates", () => {
+    const { tray, manager, visibility } = titleSetup();
+    visibility(true);
+    manager.setIconAvailable(false);
+    expect(tray.setTitle).toHaveBeenLastCalledWith("Pomatez");
+    manager.setTitle("24:59"); // Legacy string payload cannot defeat the empty-icon guard.
+    expect(tray.setTitle).toHaveBeenLastCalledWith("24:59");
+    manager.setIconAvailable(true);
+    expect(tray.setTitle).toHaveBeenLastCalledWith("");
+  });
+  it("retains configured idle/disabled titles and does not deduplicate outside macOS", () => {
+    const { tray, manager, visibility } = titleSetup(false);
+    visibility(true);
+    manager.setTitle("25:00");
+    expect(tray.setTitle).toHaveBeenLastCalledWith("25:00");
+    manager.setTitle("");
+    expect(tray.setTitle).toHaveBeenLastCalledWith("");
   });
 });

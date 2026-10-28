@@ -22,8 +22,6 @@ export const useTrayIconUpdates = (
   const dashOffset = (duration - count) * (24 / duration);
 
   useEffect(() => {
-    if (!timer.playing) return;
-
     // Text-only relies on the OS rendering a title next to a removed
     // icon, which only macOS reliably supports. Elsewhere, fall back to
     // the Minimal icon so the tray never goes blank.
@@ -55,11 +53,18 @@ export const useTrayIconUpdates = (
     const img = new Image();
     img.src = svgXML;
 
+    let cancelled = false;
     img.onload = function () {
+      if (cancelled) return;
       ctx?.drawImage(img, 0, 0);
       const dataUrl = canvas.toDataURL("image/png");
 
       onNewIcon({ dataUrl, isTemplate });
+    };
+
+    return () => {
+      cancelled = true;
+      img.onload = null;
     };
   }, [onNewIcon, timer.playing, timerType, dashOffset, trayIconStyle]);
 };

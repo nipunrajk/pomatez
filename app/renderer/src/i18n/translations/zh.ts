@@ -104,6 +104,8 @@ export const zh = {
     joinDiscord: "加入 Discord！",
   },
   settings: {
+    menuBarCountdownDedupNote:
+      "Dynamic Notch Island 显示计时器时，菜单栏仅显示图标以节省空间。“仅文本”模式始终保留倒计时。",
     title: "设置",
     restoreDefault: "恢复默认",
     restored: "已成功恢复",

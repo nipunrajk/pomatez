@@ -69,7 +69,10 @@ import {
 import isDev from "electron-is-dev";
 import store, { AppLayoutName } from "./store";
 import { COMPACT_WIDTH, getCompactHeight } from "./helpers/compactSize";
-import { bindTrayInteractions } from "./helpers/trayInteractions";
+import {
+  bindTrayInteractions,
+  createTrayTitleCoordinator,
+} from "./helpers/trayInteractions";
 import {
   clampBounds,
   createWindowSurfaces,
@@ -429,6 +432,7 @@ const contextMenu = Menu.buildFromTemplate([
 function createSystemTray() {
   tray = new Tray(trayIcon);
   tray.setToolTip(trayTooltip);
+  trayTitles.refresh();
   bindTrayInteractions(tray, {
     macOS: isMacOS(),
     menu: () => trayContextMenu || contextMenu,
@@ -653,6 +657,7 @@ ipcMain.on(
       // title text; other platforms can't show a title, so the renderer
       // falls back to a non-null icon there (see useTrayIconUpdates).
       if (process.platform === "darwin") {
+        trayTitles.setIconAvailable(false);
         tray?.setImage(nativeImage.createEmpty());
       }
       return;
@@ -663,8 +668,15 @@ ipcMain.on(
       image.setTemplateImage(true);
     }
     tray?.setImage(image);
+    trayTitles.setIconAvailable(true);
   }
 );
+
+const trayTitles = createTrayTitleCoordinator({
+  tray: () => tray,
+  macOS: process.platform === "darwin",
+  islandVisible: () => notchIsland?.isVisible() ?? false,
+});
 
 // Dynamic Island timer around the notch (macOS only). The renderer pushes
 // timer state; the overlay window shows/hides itself from it.
@@ -677,6 +689,7 @@ const notchIsland =
           "assets",
           "notchIsland.html"
         )}`,
+        onVisibilityChange: () => trayTitles.refresh(),
         onClick: () =>
           surfaces
             ? surfaces.toggle("notch")
@@ -697,9 +710,18 @@ ipcMain.on(NOTCH_ISLAND_CLICK, (e) => {
   if (notchIsland?.owns(e.sender)) notchIsland.click();
 });
 
-ipcMain.on(TRAY_TITLE_UPDATE, (e, title) => {
-  tray?.setTitle(title || "");
-});
+ipcMain.on(
+  TRAY_TITLE_UPDATE,
+  (e, payload: string | { title: string; textOnly?: boolean }) => {
+    if (e.sender !== win?.webContents) return;
+    const title = typeof payload === "string" ? payload : payload?.title;
+    if (typeof title !== "string") return;
+    trayTitles.setTitle(
+      title,
+      typeof payload === "object" && !!payload.textOnly
+    );
+  }
+);
 
 const GOOGLE_OAUTH_FILE = "google-oauth.json";
 
